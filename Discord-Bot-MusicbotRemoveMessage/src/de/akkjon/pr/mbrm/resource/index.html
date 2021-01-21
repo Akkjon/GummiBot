@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        body {
+            text-align: center;
+            background-color: #3a3a3a;
+            color: white;
+        }
+        header, .bottomList {
+            padding: 20px 0;
+        }
+        .addArea {
+            background-color: #666666;
+            color: white;
+            padding: 20px 10px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-column-gap: 10px;
+        }
+        input {
+            padding: 10px;
+        }
+        input[type=submit], button {
+            color: white;
+            background-color: black;
+            transition: .3s;
+            border: 0px solid black;
+            cursor: pointer;
+        }
+        input[type=submit]:hover, button:hover {
+            background-color: #1b1b1b;
+        }
+        .bottomList {
+            margin: 0 10px;
+        }
+        .bottomList div {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            border-bottom: 1px solid black;
+            margin: 5px 0;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+        }
+        .bottomList div span {
+            overflow: auto;
+        }
+        .bottomList div button {
+            padding: 5px;
+        }
+
+        .controlArea {
+            padding: 20px;
+        }
+        .controlArea button {
+            padding: 10px;
+            background-color: red;
+
+
+        }
+        .controlArea button:hover {
+            background-color: #970000;
+            box-shadow: 1px 0px 68px 26px rgba(255,0,0,0.75);
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Überschrift</h1>
+    </header>
+    <div class="controlArea">
+        <button onclick="stopbot('stop', true)">Bot stoppen</button>
+        <button onclick="stopbot('restart', true)">Bot neustarten</button>
+        <button onclick="stopbot('update', false)">Bot updaten</button>
+    </div>
+    <form class="addArea">
+        <input type="text" placeholder="Element" required/>
+        <input type="submit" value="Hinzufügen">
+    </form>
+    <div class="bottomList">
+        
+    </div>
+    <script>
+
+        document.querySelector(".addArea").addEventListener("submit", (e) => {
+            e.preventDefault();
+			var input = document.querySelector(".addArea input[type=text]");
+            var content = input.value;
+			
+            if(content.replace(new RegExp(" ", "g"), "").length > 0) {
+                $.get("/adddata/" + encodeURI(content), (data) => {
+                console.log(data);
+                    if(data == "succ") {
+                        addElement(content);
+						input.value = "";
+                    } else {
+                        alert("Fehler aufgetreten... Tja. Logs lesen können könnte helfen.")
+                    }
+                }, "text");
+            } else {
+                alert("Dein scheiß Ernst?")
+            }
+        })
+
+        $.getJSON("/getdata", (data) => {
+            for(var i = 0; i<data.length; i++) {
+                var msg = data[i];
+                addElement(msg);
+            }
+        });
+
+        function addElement(msg) {
+            var div = document.createElement("div");
+            var span = document.createElement("span");
+            span.innerHTML = msg;
+            var button = document.createElement("button");
+            button.innerHTML = "Löschen";
+            button.onclick = () => {
+                remove(div);
+            }
+            div.appendChild(span);
+            div.appendChild(button);
+            document.querySelector(".bottomList").appendChild(div);
+        }
+
+        function remove(element) {
+            var text = element.querySelector("span").innerHTML;
+            $.get("/removedata/" + encodeURI(text), (data) => {
+                if(data=="succ") {
+                    element.remove();
+                } else {
+                    alert("FUCK NO")
+                }
+            }, "text");
+        }
+
+        function stopbot(url, isAlert) {
+        	var result = true;
+        	if(isAlert) {
+            	result =confirm("WILLST DU DAS WIRKLICH?? R U SERIOUS?");
+            }
+            if(result==true) {
+                $.get("/control/" + url + "bot", (data) => {
+                    if(data=="succ") {
+                        location.reload();
+                    } else {
+                        alert("OH FUCK WHY. I am in pain.");
+                    }
+                }, "text")
+            }
+        }
+
+    </script>
+</body>
+</html>
