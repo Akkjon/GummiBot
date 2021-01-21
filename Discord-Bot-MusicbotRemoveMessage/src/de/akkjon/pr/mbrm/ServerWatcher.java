@@ -15,11 +15,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ServerWatcher {
 	
-	private static List<WeakReference<ServerWatcher>> serverWatchers = new ArrayList<>();
+	private static final List<WeakReference<ServerWatcher>> serverWatchers = new ArrayList<>();
 	
-	private long serverId;
+	private final long serverId;
 	private Long[] channels;
-	private String prefix = "~";
+	private final String prefix = "~";
 	
 	public ServerWatcher(long serverId) throws AlreadyBoundException {
 		for (WeakReference<ServerWatcher> weakReference : serverWatchers) {
@@ -60,7 +60,7 @@ public class ServerWatcher {
 						String content = event.getMessage().getContentRaw();
 						if(content.startsWith(prefix)) { 
 							content = content.substring(prefix.length());
-							String[] args = Arrays.asList(content.split(" ")).stream().filter(e -> e.length()>0).toArray(String[]::new);
+							String[] args = Arrays.stream(content.split(" ")).filter(e -> e.length()>0).toArray(String[]::new);
 							if(args.length==0) {
 								return;
 							}
@@ -192,17 +192,13 @@ public class ServerWatcher {
 	}
 	
 	private void removeMessages(MessageChannel channel, String messageId) {
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
-				List<Message> messages = messageHistory.getRetrievedHistory();
-				for(int i = 0; i<messages.size()-1; i++) {
-					try {
-						messages.get(i).delete().complete();
-					} catch (Exception e) {}
-				}
+		new Thread(() -> {
+			MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
+			List<Message> messages = messageHistory.getRetrievedHistory();
+			for(int i = 0; i<messages.size()-1; i++) {
+				try {
+					messages.get(i).delete().complete();
+				} catch (Exception ignored) {}
 			}
 		}).start();
 	}

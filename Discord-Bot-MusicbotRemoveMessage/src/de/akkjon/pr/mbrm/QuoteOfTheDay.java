@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.entities.MessageHistory;
 
 public class QuoteOfTheDay {
 	
-	private static Gson gson = new Gson();
+	private static final Gson gson = new Gson();
 	
 	public static String getQotdPath(long serverId) {
 		return Storage.rootFolder + serverId + File.separator + "qotd.txt";
@@ -67,7 +67,7 @@ public class QuoteOfTheDay {
 	
 	
 	
-	private long serverId;
+	private final long serverId;
 	public QuoteOfTheDay(long serverId) {
 		this.serverId = serverId;
 		Timer timer = new Timer("QuoteOfTheDay-" + serverId, true);

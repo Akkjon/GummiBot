@@ -60,11 +60,11 @@ public class Storage {
 	}
 	
 	public static Long[] addChannel(long serverId, long channelId) throws IOException {
-		List<Long> channels = new ArrayList<Long>(Arrays.asList(getChannels(serverId)));
+		List<Long> channels = new ArrayList<>(Arrays.asList(getChannels(serverId)));
 		
 		if(!channels.contains(channelId)) {
 			channels.add(channelId);
-			Long[] output = channels.toArray(new Long[channels.size()]);
+			Long[] output = channels.toArray(new Long[0]);
 			save(serverId, output);
 			return output;
 		}
@@ -72,10 +72,10 @@ public class Storage {
 	}
 	
 	public static Long[] removeChannel(long serverId, long channelId) throws IOException {
-		List<Long> channels = new ArrayList<Long>(Arrays.asList(getChannels(serverId)));
+		List<Long> channels = new ArrayList<>(Arrays.asList(getChannels(serverId)));
 		if(channels.contains(channelId)) {
 			channels.remove(channelId);
-			Long[] output = channels.toArray(new Long[channels.size()]);
+			Long[] output = channels.toArray(new Long[0]);
 			save(serverId, output);
 			return output;
 		}
@@ -100,7 +100,7 @@ public class Storage {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			List<String> lines = reader.lines().collect(Collectors.toList());
 			reader.close();
-			String output = String.join("", lines.toArray(new String[lines.size()]));
+			String output = String.join("", lines.toArray(new String[0]));
 			return output;
 		}
 		return defautVal;
@@ -108,7 +108,7 @@ public class Storage {
 	
 	public static List<String> getStringArrayFromFile(String input) {
 		List<String> arrInput = Arrays.asList(input.replace("[", "").replace("]", "").split(", "));
-		arrInput = arrInput.stream().filter(e -> {return e.trim().length() > 0;}).collect(Collectors.toList());
+		arrInput = arrInput.stream().filter(e -> e.trim().length() > 0).collect(Collectors.toList());
 		return arrInput;
 	}
 	
@@ -119,7 +119,7 @@ public class Storage {
 		}
 		Long[] output = new Long[arrInput.size()];
 		for (int i = 0; i<arrInput.size(); i++) {
-			Long l = Long.parseLong(arrInput.get(i));
+			long l = Long.parseLong(arrInput.get(i));
 			output[i] = l;
 		}
 		return output;

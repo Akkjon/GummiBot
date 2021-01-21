@@ -30,14 +30,14 @@ public class Logger extends PrintStream {
 	}
 	
 	public static String getFilePath() {
-		return Storage.jarFolder + File.separator + "logs" + File.separator + "log_" + new SimpleDateFormat("dd.MM.YYYY_HH_mm_ss").format(new Date()) + ".log";
+		return Storage.jarFolder + File.separator + "logs" + File.separator + "log_" + new SimpleDateFormat("dd.MM.yyyy_HH_mm_ss").format(new Date()) + ".log";
 	}
 	
 	public static String getTimePrefix() {
-		return "[" + new SimpleDateFormat("dd.MM.YYYY - HH:mm:ss").format(new Date()) + "] ";
+		return "[" + new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss").format(new Date()) + "] ";
 	}
 	
-	private PrintStream defaultStream;
+	private final PrintStream defaultStream;
 	private boolean printTimePrefix = true;
 	
 	private Logger(String mode, PrintStream defaultStream) {
@@ -157,7 +157,7 @@ public class Logger extends PrintStream {
 		
 		try {
 			writeToLogFile(s);
-		} catch (IOException e) {}
+		} catch (IOException ignored) {}
 	}
 	
 	

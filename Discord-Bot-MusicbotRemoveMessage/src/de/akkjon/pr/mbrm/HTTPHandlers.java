@@ -1,22 +1,15 @@
 package de.akkjon.pr.mbrm;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.text.StringEscapeUtils;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.commons.text.StringEscapeUtils;
+
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 class Index implements HttpHandler {
 
@@ -34,12 +27,12 @@ class GetHandler implements HttpHandler {
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
 		List<String> data = Handler.getData();
-		String out = "";
+		StringBuilder out = new StringBuilder();
 		for (String string : data) {
-			out += ", \"" + string + "\"";
+			out.append(", \"").append(string).append("\"");
 		}
 		if(out.length() > 0) {
-			out = out.substring(2);
+			out = new StringBuilder(out.substring(2));
 		}
 		String response = "[" + out + "]";
 		Handler.respond(exchange, response, true);
@@ -171,7 +164,7 @@ class Handler {
 		if(isJson) {
 			exchange.getResponseHeaders().set("charset", "utf-8");
 			exchange.getResponseHeaders().set("Content-Type", "application/json");
-			res = new String(res.getBytes(Charset.forName("utf-8")));
+			res = new String(res.getBytes(StandardCharsets.UTF_8));
 		}
 		exchange.sendResponseHeaders(200, res.length());
 		OutputStream os = exchange.getResponseBody();

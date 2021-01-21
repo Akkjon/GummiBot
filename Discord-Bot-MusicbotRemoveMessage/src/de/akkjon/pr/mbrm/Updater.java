@@ -53,23 +53,19 @@ public class Updater {
 	}
 	
 	public void updateRoutine() {
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				boolean newVersionAvail = false;
+		new Thread(() -> {
+			boolean newVersionAvail = false;
+			try {
+				newVersionAvail = isNewVersionAvail();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			if(newVersionAvail) {
 				try {
-					newVersionAvail = isNewVersionAvail();
-				} catch (IOException e) {
+					update();
+				} catch (Exception e) {
 					e.printStackTrace();
-				}
-				
-				if(newVersionAvail) {
-					try {
-						update();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
 				}
 			}
 		}).start();
@@ -80,7 +76,7 @@ public class Updater {
 		System.out.println("Checking for updates...");
 		BufferedInputStream in = new BufferedInputStream(new URL(versionUrl).openStream());
 		String content = "";
-	    byte dataBuffer[] = new byte[1024];
+	    byte[] dataBuffer = new byte[1024];
 	    //int bytesRead;
 	    
 	    while ((in.read(dataBuffer, 0, 1024)) != -1) {
@@ -105,7 +101,7 @@ public class Updater {
 		BufferedInputStream in = new BufferedInputStream(new URL(newDownloadUrl).openStream());
 		String filePath = Storage.getJarName();
 		FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-	    byte dataBuffer[] = new byte[1024];
+	    byte[] dataBuffer = new byte[1024];
 	    int bytesRead;
 	    
 	    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {

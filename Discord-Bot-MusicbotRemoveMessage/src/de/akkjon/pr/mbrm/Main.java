@@ -7,8 +7,6 @@ import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,7 +23,7 @@ import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class Main extends ListenerAdapter {
-	private static String token = "Nzk5MzcxNTE3NzgzMzEwMzM2.YACmvQ.eVLv8VH9MYL7k3UjWaWsEWIcoCo";
+	private static final String token = "Nzk5MzcxNTE3NzgzMzEwMzM2.YACmvQ.eVLv8VH9MYL7k3UjWaWsEWIcoCo";
 	public static JDA jda;
 	public static void main(String[] args) {
 		Logger.init();
@@ -85,23 +83,23 @@ public class Main extends ListenerAdapter {
 	
 	public static MessageEmbed getEmbedMessage(String title, String message) {
 		MessageEmbed embed = new MessageEmbed(
-				null, 
-				title, 
-				message, 
-				EmbedType.UNKNOWN, 
-				null, 
-				new Color(0, 255, 0).getRGB(), 
-				null, 
 				null,
-				null, 
-				null, 
+				title,
+				message,
+				EmbedType.UNKNOWN,
+				null,
+				new Color(0, 255, 0).getRGB(),
+				null,
+				null,
+				null,
+				null,
 				new MessageEmbed.Footer("Gummi", null, null),
-				null, 
+				null,
 				new ArrayList<>()
 			);
 		return embed;
 	}
-	
+
 	private static void setIcon() {
 		
 		if(SystemTray.isSupported()) {
@@ -109,15 +107,11 @@ public class Main extends ListenerAdapter {
 			
 			try {
 				TrayIcon icon = new TrayIcon(image, "Gummi-Dashboard");
-				icon.addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						try {
-							Desktop.getDesktop().browse(new URI("http://localhost:8088"));
-						} catch (IOException | URISyntaxException e1) {
-							e1.printStackTrace();
-						}
+				icon.addActionListener(e -> {
+					try {
+						Desktop.getDesktop().browse(new URI("http://localhost:8088"));
+					} catch (IOException | URISyntaxException e1) {
+						e1.printStackTrace();
 					}
 				});
 				icon.setImageAutoSize(true);

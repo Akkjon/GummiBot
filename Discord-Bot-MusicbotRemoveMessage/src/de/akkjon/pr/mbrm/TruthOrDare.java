@@ -11,7 +11,7 @@ import com.google.gson.JsonPrimitive;
 
 public class TruthOrDare {
 	
-	private static Gson gson = new Gson();
+	private static final Gson gson = new Gson();
 	
 	public static String getTruth(long serverId) throws IOException {
 		JsonArray global = getGlobal("truth");
