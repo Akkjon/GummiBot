@@ -44,7 +44,7 @@ public class Main extends ListenerAdapter {
 				e.printStackTrace();
 			}
 			new Main();
-			setIcon();
+//			setIcon();
 		} catch (LoginException e) {
 			System.err.println("What? No");
 			e.printStackTrace();

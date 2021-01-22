@@ -86,7 +86,7 @@ class AddHandler implements HttpHandler {
 	}
 }
 
-class ControllHandler implements HttpHandler {
+class ControlHandler implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
@@ -180,7 +180,7 @@ class Handler {
 		server.createContext("/adddata", new AddHandler());
 		server.createContext("/removedata", new RemoveHandler());
 		server.createContext("/getdata", new GetHandler());
-		server.createContext("/control", new ControllHandler());
+		server.createContext("/control", new ControlHandler());
 		server.setExecutor(null);
 		server.start();
 	}

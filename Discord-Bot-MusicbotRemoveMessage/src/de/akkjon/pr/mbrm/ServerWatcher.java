@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GenericGuildMessageReactionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ServerWatcher {
@@ -20,6 +21,7 @@ public class ServerWatcher {
 	private final long serverId;
 	private Long[] channels;
 	private final String prefix = "~";
+	private TruthOrDare tod = new TruthOrDare();
 	
 	public ServerWatcher(long serverId) throws AlreadyBoundException {
 		for (WeakReference<ServerWatcher> weakReference : serverWatchers) {
@@ -30,6 +32,7 @@ public class ServerWatcher {
 		this.serverId = serverId;
 		initChannels();
 		initCommandListeners();
+		initReactionListeners();
 		new QuoteOfTheDay(serverId);
 	}
 	
@@ -164,6 +167,20 @@ public class ServerWatcher {
 								} else {
 									event.getChannel().sendMessage(Main.getEmbedMessage("Error", "How dare you?")).complete();
 								}
+							} else if (args[0].equalsIgnoreCase("play")) {
+								if(args.length > 1) {
+									if(args[1].equalsIgnoreCase("tod") || args[1].equalsIgnoreCase("truthOrDare")) {
+										tod.resetPlayers();
+										Message message = event.getChannel().sendMessage(Main.getEmbedMessage("Game",
+												"Who wants to play a game?\n" +
+														"React with 👍 to enter the game.\n" +
+														"Click ➡ to start the game.")).complete();
+										message.addReaction("👍").queue();
+										message.addReaction("➡").queue();
+									}
+								} else {
+									event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What u wanna play bitch?")).complete();
+								}
 							} else {
 								event.getChannel().sendMessage(
 										"```Channel-Cleaning:\n"
@@ -190,7 +207,39 @@ public class ServerWatcher {
 			}
 		});
 	}
-	
+
+	public void initReactionListeners() {
+		Main.jda.addEventListener(new ListenerAdapter() {
+			@Override
+			public void onGenericGuildMessageReaction(GenericGuildMessageReactionEvent event) {
+				if (!event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
+					if (event.getReactionEmote().getName().equals("👍")) {
+						tod.addPlayer(event.getMember().getIdLong());
+					} else if (event.getReactionEmote().getName().equals("➡")) {
+						MessageHistory.getHistoryAround(event.getChannel(), event.getMessageId()).complete().getMessageById(event.getMessageId()).delete().complete();
+						Message message = event.getChannel().sendMessage(Main.getEmbedMessage("Let the games begin... " + tod.players.size() + " players", "<@" + tod.getNextPlayer() + ">... Truth or Dare?")).complete();
+						message.addReaction("1️⃣").queue();
+						message.addReaction("2️⃣").queue();
+					} else if (event.getReactionEmote().getName().equals("1️⃣")) {
+						try {
+							event.getChannel().sendMessage(Main.getEmbedMessage("Truth", TruthOrDare.getTruth(serverId))).complete();
+						} catch (IOException e) {
+							event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Why is life so fucking difficult?")).complete();
+							e.printStackTrace();
+						}
+					} else if (event.getReactionEmote().getName().equals("2️⃣")) {
+						try {
+							event.getChannel().sendMessage(Main.getEmbedMessage("Dare", TruthOrDare.getDare(serverId))).complete();
+						} catch (IOException e) {
+							event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Why is life so fucking difficult?")).complete();
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		});
+	}
+
 	private void removeMessages(MessageChannel channel, String messageId) {
 		new Thread(() -> {
 			MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();

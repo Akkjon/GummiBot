@@ -3,6 +3,7 @@ package de.akkjon.pr.mbrm;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -12,6 +13,8 @@ import com.google.gson.JsonPrimitive;
 public class TruthOrDare {
 	
 	private static final Gson gson = new Gson();
+	final ArrayList<Long> players = new ArrayList<>();
+	private int lastPlayer = 0;
 	
 	public static String getTruth(long serverId) throws IOException {
 		JsonArray global = getGlobal("truth");
@@ -88,5 +91,19 @@ public class TruthOrDare {
 		String fileContent = Storage.getFileContent(Storage.rootFolder + serverId + File.separator + "tod.txt", "{}");
 		JsonObject element = gson.fromJson(fileContent, JsonObject.class);
 		return element;
+	}
+
+	void addPlayer(Long id) {
+		if(!players.contains(id)) players.add(id);
+	}
+
+	long getNextPlayer() {
+		if(++lastPlayer >= players.size()) lastPlayer = 0;
+		return players.get(lastPlayer);
+	}
+
+	void resetPlayers() {
+		players.clear();
+		lastPlayer = 0;
 	}
 }
