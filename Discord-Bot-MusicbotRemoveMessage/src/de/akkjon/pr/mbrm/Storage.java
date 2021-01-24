@@ -7,18 +7,25 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.text.StringEscapeUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 
 public class Storage {
 	
-	public static final String jarFolder = StringEscapeUtils.unescapeHtml3(new File(ClassLoader.getSystemClassLoader().getResource(".").getPath()).toString());
+	public static String jarFolder = null;
+	static {
+		try {
+			jarFolder = (new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static final String rootFolder = jarFolder + File.separator + "servers" + File.separator;
 	
 	public static String getJarName() {

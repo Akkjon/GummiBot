@@ -1,9 +1,12 @@
 package de.akkjon.pr.mbrm;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
