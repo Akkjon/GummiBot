@@ -7,252 +7,195 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GenericGuildMessageReactionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ServerWatcher {
-	
-	private static final List<WeakReference<ServerWatcher>> serverWatchers = new ArrayList<>();
-	
-	private final long serverId;
-	private Long[] channels;
-	private final String prefix = "~";
-	private TruthOrDare tod = new TruthOrDare();
-	
-	public ServerWatcher(long serverId) throws AlreadyBoundException {
-		for (WeakReference<ServerWatcher> weakReference : serverWatchers) {
-			if(weakReference.get().getGuildId()==serverId) {
-				throw new AlreadyBoundException("Server Watcher already exists");
-			}
-		}
-		this.serverId = serverId;
-		initChannels();
-		initCommandListeners();
-		initReactionListeners();
-		new QuoteOfTheDay(serverId);
-	}
-	
-	
-	
-	public long getGuildId() {
-		return this.serverId;
-	}
-	
-	private void initChannels() {
-		this.channels = Storage.getChannels(serverId);
-	}
-	
-	private boolean isChannelRegistered(long channelId) {
-		for (Long long1 : channels) {
-			if(long1==channelId) return true;
-		}
-		return false;
-	}
-	
-	private void initCommandListeners() {
-		Main.jda.addEventListener(new ListenerAdapter() {
-			@Override
-			public void onMessageReceived(MessageReceivedEvent event) {
-				if(event.isFromGuild()) {
-					if(event.getGuild().getIdLong() == serverId) {
-						long channelId = event.getChannel().getIdLong();
-						String content = event.getMessage().getContentRaw();
-						if(content.startsWith(prefix)) { 
-							content = content.substring(prefix.length());
-							String[] args = Arrays.stream(content.split(" ")).filter(e -> e.length()>0).toArray(String[]::new);
-							if(args.length==0) {
-								return;
-							}
-							if(args[0].equalsIgnoreCase("addchannel")) {
-								if(!isChannelRegistered(channelId)) {
-									try {
-										ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
-										event.getChannel().sendMessage(Main.getEmbedMessage("Success", "You wanna make me your slave? Sure...")).complete();
-									} catch (IOException e) {
-										event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
-										e.printStackTrace();
-									}
-									
-								} else {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What do you want from me, bitch? I am already working here.")).complete();
-								}
-							} else if (args[0].equalsIgnoreCase("removechannel")) {
-								if(isChannelRegistered(channelId)) {
-									try {
-										ServerWatcher.this.channels = Storage.removeChannel(serverId, channelId);
-										event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Alright, fuck you. Bye")).complete();
-									} catch (IOException e) {
-										event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
-										e.printStackTrace();
-									}
-									
-								} else {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I was never watchning this fookin channel.")).complete();
-								}
-							} else if (args[0].equalsIgnoreCase("addqotd")) {
-								try {
-									boolean isAdded = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
-									if(isAdded) {
-										event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Ok my master.")).complete();
-									} else {
-										event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I am allready here, don't you see me? OPEN YOUR GOD DAMNED EYES.")).complete();
-									}
-								} catch(Exception e) {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I fucking hate my life... AN ERROR AGAIN")).complete();
-									e.printStackTrace();
-								}
-							} else if (args[0].equalsIgnoreCase("removeqotd")) {
-								try {
-									boolean isRemoved = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
-									if(isRemoved) {
-										event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Doby is free.")).complete();
-									} else {
-										event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You cannot remove me, IF I AM NOT HERE. Fuck off.")).complete();
-									}
-								} catch(Exception e) {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Fuck, shit, ahhh, NOOOOOO. I made a mistake...")).complete();
-									e.printStackTrace();
-								}
-							} else if (args[0].equalsIgnoreCase("truth")) {
-								try {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Truth", TruthOrDare.getTruth(serverId))).complete();
-								} catch (IOException e) {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Why is life so fucking difficult?")).complete();
-									e.printStackTrace();
-								}
-							} else if (args[0].equalsIgnoreCase("dare")) {
-								try {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Dare", TruthOrDare.getDare(serverId))).complete();
-								} catch (IOException e) {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Why is life so fucking difficult?")).complete();
-									e.printStackTrace();
-								}
-							} else if (args[0].equalsIgnoreCase("addtruth")) {
-								if(args.length > 1) {
-									String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
-									try {
-										boolean isAdded = TruthOrDare.addTruth(newElement, serverId);
-										if(isAdded) {
-											event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
-										} else {
-											event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You fucking goblin.")).complete();
-										}
-									} catch (IOException e) {
-										event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am fucking retarded... You are as well.")).complete();
-										e.printStackTrace();
-									}
-									
-								} else {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I don't think so...")).complete();
-								}
-							} else if (args[0].equalsIgnoreCase("adddare")) {
-								if(args.length > 1) {
-									String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
-									try {
-										boolean isAdded = TruthOrDare.addDare(newElement, serverId);
-										if(isAdded) {
-											event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
-										} else {
-											event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
-										}
-									} catch (IOException e) {
-										event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
-										e.printStackTrace();
-									}
-									
-								} else {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Error", "How dare you?")).complete();
-								}
-							} else if (args[0].equalsIgnoreCase("play")) {
-								if(args.length > 1) {
-									if(args[1].equalsIgnoreCase("tod") || args[1].equalsIgnoreCase("truthOrDare")) {
-										tod.resetPlayers();
-										Message message = event.getChannel().sendMessage(Main.getEmbedMessage("Game",
-												"Who wants to play a game?\n" +
-														"React with 👍 to enter the game.\n" +
-														"Click ➡ to start the game.")).complete();
-										message.addReaction("👍").queue();
-										message.addReaction("➡").queue();
-									}
-								} else {
-									event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What u wanna play bitch?")).complete();
-								}
-							} else {
-								event.getChannel().sendMessage(
-										"```Channel-Cleaning:\n"
-										+ "~addchannel\n"
-										+ "~removechannel\n"
-										+ "\n"
-										+ "Quote of the day\n"
-										+ "~addqotd\n"
-										+ "~removeqotd\n"
-										+ "\n"
-										+ "Truth or dare\n"
-										+ "~truth\n"
-										+ "~dare\n"
-										+ "~addtruth\n"
-										+ "~adddare```").complete();
-							}
-						}
-						
-						if(isChannelRegistered(channelId)) {
-							removeMessages(event.getChannel(), event.getMessageId());
-						}
-					}
-				}
-			}
-		});
-	}
 
-	public void initReactionListeners() {
-		Main.jda.addEventListener(new ListenerAdapter() {
-			@Override
-			public void onGenericGuildMessageReaction(GenericGuildMessageReactionEvent event) {
-				if (!event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
-					if (event.getReactionEmote().getName().equals("👍")) {
-						tod.addPlayer(event.getMember().getIdLong());
-					} else if (event.getReactionEmote().getName().equals("➡")) {
-						MessageHistory.getHistoryAround(event.getChannel(), event.getMessageId()).complete().getMessageById(event.getMessageId()).delete().complete();
-						Message message = event.getChannel().sendMessage(Main.getEmbedMessage("Let the games begin... " + tod.players.size() + " players", "<@" + tod.getNextPlayer() + ">... Truth or Dare?")).complete();
-						message.addReaction("1️⃣").queue();
-						message.addReaction("2️⃣").queue();
-					} else if (event.getReactionEmote().getName().equals("1️⃣")) {
-						try {
-							event.getChannel().sendMessage(Main.getEmbedMessage("Truth", TruthOrDare.getTruth(serverId))).complete();
-						} catch (IOException e) {
-							event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Why is life so fucking difficult?")).complete();
-							e.printStackTrace();
-						}
-					} else if (event.getReactionEmote().getName().equals("2️⃣")) {
-						try {
-							event.getChannel().sendMessage(Main.getEmbedMessage("Dare", TruthOrDare.getDare(serverId))).complete();
-						} catch (IOException e) {
-							event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Why is life so fucking difficult?")).complete();
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		});
-	}
+    private static final List<WeakReference<ServerWatcher>> serverWatchers = new ArrayList<>();
 
-	private void removeMessages(MessageChannel channel, String messageId) {
-		new Thread(() -> {
-			MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
-			List<Message> messages = messageHistory.getRetrievedHistory();
-			for(int i = 0; i<messages.size()-1; i++) {
-				try {
-					messages.get(i).delete().complete();
-				} catch (Exception ignored) {}
-			}
-		}).start();
-	}
-	
-	
-	
-	
+    private final long serverId;
+    private Long[] channels;
+    private final String prefix = "~";
+
+    public ServerWatcher(long serverId) throws AlreadyBoundException {
+        for (WeakReference<ServerWatcher> weakReference : serverWatchers) {
+            if (weakReference.get().getGuildId() == serverId) {
+                throw new AlreadyBoundException("Server Watcher already exists");
+            }
+        }
+        this.serverId = serverId;
+        initChannels();
+        initCommandListeners();
+        new QuoteOfTheDay(serverId);
+    }
+
+
+
+    public long getGuildId() {
+        return this.serverId;
+    }
+
+    private void initChannels() {
+        this.channels = Storage.getChannels(serverId);
+    }
+
+    private boolean isChannelRegistered(long channelId) {
+        for (Long long1 : channels) {
+            if (long1 == channelId) return true;
+        }
+        return false;
+    }
+
+    private void initCommandListeners() {
+        Main.jda.addEventListener(new ListenerAdapter() {
+            @Override
+            public void onMessageReceived(MessageReceivedEvent event) {
+                if (event.isFromGuild()) {
+                    if (event.getGuild().getIdLong() == serverId) {
+                        long channelId = event.getChannel().getIdLong();
+                        String content = event.getMessage().getContentRaw();
+                        if (content.startsWith(prefix)) {
+                            content = content.substring(prefix.length());
+                            String[] args = Arrays.stream(content.split(" ")).filter(e -> e.length() > 0).toArray(String[]::new);
+                            if (args.length == 0) {
+                                return;
+                            }
+                            if (args[0].equalsIgnoreCase("addchannel")) {
+                                if (!isChannelRegistered(channelId)) {
+                                    try {
+                                        ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Success", "You wanna make me your slave? Sure...")).complete();
+                                    } catch (IOException e) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
+                                        e.printStackTrace();
+                                    }
+
+                                } else {
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What do you want from me, bitch? I am already working here.")).complete();
+                                }
+                            } else if (args[0].equalsIgnoreCase("removechannel")) {
+                                if (isChannelRegistered(channelId)) {
+                                    try {
+                                        ServerWatcher.this.channels = Storage.removeChannel(serverId, channelId);
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Alright, fuck you. Bye")).complete();
+                                    } catch (IOException e) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
+                                        e.printStackTrace();
+                                    }
+
+                                } else {
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I was never watchning this fookin channel.")).complete();
+                                }
+                            } else if (args[0].equalsIgnoreCase("addqotd")) {
+                                try {
+                                    boolean isAdded = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
+                                    if (isAdded) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Ok my master.")).complete();
+                                    } else {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I am allready here, don't you see me? OPEN YOUR GOD DAMNED EYES.")).complete();
+                                    }
+                                } catch (Exception e) {
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I fucking hate my life... AN ERROR AGAIN")).complete();
+                                    e.printStackTrace();
+                                }
+                            } else if (args[0].equalsIgnoreCase("removeqotd")) {
+                                try {
+                                    boolean isRemoved = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
+                                    if (isRemoved) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Doby is free.")).complete();
+                                    } else {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You cannot remove me, IF I AM NOT HERE. Fuck off.")).complete();
+                                    }
+                                } catch (Exception e) {
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Fuck, shit, ahhh, NOOOOOO. I made a mistake...")).complete();
+                                    e.printStackTrace();
+                                }
+                            } else if (args[0].equalsIgnoreCase("addtruth")) {
+                                if (args.length > 1) {
+                                    String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
+                                    try {
+                                        boolean isAdded = TruthOrDare.addTruth(newElement, serverId);
+                                        if (isAdded) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                        } else {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You fucking goblin.")).complete();
+                                        }
+                                    } catch (IOException e) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am fucking retarded... You are as well.")).complete();
+                                        e.printStackTrace();
+                                    }
+
+                                } else {
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I don't think so...")).complete();
+                                }
+                            } else if (args[0].equalsIgnoreCase("adddare")) {
+                                if (args.length > 1) {
+                                    String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
+                                    try {
+                                        boolean isAdded = TruthOrDare.addDare(newElement, serverId);
+                                        if (isAdded) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                        } else {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
+                                        }
+                                    } catch (IOException e) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
+                                        e.printStackTrace();
+                                    }
+
+                                } else {
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "How dare you?")).complete();
+                                }
+                            } else if (args[0].equalsIgnoreCase("play")) {
+                                if (args.length > 1) {
+                                    if (args[1].equalsIgnoreCase("tod") || args[1].equalsIgnoreCase("truthOrDare")) {
+                                        TruthOrDare tod = new TruthOrDare(serverId);
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + tod.getChannelId() + ">")).complete();
+                                    }
+                                } else {
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What u wanna play bitch?")).complete();
+                                }
+                            } else {
+                                event.getChannel().sendMessage(
+                                        "```Channel-Cleaning:\n"
+                                                + "~addchannel\n"
+                                                + "~removechannel\n"
+                                                + "\n"
+                                                + "Quote of the day\n"
+                                                + "~addqotd\n"
+                                                + "~removeqotd\n"
+                                                + "\n"
+                                                + "Games\n"
+                                                + "~play tod\n"
+                                                + "~addtruth\n"
+                                                + "~adddare```").complete();
+                            }
+                        }
+
+                        if (isChannelRegistered(channelId)) {
+                            removeMessages(event.getChannel(), event.getMessageId());
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void removeMessages(MessageChannel channel, String messageId) {
+        new Thread(() -> {
+            MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
+            List<Message> messages = messageHistory.getRetrievedHistory();
+            for (int i = 0; i < messages.size() - 1; i++) {
+                try {
+                    messages.get(i).delete().complete();
+                } catch (Exception ignored) {
+                }
+            }
+        }).start();
+    }
+
+
 }
