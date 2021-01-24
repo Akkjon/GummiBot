@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.akkjon.pr.mbrm.games.IchHabNochNie;
 import de.akkjon.pr.mbrm.games.TruthOrDare;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -154,6 +155,10 @@ public class ServerWatcher {
                                     if (args[1].equalsIgnoreCase("tod") || args[1].equalsIgnoreCase("truthOrDare")) {
                                         TruthOrDare tod = new TruthOrDare(serverId);
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + tod.getChannelId() + ">")).complete();
+                                    } else
+                                    if (args[1].equalsIgnoreCase("ihnn") || args[1].equalsIgnoreCase("ichHabNochNie")) {
+                                        IchHabNochNie ihnn = new IchHabNochNie(serverId);
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + ihnn.getChannelId() + ">")).complete();
                                     }
                                 } else {
                                     event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What u wanna play bitch?")).complete();
