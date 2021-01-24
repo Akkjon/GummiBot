@@ -12,8 +12,6 @@ import java.util.List;
 
 public class IchHabNochNie extends Game {
 
-    private boolean isStarted = false;
-
     private List<String> remainingList;
 
     public IchHabNochNie(long serverID) {
@@ -66,8 +64,7 @@ public class IchHabNochNie extends Game {
 
                     if (title.equals("Ich hab noch nie")) {
                         if (event.getReactionEmote().getName().equals("➡")) {
-                            if(!isStarted) startGame();
-                            else sendMessage();
+                            sendMessage();
                         } else if (event.getReactionEmote().getName().equals("❌")) {
                             channel.delete().complete();
                         }
@@ -75,12 +72,6 @@ public class IchHabNochNie extends Game {
                 }
             }
         });
-    }
-
-    private void startGame() {
-        if (isStarted) return;
-        isStarted = true;
-        sendMessage();
     }
 
     void sendMessage() {
