@@ -1,9 +1,8 @@
 package de.akkjon.pr.mbrm;
 
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,9 +14,20 @@ import com.google.gson.JsonObject;
 
 public class Updater {
 	
-	private static final int version = 1;
+	private static double version = 1;
 	private static final String versionUrl = "https://onedrive.live.com/download?cid=B327A7F518EB2758&resid=B327A7F518EB2758%21371414&authkey=AF_cXCt3Fouz7jo";
-	
+
+	private static final String versionFilePath = Storage.jarFolder + File.separator + "version.txt";
+
+	static {
+		try {
+			String versionFile = Storage.getFileContent(versionFilePath, version + "");
+			version = Double.parseDouble(versionFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private static Updater updater = null;
 	
 	public static Updater getUpdater() {
@@ -26,7 +36,8 @@ public class Updater {
 	
 	private Gson gson;
 	private String newDownloadUrl = "";
-	
+	private double newVersion = -1;
+
 	public Updater() {
 		if(updater != null) {
 			return;
@@ -84,9 +95,9 @@ public class Updater {
 	    }
 	    content = content.trim();
 	    JsonObject jsonObject = gson.fromJson(content, JsonObject.class);
-	    int versionGot = jsonObject.get("version").getAsInt();
-	    System.out.println("Update-Check: active version: " + version + "; up-to-date version: " + versionGot);
-	    if(versionGot > version) {
+	    newVersion = jsonObject.get("version").getAsDouble();
+	    System.out.println("Update-Check: active version: " + version + "; up-to-date version: " + newVersion);
+	    if(newVersion > version) {
 	    	newDownloadUrl = jsonObject.get("downloadUrl").getAsString();
 	    	
 	    	return true;
@@ -98,6 +109,17 @@ public class Updater {
 	private void update() throws IOException, InterruptedException {
 		System.out.println("Updating...");
 		shutdownInternals();
+
+		File file = new File(versionFilePath);
+		if(!file.exists()) {
+			file.getParentFile().mkdirs();
+			file.createNewFile();
+		}
+
+		FileWriter writer = new FileWriter(file);
+		writer.write(newVersion + "");
+		writer.close();
+
 		BufferedInputStream in = new BufferedInputStream(new URL(newDownloadUrl).openStream());
 		String filePath = Storage.getJarName();
 		FileOutputStream fileOutputStream = new FileOutputStream(filePath);
