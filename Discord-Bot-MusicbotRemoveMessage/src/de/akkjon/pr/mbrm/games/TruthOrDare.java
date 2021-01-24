@@ -206,6 +206,6 @@ public class TruthOrDare extends Game {
     }
 
     private void loadRemainingDare() throws IOException {
-        this.remainingListTruth = loadRemaining("dare", "tod");
+        this.remainingListDare = loadRemaining("dare", "tod");
     }
 }
