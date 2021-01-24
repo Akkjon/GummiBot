@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 
 public class Updater {
 	
-	private static final int version = 0;
+	private static final int version = 1;
 	private static final String versionUrl = "https://onedrive.live.com/download?cid=B327A7F518EB2758&resid=B327A7F518EB2758%21371414&authkey=AF_cXCt3Fouz7jo";
 	
 	private static Updater updater = null;
