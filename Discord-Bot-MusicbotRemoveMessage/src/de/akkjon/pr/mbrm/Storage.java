@@ -126,7 +126,7 @@ public class Storage {
 	}
 	
 	public static String getInternalFile(String path) {
-		InputStream is = Main.class.getResourceAsStream(path);
+		InputStream is = Main.class.getResourceAsStream("/" + path);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
 		List<String> lines = reader.lines().collect(Collectors.toList());

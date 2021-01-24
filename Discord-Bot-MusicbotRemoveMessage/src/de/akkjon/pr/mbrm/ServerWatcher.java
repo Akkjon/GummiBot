@@ -146,9 +146,25 @@ public class ServerWatcher {
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
                                         e.printStackTrace();
                                     }
-
                                 } else {
                                     event.getChannel().sendMessage(Main.getEmbedMessage("Error", "How dare you?")).complete();
+                                }
+                            } else if (args[0].equalsIgnoreCase("addmessage")) {
+                                if (args.length > 1) {
+                                    String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
+                                    try {
+                                        boolean isAdded = IchHabNochNie.addMessage(newElement, serverId);
+                                        if (isAdded) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                        } else {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
+                                        }
+                                    } catch (IOException e) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Hustensohn!")).complete();
                                 }
                             } else if (args[0].equalsIgnoreCase("play")) {
                                 if (args.length > 1) {

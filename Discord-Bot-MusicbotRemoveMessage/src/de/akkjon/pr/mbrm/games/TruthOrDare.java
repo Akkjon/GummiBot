@@ -1,34 +1,28 @@
 package de.akkjon.pr.mbrm.games;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import de.akkjon.pr.mbrm.Main;
-import de.akkjon.pr.mbrm.Storage;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TruthOrDare extends ListenerAdapter {
+public class TruthOrDare extends Game {
 
-    private static final Gson gson = new Gson();
     final ArrayList<Long> players = new ArrayList<>();
     private long lastPlayer;
-    private final long guildId;
-    private final TextChannel channel;
     private boolean isStarted = false;
     private boolean isChoosing;
 
 
     public TruthOrDare(long serverID) {
-        this.guildId = serverID;
+        super(serverID);
         this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel("Truth-or-Dare").complete();
         Message message = channel.sendMessage(Main.getEmbedMessage("Truth or Dare",
                 "Who wants to play a game?\n" +
@@ -43,82 +37,23 @@ public class TruthOrDare extends ListenerAdapter {
     }
 
     public static String getTruth(long serverId) throws IOException {
-		JsonArray global = getGlobal("truth");
-		JsonArray server = getServer("truth", serverId);
-		return getFromLists(global, server);
+        JsonArray global = getGlobal("truth", "tod.json");
+        JsonArray server = getServer("truth", serverId, "tod.txt");
+        return getFromLists(global, server);
     }
 
     public static String getDare(long serverId) throws IOException {
-		JsonArray global = getGlobal("dare");
-		JsonArray server = getServer("dare", serverId);
-		return getFromLists(global, server);
+        JsonArray global = getGlobal("dare", "tod.json");
+        JsonArray server = getServer("dare", serverId, "tod.txt");
+        return getFromLists(global, server);
     }
 
     public static boolean addTruth(String element, long serverId) throws IOException {
-        return add(element, "truth", serverId);
+        return add(element, "truth", serverId, "tod.txt");
     }
 
     public static boolean addDare(String element, long serverId) throws IOException {
-        return add(element, "dare", serverId);
-    }
-
-    public static boolean add(String element, String mode, long serverId) throws IOException {
-        String path = Storage.rootFolder + serverId + File.separator + "tod.txt";
-        JsonObject object = gson.fromJson(Storage.getFileContent(path, "{}"), JsonObject.class);
-        if (!object.has(mode)) {
-            object.add(mode, new JsonArray());
-        }
-        JsonArray array = object.get(mode).getAsJsonArray();
-        if (!array.contains(new JsonPrimitive(element))) {
-            array.add(element);
-            String content = gson.toJson(object);
-
-            File file = new File(path);
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            }
-
-            FileWriter writer = new FileWriter(file);
-            writer.write(content);
-            writer.close();
-
-            return true;
-        }
-        return false;
-    }
-
-    private static String getFromLists(JsonArray global, JsonArray server) {
-        int max = global.size() + server.size();
-        int value = (int) (Math.random() * max);
-        if (value < global.size()) {
-            return global.get(value).getAsString();
-        } else {
-            value = value % global.size();
-            return server.get(value).getAsString();
-        }
-    }
-
-    private static JsonArray getGlobal(String mode) {
-        String filecontent = Storage.getInternalFile("/tod.json");
-        Gson gson = new Gson();
-        JsonObject element = gson.fromJson(filecontent, JsonObject.class);
-        JsonArray array = element.get(mode).getAsJsonArray();
-        return array;
-    }
-
-    private static JsonArray getServer(String mode, long serverId) throws IOException {
-        JsonObject element = getServerInternal(serverId);
-        if (element.has(mode)) {
-            return element.get(mode).getAsJsonArray();
-        }
-        return new JsonArray(0);
-    }
-
-    private static JsonObject getServerInternal(long serverId) throws IOException {
-        String fileContent = Storage.getFileContent(Storage.rootFolder + serverId + File.separator + "tod.txt", "{}");
-        JsonObject element = gson.fromJson(fileContent, JsonObject.class);
-        return element;
+        return add(element, "dare", serverId, "tod.txt");
     }
 
     void addPlayer(Long id) {
@@ -216,7 +151,7 @@ public class TruthOrDare extends ListenerAdapter {
     }
 
     private void startGame() {
-        if(players.size() <= 1) {
+        if (players.size() <= 1) {
             channel.sendMessage(Main.getEmbedMessage("Nope!", "Get yourself some friends nigga.")).complete();
             return;
         }
@@ -251,9 +186,5 @@ public class TruthOrDare extends ListenerAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public long getChannelId() {
-        return channel.getIdLong();
     }
 }
