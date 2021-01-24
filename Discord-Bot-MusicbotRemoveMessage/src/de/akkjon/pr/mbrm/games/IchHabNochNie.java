@@ -14,9 +14,6 @@ public class IchHabNochNie extends Game {
 
     private boolean isStarted = false;
 
-    //private JsonArray remainingListGlobal;
-    //private JsonArray remainingListServer;
-
     private List<String> remainingList;
 
     public IchHabNochNie(long serverID) {
@@ -69,7 +66,8 @@ public class IchHabNochNie extends Game {
 
                     if (title.equals("Ich hab noch nie")) {
                         if (event.getReactionEmote().getName().equals("➡")) {
-                            startGame();
+                            if(!isStarted) startGame();
+                            else sendMessage();
                         } else if (event.getReactionEmote().getName().equals("❌")) {
                             channel.delete().complete();
                         }
