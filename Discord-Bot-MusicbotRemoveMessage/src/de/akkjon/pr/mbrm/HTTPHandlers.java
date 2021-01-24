@@ -15,7 +15,7 @@ class Index implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
-		String response = Storage.getInternalFile("/de/akkjon/pr/mbrm/resource/index.html");
+		String response = Storage.getInternalFile("/resource/index.html");
 		Handler.respond(exchange, response, false);
 	}
 	

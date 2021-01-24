@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.akkjon.pr.mbrm.games.Dice;
 import de.akkjon.pr.mbrm.games.IchHabNochNie;
 import de.akkjon.pr.mbrm.games.TruthOrDare;
 import net.dv8tion.jda.api.entities.*;
@@ -32,7 +33,6 @@ public class ServerWatcher {
         initCommandListeners();
         new QuoteOfTheDay(serverId);
     }
-
 
 
     public long getGuildId() {
@@ -155,14 +155,22 @@ public class ServerWatcher {
                                     if (args[1].equalsIgnoreCase("tod") || args[1].equalsIgnoreCase("truthOrDare")) {
                                         TruthOrDare tod = new TruthOrDare(serverId);
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + tod.getChannelId() + ">")).complete();
-                                    } else
-                                    if (args[1].equalsIgnoreCase("ihnn") || args[1].equalsIgnoreCase("ichHabNochNie")) {
+                                    } else if (args[1].equalsIgnoreCase("ihnn") || args[1].equalsIgnoreCase("ichHabNochNie")) {
                                         IchHabNochNie ihnn = new IchHabNochNie(serverId);
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + ihnn.getChannelId() + ">")).complete();
                                     }
                                 } else {
                                     event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What u wanna play bitch?")).complete();
                                 }
+                            } else if (args[0].equalsIgnoreCase("throwDice")) {
+                                if (args.length > 1) {
+                                    try {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(Integer.parseInt(args[1]))))).complete();
+                                    } catch (NumberFormatException e) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Emilia, was soll der Shit. Was zum Fick ist " + args[1])).complete();
+                                    }
+                                } else
+                                event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(6)))).complete();
                             } else {
                                 event.getChannel().sendMessage(
                                         "```Channel-Cleaning:\n"
@@ -174,9 +182,13 @@ public class ServerWatcher {
                                                 + "~removeqotd\n"
                                                 + "\n"
                                                 + "Games\n"
-                                                + "~play tod\n"
+                                                + "~play tod - TruthOrDare\n"
                                                 + "~addtruth\n"
-                                                + "~adddare```").complete();
+                                                + "~adddare\n"
+                                                + "\n"
+                                                + "~play ihnn - IchHabNochNie" +
+                                                "```").complete();
+
                             }
                         }
 

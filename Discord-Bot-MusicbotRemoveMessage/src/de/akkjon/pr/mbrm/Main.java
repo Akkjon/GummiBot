@@ -44,7 +44,7 @@ public class Main extends ListenerAdapter {
 				e.printStackTrace();
 			}
 			new Main();
-//			setIcon();
+			setIcon();
 		} catch (LoginException e) {
 			System.err.println("What? No");
 			e.printStackTrace();
@@ -103,7 +103,7 @@ public class Main extends ListenerAdapter {
 	private static void setIcon() {
 		
 		if(SystemTray.isSupported()) {
-			Image image = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/de/akkjon/pr/mbrm/resource/GummiIcon.png"));
+			Image image = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/GummiIcon.png"));
 			
 			try {
 				TrayIcon icon = new TrayIcon(image, "Gummi-Dashboard");

@@ -8,34 +8,27 @@ import de.akkjon.pr.mbrm.Main;
 import de.akkjon.pr.mbrm.Storage;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class IchHabNochNie extends ListenerAdapter {
 
     private static final Gson gson = new Gson();
-    final ArrayList<Long> players = new ArrayList<>();
-    private long lastPlayer;
     private final long guildId;
     private final TextChannel channel;
     private boolean isStarted = false;
-    private boolean isChoosing;
 
 
     public IchHabNochNie(long serverID) {
         this.guildId = serverID;
         this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel("Ich-hab-noch-nie").complete();
-        Message message = channel.sendMessage(Main.getEmbedMessage("Truth or Dare",
+        Message message = channel.sendMessage(Main.getEmbedMessage("Ich hab noch nie",
                 "Who wants to play a game?\n" +
-                        "React with 👍 to enter the game.\n" +
                         "Click ➡ to start the game.\n" +
                         "Click ❌ to end the current game.")).complete();
-        message.addReaction("👍").queue();
         message.addReaction("➡").queue();
         message.addReaction("❌").queue();
         message.pin().complete();
@@ -43,14 +36,13 @@ public class IchHabNochNie extends ListenerAdapter {
     }
 
     public static String getMessage(long serverId) throws IOException {
-//		JsonArray global = getGlobal("truth");
-//		JsonArray server = getServer("truth", serverId);
-//		return getFromLists(global, server);
-        return "aaa";
+		JsonArray global = getGlobal("message");
+		JsonArray server = getServer("message", serverId);
+		return getFromLists(global, server);
     }
 
     public static boolean addMessage(String element, long serverId) throws IOException {
-        return add(element, "truth", serverId);
+        return add(element, "message", serverId);
     }
 
 
@@ -92,7 +84,7 @@ public class IchHabNochNie extends ListenerAdapter {
     }
 
     private static JsonArray getGlobal(String mode) {
-        String filecontent = Storage.getInternalFile("/de/akkjon/pr/mbrm/resource/ihnn.json");
+        String filecontent = Storage.getInternalFile("/ihnn.json");
         Gson gson = new Gson();
         JsonObject element = gson.fromJson(filecontent, JsonObject.class);
         JsonArray array = element.get(mode).getAsJsonArray();
@@ -113,30 +105,6 @@ public class IchHabNochNie extends ListenerAdapter {
         return element;
     }
 
-    void addPlayer(Long id) {
-        if (!players.contains(id)) players.add(id);
-    }
-
-    void removePlayer(long id) {
-        if (players.size() <= 1) {
-            channel.delete().complete();
-            return;
-        }
-        if (this.lastPlayer == id) sendNextPlayerMessage();
-        players.remove(id);
-    }
-
-    long getNextPlayer() {
-        int indexOflastPlayer = players.indexOf(lastPlayer);
-        if (++indexOflastPlayer >= players.size()) indexOflastPlayer = 0;
-        this.lastPlayer = players.get(indexOflastPlayer);
-        return this.lastPlayer;
-    }
-
-    long getCurrentPlayer() {
-        return lastPlayer;
-    }
-
     public void initReactionListeners() {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
@@ -155,46 +123,11 @@ public class IchHabNochNie extends ListenerAdapter {
                 if (message.getEmbeds().size() != 0) {
                     String title = message.getEmbeds().get(0).getTitle();
 
-                    if (title.equals("Truth") || title.equals("Dare")) {
+                    if (title.equals("Ich hab noch nie")) {
                         if (event.getReactionEmote().getName().equals("➡")) {
-                            if (isChoosing) return;
-                            sendNextPlayerMessage();
-                        }
-                    } else if (title.equals("Truth or Dare")) {
-                        if (event.getReactionEmote().getName().equals("👍")) {
-                            addPlayer(event.getMember().getIdLong());
-                        } else if (event.getReactionEmote().getName().equals("➡")) {
-                            startGame();
+                            sendMessage();
                         } else if (event.getReactionEmote().getName().equals("❌")) {
                             channel.delete().complete();
-                        }
-                    } else if (title.startsWith("Let the games begin...") || title.equals("Next player:")) {
-                        if (event.getMember().getIdLong() == (getCurrentPlayer())) {
-                            isChoosing = false;
-                            if (event.getReactionEmote().getName().equals("1️⃣")) {
-                                sendTruth(channel);
-                            } else if (event.getReactionEmote().getName().equals("2️⃣")) {
-                                sendDare(channel);
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
-
-                //skip if message was not from bot
-                if (!message.getAuthor().equals(event.getJDA().getSelfUser())) {
-                    return;
-                }
-
-                if (message.getEmbeds().size() != 0) {
-                    String title = message.getEmbeds().get(0).getTitle();
-                    if (title.equals("Truth or Dare")) {
-                        if (event.getReactionEmote().getName().equals("👍")) {
-                            removePlayer(event.getMember().getIdLong());
                         }
                     }
                 }
@@ -203,42 +136,20 @@ public class IchHabNochNie extends ListenerAdapter {
     }
 
     private void startGame() {
-        if(players.size() <= 1) {
-            channel.sendMessage(Main.getEmbedMessage("Nope!", "Get yourself some friends nigga.")).complete();
-            return;
-        }
         if (isStarted) return;
         isStarted = true;
-        isChoosing = true;
-        Message msg = channel.sendMessage(Main.getEmbedMessage("Let the games begin... " + players.size() + " players", "<@" + getNextPlayer() + ">... Truth or Dare?")).complete();
-        msg.addReaction("1️⃣").queue();
-        msg.addReaction("2️⃣").queue();
+        sendMessage();
     }
 
-    private void sendNextPlayerMessage() {
-        Message msg = channel.sendMessage(Main.getEmbedMessage("Next player:", "<@" + getNextPlayer() + ">... Truth or Dare?")).complete();
-        isChoosing = true;
-        msg.addReaction("1️⃣").queue();
-        msg.addReaction("2️⃣").queue();
-    }
-
-    void sendTruth(MessageChannel channel) {
+    void sendMessage() {
         try {
-            Message msg = channel.sendMessage(Main.getEmbedMessage("Truth", TruthOrDare.getTruth(guildId))).complete();
+            Message msg = channel.sendMessage(Main.getEmbedMessage("Ich hab noch nie", "..." + getMessage(guildId))).complete();
             msg.addReaction("➡").queue();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    void sendDare(MessageChannel channel) {
-        try {
-            Message msg = channel.sendMessage(Main.getEmbedMessage("Dare", TruthOrDare.getDare(guildId))).complete();
-            msg.addReaction("➡").queue();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public long getChannelId() {
         return channel.getIdLong();

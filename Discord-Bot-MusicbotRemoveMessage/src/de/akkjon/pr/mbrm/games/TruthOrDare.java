@@ -43,17 +43,15 @@ public class TruthOrDare extends ListenerAdapter {
     }
 
     public static String getTruth(long serverId) throws IOException {
-//		JsonArray global = getGlobal("truth");
-//		JsonArray server = getServer("truth", serverId);
-//		return getFromLists(global, server);
-        return "aaa";
+		JsonArray global = getGlobal("truth");
+		JsonArray server = getServer("truth", serverId);
+		return getFromLists(global, server);
     }
 
     public static String getDare(long serverId) throws IOException {
-//		JsonArray global = getGlobal("dare");
-//		JsonArray server = getServer("dare", serverId);
-//		return getFromLists(global, server);
-        return "bbb";
+		JsonArray global = getGlobal("dare");
+		JsonArray server = getServer("dare", serverId);
+		return getFromLists(global, server);
     }
 
     public static boolean addTruth(String element, long serverId) throws IOException {
@@ -102,7 +100,7 @@ public class TruthOrDare extends ListenerAdapter {
     }
 
     private static JsonArray getGlobal(String mode) {
-        String filecontent = Storage.getInternalFile("/de/akkjon/pr/mbrm/resource/tod.json");
+        String filecontent = Storage.getInternalFile("/tod.json");
         Gson gson = new Gson();
         JsonObject element = gson.fromJson(filecontent, JsonObject.class);
         JsonArray array = element.get(mode).getAsJsonArray();
@@ -151,7 +149,12 @@ public class TruthOrDare extends ListenerAdapter {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
+                Message message = null;
+                try {
+                    message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
+                } catch (Exception e) {
+                    return;
+                }
 
                 //skip if message was not from bot or reaction was from bot
                 User bot = event.getJDA().getSelfUser();
