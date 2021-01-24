@@ -1,9 +1,11 @@
-package de.akkjon.pr.mbrm;
+package de.akkjon.pr.mbrm.games;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import de.akkjon.pr.mbrm.Main;
+import de.akkjon.pr.mbrm.Storage;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
@@ -248,7 +250,7 @@ public class TruthOrDare extends ListenerAdapter {
         }
     }
 
-    long getChannelId() {
+    public long getChannelId() {
         return channel.getIdLong();
     }
 }
