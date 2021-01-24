@@ -1,6 +1,5 @@
 package de.akkjon.pr.mbrm.games;
 
-import com.google.gson.JsonArray;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -12,6 +11,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TruthOrDare extends Game {
 
@@ -19,6 +19,10 @@ public class TruthOrDare extends Game {
     private long lastPlayer;
     private boolean isStarted = false;
     private boolean isChoosing;
+
+    private List<String> remainingListTruth;
+    private List<String> remainingListDare;
+
 
 
     public TruthOrDare(long serverID) {
@@ -33,19 +37,28 @@ public class TruthOrDare extends Game {
         message.addReaction("➡").queue();
         message.addReaction("❌").queue();
         message.pin().complete();
+        try {
+            loadRemainingDare();
+            loadRemainingTruth();
+        } catch (IOException e) {
+            e.printStackTrace();
+            this.channel.delete();
+        }
         initReactionListeners();
     }
 
-    public static String getTruth(long serverId) throws IOException {
-        JsonArray global = getGlobal("truth", "tod.json");
-        JsonArray server = getServer("truth", serverId, "tod.txt");
-        return getFromLists(global, server);
+    public String getTruth() throws IOException {
+        if(this.remainingListTruth.size()==0) {
+            loadRemainingTruth();
+        }
+        return getFromLists(this.remainingListTruth);
     }
 
-    public static String getDare(long serverId) throws IOException {
-        JsonArray global = getGlobal("dare", "tod.json");
-        JsonArray server = getServer("dare", serverId, "tod.txt");
-        return getFromLists(global, server);
+    public String getDare() throws IOException {
+        if(this.remainingListDare.size()==0) {
+            loadRemainingDare();
+        }
+        return getFromLists(this.remainingListDare);
     }
 
     public static boolean addTruth(String element, long serverId) throws IOException {
@@ -172,7 +185,7 @@ public class TruthOrDare extends Game {
 
     void sendTruth(MessageChannel channel) {
         try {
-            Message msg = channel.sendMessage(Main.getEmbedMessage("Truth", TruthOrDare.getTruth(guildId))).complete();
+            Message msg = channel.sendMessage(Main.getEmbedMessage("Truth", getTruth())).complete();
             msg.addReaction("➡").queue();
         } catch (IOException e) {
             e.printStackTrace();
@@ -181,10 +194,18 @@ public class TruthOrDare extends Game {
 
     void sendDare(MessageChannel channel) {
         try {
-            Message msg = channel.sendMessage(Main.getEmbedMessage("Dare", TruthOrDare.getDare(guildId))).complete();
+            Message msg = channel.sendMessage(Main.getEmbedMessage("Dare", getDare())).complete();
             msg.addReaction("➡").queue();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadRemainingTruth() throws IOException {
+        this.remainingListTruth = loadRemaining("truth", "tod");
+    }
+
+    private void loadRemainingDare() throws IOException {
+        this.remainingListTruth = loadRemaining("dare", "tod");
     }
 }

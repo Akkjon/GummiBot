@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
 import de.akkjon.pr.mbrm.Storage;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,6 +12,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 
 public class Game extends ListenerAdapter {
 
@@ -24,15 +27,12 @@ public class Game extends ListenerAdapter {
 
     }
 
-    static String getFromLists(JsonArray global, JsonArray server) {
-        int max = global.size() + server.size();
-        int value = (int) (Math.random() * max);
-        if (value < global.size()) {
-            return global.get(value).getAsString();
-        } else {
-            value = value % global.size();
-            return server.get(value).getAsString();
-        }
+    static String getFromLists(List<String> list) {
+        int value = (int) (Math.random() * list.size());
+
+        String returnVal = list.get(value);
+        list.remove(value);
+        return returnVal;
     }
 
     public static boolean add(String element, String mode, long serverId, String fileName) throws IOException {
@@ -63,8 +63,7 @@ public class Game extends ListenerAdapter {
 
     static JsonObject getServerInternal(long serverId, String fileName) throws IOException {
         String fileContent = Storage.getFileContent(Storage.rootFolder + serverId + File.separator + fileName, "{}");
-        JsonObject element = gson.fromJson(fileContent, JsonObject.class);
-        return element;
+        return gson.fromJson(fileContent, JsonObject.class);
     }
 
     static JsonArray getServer(String mode, long serverId, String fileName) throws IOException {
@@ -76,14 +75,26 @@ public class Game extends ListenerAdapter {
     }
 
     static JsonArray getGlobal(String mode, String fileName) {
-        String filecontent = Storage.getInternalFile(fileName);
+        String fileContent = Storage.getInternalFile(fileName);
         Gson gson = new Gson();
-        JsonObject element = gson.fromJson(filecontent, JsonObject.class);
-        JsonArray array = element.get(mode).getAsJsonArray();
-        return array;
+        JsonObject element = gson.fromJson(fileContent, JsonObject.class);
+        return element.get(mode).getAsJsonArray();
     }
 
     public long getChannelId() {
         return channel.getIdLong();
+    }
+
+    public List<String> loadRemaining(String mode, String fileName) throws IOException {
+        JsonArray global = getGlobal(mode, fileName + ".json");
+        JsonArray server = getServer(mode, guildId, fileName + ".txt");
+
+        Type collectionType = new TypeToken<List<String>>(){}.getType();
+        List<String> strGlobal = gson.fromJson(global, collectionType);
+        List<String> strServer = gson.fromJson(server, collectionType);
+
+        strGlobal.addAll(strServer);
+
+        return strGlobal;
     }
 }

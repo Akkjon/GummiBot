@@ -1,6 +1,5 @@
 package de.akkjon.pr.mbrm.games;
 
-import com.google.gson.JsonArray;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -9,11 +8,16 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.IOException;
+import java.util.List;
 
 public class IchHabNochNie extends Game {
 
     private boolean isStarted = false;
 
+    //private JsonArray remainingListGlobal;
+    //private JsonArray remainingListServer;
+
+    private List<String> remainingList;
 
     public IchHabNochNie(long serverID) {
         super(serverID);
@@ -25,13 +29,20 @@ public class IchHabNochNie extends Game {
         message.addReaction("➡").queue();
         message.addReaction("❌").queue();
         message.pin().complete();
+        try {
+            loadRemainingList();
+        } catch (IOException e) {
+            e.printStackTrace();
+            this.channel.delete();
+        }
         initReactionListeners();
     }
 
-    public static String getMessage(long serverId) throws IOException {
-        JsonArray global = getGlobal("questions", "ihnn.json");
-        JsonArray server = getServer("questions", serverId, "ihnn.txt");
-        return getFromLists(global, server);
+    public String getMessage() throws IOException {
+        if(this.remainingList.size()==0) {
+            loadRemainingList();
+        }
+        return getFromLists(this.remainingList);
     }
 
     public static boolean addMessage(String element, long serverId) throws IOException {
@@ -76,10 +87,14 @@ public class IchHabNochNie extends Game {
 
     void sendMessage() {
         try {
-            Message msg = channel.sendMessage(Main.getEmbedMessage("Ich hab noch nie", "..." + getMessage(guildId))).complete();
+            Message msg = channel.sendMessage(Main.getEmbedMessage("Ich hab noch nie", "..." + getMessage())).complete();
             msg.addReaction("➡").queue();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadRemainingList() throws IOException {
+        this.remainingList = loadRemaining("questions", "ihnn");
     }
 }
