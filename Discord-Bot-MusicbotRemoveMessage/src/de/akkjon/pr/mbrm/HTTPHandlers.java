@@ -16,7 +16,11 @@ class Index implements HttpHandler {
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
 		String response = Storage.getInternalFile("index.html");
-		Handler.respond(exchange, response, false);
+		try {
+			Handler.respond(exchange, response, false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
@@ -170,7 +174,6 @@ class Handler {
 		OutputStream os = exchange.getResponseBody();
 		os.write(res.getBytes());
 		os.close();
-		
 	}
 	
 	public static void initWebServer() throws IOException {
