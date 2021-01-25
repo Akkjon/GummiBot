@@ -14,6 +14,8 @@ public class IchHabNochNie extends Game {
 
     private List<String> remainingList;
 
+    private static String fileName = "ihnn";
+
     public IchHabNochNie(long serverID) {
         super(serverID);
         this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel("Ich-hab-noch-nie").complete();
@@ -41,7 +43,7 @@ public class IchHabNochNie extends Game {
     }
 
     public static boolean addMessage(String element, long serverId) throws IOException {
-        return add(element, "message", serverId, "ihnn.txt");
+        return add(element, "message", serverId, fileName + ".txt");
     }
 
     public void initReactionListeners() {
@@ -52,10 +54,10 @@ public class IchHabNochNie extends Game {
 
                 //skip if message was not from bot or reaction was from bot
                 User bot = event.getJDA().getSelfUser();
-                if (!message.getAuthor().equals(bot)) {
+                if (event.getMember().getUser().equals(bot)) {
                     return;
                 }
-                if (event.getMember().getUser().equals(bot)) {
+                if (!message.getAuthor().equals(bot)) {
                     return;
                 }
 
@@ -84,6 +86,6 @@ public class IchHabNochNie extends Game {
     }
 
     private void loadRemainingList() throws IOException {
-        this.remainingList = loadRemaining("questions", "ihnn");
+        this.remainingList = loadRemaining("questions", fileName);
     }
 }
