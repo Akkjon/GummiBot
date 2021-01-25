@@ -25,7 +25,9 @@ public class QuoteOfTheDay {
 	public static String getQotdPath(long serverId) {
 		return Storage.rootFolder + serverId + File.separator + "qotd.txt";
 	}
-	
+
+	private List<String> data;
+
 	public static boolean removeQotd(long channelId, long serverId) throws IOException {
 		JsonObject obj = getQotdObject(serverId);
 		if(obj.has(channelId+"")) {
@@ -88,8 +90,12 @@ public class QuoteOfTheDay {
 	
 	private void timerTask() {
 		try {
-			List<String> data = Handler.getData();
+			if(this.data.size() == 0) {
+				loadData();
+			}
+			//List<String> data = Handler.getData();
 			int index = (int)(Math.random() * data.size());
+			this.data.remove(index);
 			String msg = data.get(index);
 			JsonObject obj = QuoteOfTheDay.getQotdObject(serverId);
 			
@@ -97,7 +103,10 @@ public class QuoteOfTheDay {
 				
 				MessageChannel channel=getMessageChannelById(Long.parseLong(entry.getKey()));
 				
-				if(channel==null) continue;
+				if(channel==null) {
+					obj.remove(entry.getKey());
+					continue;
+				}
 				
 				if(!entry.getValue().isJsonNull() && (entry.getValue().getAsLong()>=0)) {
 					long messageId = entry.getValue().getAsLong();
@@ -126,5 +135,13 @@ public class QuoteOfTheDay {
 			}
 		}
 		return null;
+	}
+
+	private void loadData() {
+		try {
+			this.data = Handler.getData();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
