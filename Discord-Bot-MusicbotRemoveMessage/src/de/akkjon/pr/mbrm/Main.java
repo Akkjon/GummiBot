@@ -26,9 +26,6 @@ public class Main extends ListenerAdapter {
 	private static final String token = "Nzk5MzcxNTE3NzgzMzEwMzM2.YACmvQ.eVLv8VH9MYL7k3UjWaWsEWIcoCo";
 	public static JDA jda;
 	public static void main(String[] args) {
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			jda.getCategoryById(802719239723024414L).getTextChannels().forEach(channel -> channel.delete().complete());
-		}));
 		Logger.init();
 		try {
 			Handler.initWebServer();

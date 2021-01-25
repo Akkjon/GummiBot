@@ -98,6 +98,12 @@ class ControlHandler implements HttpHandler {
 		String pathName = "/control/";
 		if(url.equals(pathName + "stopbot")) {
 			System.out.println("Stopping because of signal");
+			Main.jda.getCategoryById(802719239723024414L).getTextChannels().forEach(channel -> channel.delete().complete());
+			try {
+				Updater.shutdownInternals();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			Handler.respond(exchange, "succ", true);
 			System.exit(0);
 		} else if (url.equals(pathName + "restartbot")) {
