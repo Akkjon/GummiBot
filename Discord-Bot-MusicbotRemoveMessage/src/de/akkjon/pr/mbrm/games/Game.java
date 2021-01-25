@@ -6,7 +6,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 import de.akkjon.pr.mbrm.Storage;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.File;
@@ -22,8 +25,8 @@ public class Game extends ListenerAdapter {
     TextChannel channel;
 
 
-    Game(long serverID) {
-        this.guildId = serverID;
+    Game(long serverId) {
+        this.guildId = serverId;
 
     }
 
@@ -96,5 +99,17 @@ public class Game extends ListenerAdapter {
         strGlobal.addAll(strServer);
 
         return strGlobal;
+    }
+
+    public static boolean shouldReactToMessage(GuildMessageReactionAddEvent event, Message message) {
+        //skip if message was not from bot or reaction was from bot
+        User bot = event.getJDA().getSelfUser();
+        if (!message.getAuthor().equals(bot)) {
+            return false;
+        }
+        if (event.getMember().getUser().equals(bot)) {
+            return false;
+        }
+        return true;
     }
 }

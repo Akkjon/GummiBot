@@ -4,7 +4,6 @@ import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -106,11 +105,7 @@ public class TruthOrDare extends Game {
                 }
 
                 //skip if message was not from bot or reaction was from bot
-                User bot = event.getJDA().getSelfUser();
-                if (event.getMember().getUser().equals(bot)) {
-                    return;
-                }
-                if (!message.getAuthor().equals(bot)) {
+                if(!shouldReactToMessage(event, message)) {
                     return;
                 }
 
