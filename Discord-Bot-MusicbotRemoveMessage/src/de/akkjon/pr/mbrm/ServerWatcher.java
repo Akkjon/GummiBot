@@ -64,147 +64,154 @@ public class ServerWatcher {
                             if (args.length == 0) {
                                 return;
                             }
-                            if (args[0].equalsIgnoreCase("addchannel")) {
-                                if (!isChannelRegistered(channelId)) {
-                                    try {
-                                        ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Success", "You wanna make me your slave? Sure...")).complete();
-                                    } catch (IOException e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
-                                        e.printStackTrace();
-                                    }
+                            switch (args[0].toLowerCase()) {
+                                case "addchannel" -> {
+                                    if (!isChannelRegistered(channelId)) {
+                                        try {
+                                            ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "You wanna make me your slave? Sure...")).complete();
+                                        } catch (IOException e) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
+                                            e.printStackTrace();
+                                        }
 
-                                } else {
-                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What do you want from me, bitch? I am already working here.")).complete();
-                                }
-                            } else if (args[0].equalsIgnoreCase("removechannel")) {
-                                if (isChannelRegistered(channelId)) {
-                                    try {
-                                        ServerWatcher.this.channels = Storage.removeChannel(serverId, channelId);
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Alright, fuck you. Bye")).complete();
-                                    } catch (IOException e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
-                                        e.printStackTrace();
-                                    }
-
-                                } else {
-                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I was never watchning this fookin channel.")).complete();
-                                }
-                            } else if (args[0].equalsIgnoreCase("addqotd")) {
-                                try {
-                                    boolean isAdded = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
-                                    if (isAdded) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Ok my master.")).complete();
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I am allready here, don't you see me? OPEN YOUR GOD DAMNED EYES.")).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What do you want from me, bitch? I am already working here.")).complete();
                                     }
-                                } catch (Exception e) {
-                                    event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I fucking hate my life... AN ERROR AGAIN")).complete();
-                                    e.printStackTrace();
                                 }
-                            } else if (args[0].equalsIgnoreCase("removeqotd")) {
-                                try {
-                                    boolean isRemoved = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
-                                    if (isRemoved) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Doby is free.")).complete();
-                                    } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You cannot remove me, IF I AM NOT HERE. Fuck off.")).complete();
-                                    }
-                                } catch (Exception e) {
-                                    event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Fuck, shit, ahhh, NOOOOOO. I made a mistake...")).complete();
-                                    e.printStackTrace();
-                                }
-                            } else if (args[0].equalsIgnoreCase("addtruth")) {
-                                if (args.length > 1) {
-                                    String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
-                                    try {
-                                        boolean isAdded = TruthOrDare.addTruth(newElement, serverId);
-                                        if (isAdded) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
-                                        } else {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You fucking goblin.")).complete();
+                                case "removechannel" -> {
+                                    if (isChannelRegistered(channelId)) {
+                                        try {
+                                            ServerWatcher.this.channels = Storage.removeChannel(serverId, channelId);
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Alright, fuck you. Bye")).complete();
+                                        } catch (IOException e) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
+                                            e.printStackTrace();
                                         }
-                                    } catch (IOException e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am fucking retarded... You are as well.")).complete();
-                                        e.printStackTrace();
-                                    }
 
-                                } else {
-                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I don't think so...")).complete();
+                                    } else {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I was never watchning this fookin channel.")).complete();
+                                    }
                                 }
-                            } else if (args[0].equalsIgnoreCase("adddare")) {
-                                if (args.length > 1) {
-                                    String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
+                                case "addqotd" -> {
                                     try {
-                                        boolean isAdded = TruthOrDare.addDare(newElement, serverId);
+                                        boolean isAdded = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isAdded) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Ok my master.")).complete();
                                         } else {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I am allready here, don't you see me? OPEN YOUR GOD DAMNED EYES.")).complete();
                                         }
-                                    } catch (IOException e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
+                                    } catch (Exception e) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I fucking hate my life... AN ERROR AGAIN")).complete();
                                         e.printStackTrace();
                                     }
-                                } else {
-                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "How dare you?")).complete();
                                 }
-                            } else if (args[0].equalsIgnoreCase("addmessage")) {
-                                if (args.length > 1) {
-                                    String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
+                                case "removeqotd" -> {
                                     try {
-                                        boolean isAdded = IchHabNochNie.addMessage(newElement, serverId);
-                                        if (isAdded) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                        boolean isRemoved = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
+                                        if (isRemoved) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Doby is free.")).complete();
                                         } else {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You cannot remove me, IF I AM NOT HERE. Fuck off.")).complete();
                                         }
-                                    } catch (IOException e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
+                                    } catch (Exception e) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Fuck, shit, ahhh, NOOOOOO. I made a mistake...")).complete();
                                         e.printStackTrace();
                                     }
-                                } else {
-                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Hustensohn!")).complete();
                                 }
-                            } else if (args[0].equalsIgnoreCase("play")) {
-                                if (args.length > 1) {
-                                    if (args[1].equalsIgnoreCase("tod") || args[1].equalsIgnoreCase("truthOrDare")) {
-                                        TruthOrDare tod = new TruthOrDare(serverId);
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + tod.getChannelId() + ">")).complete();
-                                    } else if (args[1].equalsIgnoreCase("ihnn") || args[1].equalsIgnoreCase("ichHabNochNie")) {
-                                        IchHabNochNie ihnn = new IchHabNochNie(serverId);
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + ihnn.getChannelId() + ">")).complete();
+                                case "addtruth" -> {
+                                    if (args.length > 1) {
+                                        String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
+                                        try {
+                                            boolean isAdded = TruthOrDare.addTruth(newElement, serverId);
+                                            if (isAdded) {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                            } else {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You fucking goblin.")).complete();
+                                            }
+                                        } catch (IOException e) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am fucking retarded... You are as well.")).complete();
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I don't think so...")).complete();
                                     }
-                                } else {
-                                    event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What u wanna play bitch?")).complete();
                                 }
-                            } else if (args[0].equalsIgnoreCase("throwDice")) {
-                                if (args.length > 1) {
-                                    try {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(Integer.parseInt(args[1]))))).complete();
-                                    } catch (NumberFormatException e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Emilia, was soll der Shit. Was zum Fick ist " + args[1])).complete();
+                                case "adddare" -> {
+                                    if (args.length > 1) {
+                                        String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
+                                        try {
+                                            boolean isAdded = TruthOrDare.addDare(newElement, serverId);
+                                            if (isAdded) {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                            } else {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
+                                            }
+                                        } catch (IOException e) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "How dare you?")).complete();
                                     }
-                                } else
-                                event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(6)))).complete();
-                            } else {
-                                event.getChannel().sendMessage(
-                                        "```Channel-Cleaning:\n"
-                                                + "~addchannel\n"
-                                                + "~removechannel\n"
-                                                + "\n"
-                                                + "Quote of the day\n"
-                                                + "~addqotd\n"
-                                                + "~removeqotd\n"
-                                                + "\n"
-                                                + "Games\n"
-                                                + "~play tod - TruthOrDare\n"
-                                                + "~addtruth\n"
-                                                + "~adddare\n"
-                                                + "\n"
-                                                + "~play ihnn - IchHabNochNie" +
+                                }
+                                case "addmessage" -> {
+                                    if (args.length > 1) {
+                                        String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
+                                        try {
+                                            boolean isAdded = IchHabNochNie.addMessage(newElement, serverId);
+                                            if (isAdded) {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                            } else {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
+                                            }
+                                        } catch (IOException e) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Hustensohn!")).complete();
+                                    }
+                                }
+                                case "play" -> {
+                                    if (args.length > 1) {
+                                        if (args[1].equalsIgnoreCase("tod") || args[1].equalsIgnoreCase("truthOrDare")) {
+                                            TruthOrDare tod = new TruthOrDare(serverId);
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + tod.getChannelId() + ">")).complete();
+                                        } else if (args[1].equalsIgnoreCase("ihnn") || args[1].equalsIgnoreCase("ichHabNochNie")) {
+                                            IchHabNochNie ihnn = new IchHabNochNie(serverId);
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + ihnn.getChannelId() + ">")).complete();
+                                        }
+                                    } else {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What u wanna play bitch?")).complete();
+                                    }
+                                }
+                                case "throwdice" -> {
+                                    if (args.length > 1) {
+                                        try {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(Integer.parseInt(args[1]))))).complete();
+                                        } catch (NumberFormatException e) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Emilia, was soll der Shit. Was zum Fick ist " + args[1])).complete();
+                                        }
+                                    } else
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(6)))).complete();
+                                }
+                                default -> event.getChannel().sendMessage(
+                                        "```Channel-Cleaning:\n" +
+                                                "~addchannel\n" +
+                                                "~removechannel\n" +
+                                                "\n" +
+                                                "Quote of the day\n" +
+                                                "~addqotd\n" +
+                                                "~removeqotd\n" +
+                                                "\n" +
+                                                "Games\n" +
+                                                "~play tod - TruthOrDare\n" +
+                                                "~addtruth\n" +
+                                                "~adddare\n" +
+                                                "\n" +
+                                                "~play ihnn - IchHabNochNie" +
                                                 "```").complete();
-
                             }
                         }
 

@@ -23,6 +23,8 @@ public class TruthOrDare extends Game {
     private List<String> remainingListTruth;
     private List<String> remainingListDare;
 
+    private static String fileName = "tod";
+
 
 
     public TruthOrDare(long serverID) {
@@ -62,11 +64,11 @@ public class TruthOrDare extends Game {
     }
 
     public static boolean addTruth(String element, long serverId) throws IOException {
-        return add(element, "truth", serverId, "tod.txt");
+        return add(element, "truth", serverId, fileName + ".txt");
     }
 
     public static boolean addDare(String element, long serverId) throws IOException {
-        return add(element, "dare", serverId, "tod.txt");
+        return add(element, "dare", serverId, fileName + ".txt");
     }
 
     void addPlayer(Long id) {
@@ -85,8 +87,7 @@ public class TruthOrDare extends Game {
     long getNextPlayer() {
         int indexOflastPlayer = players.indexOf(lastPlayer);
         if (++indexOflastPlayer >= players.size()) indexOflastPlayer = 0;
-        this.lastPlayer = players.get(indexOflastPlayer);
-        return this.lastPlayer;
+        return this.lastPlayer = players.get(indexOflastPlayer);
     }
 
     long getCurrentPlayer() {
@@ -106,10 +107,10 @@ public class TruthOrDare extends Game {
 
                 //skip if message was not from bot or reaction was from bot
                 User bot = event.getJDA().getSelfUser();
-                if (!message.getAuthor().equals(bot)) {
+                if (event.getMember().getUser().equals(bot)) {
                     return;
                 }
-                if (event.getMember().getUser().equals(bot)) {
+                if (!message.getAuthor().equals(bot)) {
                     return;
                 }
 
@@ -202,10 +203,10 @@ public class TruthOrDare extends Game {
     }
 
     private void loadRemainingTruth() throws IOException {
-        this.remainingListTruth = loadRemaining("truth", "tod");
+        this.remainingListTruth = loadRemaining("truth", fileName);
     }
 
     private void loadRemainingDare() throws IOException {
-        this.remainingListDare = loadRemaining("dare", "tod");
+        this.remainingListDare = loadRemaining("dare", fileName);
     }
 }
