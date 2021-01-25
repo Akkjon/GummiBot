@@ -113,7 +113,7 @@ public class ServerWatcher {
                                 }
                                 case "removeqotd" -> {
                                     try {
-                                        boolean isRemoved = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
+                                        boolean isRemoved = QuoteOfTheDay.removeQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isRemoved) {
                                             event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Doby is free.")).complete();
                                         } else {
