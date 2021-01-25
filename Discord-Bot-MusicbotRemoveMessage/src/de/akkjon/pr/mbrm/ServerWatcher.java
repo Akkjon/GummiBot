@@ -59,6 +59,10 @@ public class ServerWatcher {
                     if (event.getGuild().getIdLong() == serverId) {
                         long channelId = event.getChannel().getIdLong();
                         String content = event.getMessage().getContentRaw();
+                        long selfUserId = Main.jda.getSelfUser().getIdLong();
+                        if(event.getMessage().getMentionedMembers().stream().filter(member -> member.getIdLong()==selfUserId).count()>0) {
+                            event.getChannel().sendMessage("Fresse halten, du störst mich in meiner kreativen Phase").complete();
+                        }
                         if (content.startsWith(prefix)) {
                             content = content.substring(prefix.length());
                             String[] args = Arrays.stream(content.split(" ")).filter(e -> e.length() > 0).toArray(String[]::new);
