@@ -6,6 +6,7 @@ import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import de.akkjon.pr.mbrm.games.Dice;
 import de.akkjon.pr.mbrm.games.IchHabNochNie;
@@ -160,23 +161,56 @@ public class ServerWatcher {
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Error", "How dare you?")).complete();
                                     }
                                 }
-                                case "addmessage" -> {
-                                    if (args.length > 1) {
-                                        String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
-                                        try {
-                                            boolean isAdded = IchHabNochNie.addMessage(newElement, serverId);
-                                            if (isAdded) {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
-                                            } else {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
-                                            }
-                                        } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
-                                            e.printStackTrace();
-                                        }
-                                    } else {
+                                case "addquestion" -> {
+                                    if (args.length == 0) {
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Hustensohn!")).complete();
                                     }
+                                    if(args.length < 2) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Ich hasse dich!")).complete();
+                                    }
+                                    String gameName = args[0].toLowerCase();
+                                    String newElement = String.join(" ", Arrays.asList(args).subList(2, args.length));
+
+                                    String succesTitle          =   "Success";
+                                    String succesDescription    =   "Added \"" + newElement + "\"";
+                                    String ErrorTitle           =   "Error";
+                                    String ErrorDescription     =   "I fucking hate you. It's already registered...";
+                                    String InternalErrorTitle   =   "Internal error";
+                                    String InternalErrorDescription="You are annoying... I made a mistake because of you.";
+
+                                    switch (gameName) {
+                                        case "ihnn" -> {
+                                            try {
+                                                boolean isAdded = IchHabNochNie.addMessage(newElement, serverId);
+                                                if (isAdded) {
+                                                    event.getChannel().sendMessage(Main.getEmbedMessage(succesTitle, succesDescription)).complete();
+                                                } else {
+                                                    event.getChannel().sendMessage(Main.getEmbedMessage(ErrorTitle, ErrorDescription)).complete();
+                                                }
+                                            } catch (IOException e) {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(InternalErrorTitle, InternalErrorDescription)).complete();
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        case "wde" -> {
+                                            try {
+                                                boolean isAdded = WürdestDuEher.addMessage(newElement, serverId);
+                                                if (isAdded) {
+                                                    event.getChannel().sendMessage(Main.getEmbedMessage(succesTitle, succesDescription)).complete();
+                                                } else {
+                                                    event.getChannel().sendMessage(Main.getEmbedMessage(ErrorTitle, ErrorDescription)).complete();
+                                                }
+                                            } catch (IOException e) {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(InternalErrorTitle, InternalErrorDescription)).complete();
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        default -> {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Bist du behindert? Das gibt es nicht!")).complete();
+                                        }
+                                    }
+
+
                                 }
                                 case "play" -> {
                                     if (args.length > 1) {

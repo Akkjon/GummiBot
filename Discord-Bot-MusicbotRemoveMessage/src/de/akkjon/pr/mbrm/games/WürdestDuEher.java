@@ -18,6 +18,7 @@ public class WürdestDuEher extends Game{
     private boolean isStarted = false;
 
     private List<String> remainingList;
+    private static String fileName = "wde";
 
     public WürdestDuEher(long serverId) {
         super(serverId);
@@ -48,7 +49,7 @@ public class WürdestDuEher extends Game{
     }
 
     public static boolean addMessage(String element, long serverId) throws IOException {
-        return add(element, "questions", serverId, "wde.txt");
+        return add(element, "questions", serverId, fileName+".txt");
     }
 
     void addPlayer(Long id) {
@@ -140,6 +141,6 @@ public class WürdestDuEher extends Game{
     }
 
     private void loadRemainingList() throws IOException {
-        this.remainingList = loadRemaining("questions", "wde");
+        this.remainingList = loadRemaining("questions", fileName);
     }
 }
