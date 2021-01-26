@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.Guild;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class Storage {
 	
@@ -23,6 +25,7 @@ public class Storage {
 			jarFolder = (new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath());
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
+			jarFolder = StringEscapeUtils.unescapeHtml4(new File(ClassLoader.getSystemClassLoader().getResource(".").getPath()).toString());
 		}
 	}
 
