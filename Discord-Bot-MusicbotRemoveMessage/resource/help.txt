@@ -1,0 +1,15 @@
+```Channel-Cleaning:
+~addchannel
+~removechannel
+
+Quote of the day
+~addqotd
+~removeqotd
+
+Games
+~play tod - TruthOrDare
+~addtruth
+~adddare
+
+~play ihnn - IchHabNochNie
+~play wde - WürdestDuEher```
