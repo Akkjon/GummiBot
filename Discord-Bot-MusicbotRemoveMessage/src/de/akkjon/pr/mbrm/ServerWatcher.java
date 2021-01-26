@@ -6,7 +6,6 @@ import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import de.akkjon.pr.mbrm.games.Dice;
 import de.akkjon.pr.mbrm.games.IchHabNochNie;
@@ -62,7 +61,7 @@ public class ServerWatcher {
                         String content = event.getMessage().getContentRaw();
                         long selfUserId = Main.jda.getSelfUser().getIdLong();
                         if(event.getMessage().getMentionedMembers().stream().filter(member -> member.getIdLong()==selfUserId).count()>0) {
-                            event.getChannel().sendMessage("Fresse halten, du störst mich in meiner kreativen Phase").complete();
+                            event.getChannel().sendMessage(Locales.getString("msg.onMentioned")).complete();
                         }
                         if (content.startsWith(prefix)) {
                             content = content.substring(prefix.length());
@@ -75,40 +74,40 @@ public class ServerWatcher {
                                     if (!isChannelRegistered(channelId)) {
                                         try {
                                             ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "You wanna make me your slave? Sure...")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onAddChannelSuccess"))).complete();
                                         } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError"))).complete();
                                             e.printStackTrace();
                                         }
 
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What do you want from me, bitch? I am already working here.")).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddChannelError"))).complete();
                                     }
                                 }
                                 case "removechannel" -> {
                                     if (isChannelRegistered(channelId)) {
                                         try {
                                             ServerWatcher.this.channels = Storage.removeChannel(serverId, channelId);
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Alright, fuck you. Bye")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onRemoveChannelSuccess"))).complete();
                                         } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am dumb... I encountered an error.")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError"))).complete();
                                             e.printStackTrace();
                                         }
 
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I was never watchning this fookin channel.")).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onRemoveChannelError"))).complete();
                                     }
                                 }
                                 case "addqotd" -> {
                                     try {
                                         boolean isAdded = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isAdded) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Ok my master.")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onAddQotdSuccess"))).complete();
                                         } else {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I am allready here, don't you see me? OPEN YOUR GOD DAMNED EYES.")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddQotdError"))).complete();
                                         }
                                     } catch (Exception e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I fucking hate my life... AN ERROR AGAIN")).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError2"))).complete();
                                         e.printStackTrace();
                                     }
                                 }
@@ -116,12 +115,12 @@ public class ServerWatcher {
                                     try {
                                         boolean isRemoved = QuoteOfTheDay.removeQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isRemoved) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Doby is free.")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onRemoveQotdSuccess"))).complete();
                                         } else {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You cannot remove me, IF I AM NOT HERE. Fuck off.")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onRemoveQotdError"))).complete();
                                         }
                                     } catch (Exception e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "Fuck, shit, ahhh, NOOOOOO. I made a mistake...")).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError3"))).complete();
                                         e.printStackTrace();
                                     }
                                 }
@@ -131,16 +130,16 @@ public class ServerWatcher {
                                         try {
                                             boolean isAdded = TruthOrDare.addTruth(newElement, serverId);
                                             if (isAdded) {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onAddTruthSuccess", newElement))).complete();
                                             } else {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", "You fucking goblin.")).complete();
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddTruthError"))).complete();
                                             }
                                         } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "I am fucking retarded... You are as well.")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError4"))).complete();
                                             e.printStackTrace();
                                         }
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I don't think so...")).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddTruthNoArgument"))).complete();
                                     }
                                 }
                                 case "adddare" -> {
@@ -149,26 +148,28 @@ public class ServerWatcher {
                                         try {
                                             boolean isAdded = TruthOrDare.addDare(newElement, serverId);
                                             if (isAdded) {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", "Added \"" + newElement + "\"")).complete();
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onAddTruthSuccess", newElement))).complete();
                                             } else {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", "I fucking hate you. It's already registered...")).complete();
+                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddDareError"))).complete();
                                             }
                                         } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", "You are annoying... I made a mistake because of you.")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError5"))).complete();
                                             e.printStackTrace();
                                         }
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "How dare you?")).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddDareNoArgument"))).complete();
                                     }
                                 }
                                 case "addquestion" -> {
-                                    if (args.length == 0) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Hustensohn!")).complete();
+                                    if (args.length == 1) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddQuestionError1"))).complete();
+                                        return;
                                     }
-                                    if(args.length < 2) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Ich hasse dich!")).complete();
+                                    if(args.length < 3) {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddQuestionError2"))).complete();
+                                        return;
                                     }
-                                    String gameName = args[0].toLowerCase();
+                                    String gameName = args[1].toLowerCase();
                                     String newElement = String.join(" ", Arrays.asList(args).subList(2, args.length));
 
                                     String succesTitle          =   "Success";

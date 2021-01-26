@@ -30,7 +30,7 @@ public class Main extends ListenerAdapter {
 		try {
 			Handler.initWebServer();
 		} catch (IOException e) {
-			System.err.println("NEIN! KEIN WEBSERVER, ARSCH, KEIN PORT FREI, MEH");
+			System.err.println(Locales.getString("error.noPortAvailable"));
 			e.printStackTrace();
 			System.exit(0);
 		}
@@ -46,7 +46,7 @@ public class Main extends ListenerAdapter {
 			new Main();
 			setIcon();
 		} catch (LoginException e) {
-			System.err.println("What? No");
+			System.err.println(Locales.getString("error.loginException"));
 			e.printStackTrace();
 			
 			try {
@@ -63,7 +63,7 @@ public class Main extends ListenerAdapter {
 			try {
 				new ServerWatcher(server);
 			} catch (AlreadyBoundException e) {
-				System.err.println("Cannot start Watcher for server " + server);
+				System.err.println(Locales.getString("error.startWatcher", server));
 				e.printStackTrace();
 			}
 		}
@@ -76,7 +76,7 @@ public class Main extends ListenerAdapter {
 		try {
 			new ServerWatcher(serverId);
 		} catch (AlreadyBoundException e) {
-			System.err.println("Cannot start Watcher for server " + serverId);
+			System.err.println(Locales.getString("error.startWatcher", serverId));
 			e.printStackTrace();
 		}
 	}
