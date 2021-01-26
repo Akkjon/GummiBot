@@ -9,14 +9,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Map.Entry;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 
-import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.entities.*;
 
 public class QuoteOfTheDay {
 	
@@ -98,7 +93,11 @@ public class QuoteOfTheDay {
 			this.data.remove(index);
 			String msg = data.get(index);
 			JsonObject obj = QuoteOfTheDay.getQotdObject(serverId);
-			
+
+			JsonArray array = gson.fromJson(Storage.getInternalFile("/animals.json"), JsonObject.class).get("animals").getAsJsonArray();
+			int index2 = (int)(Math.random() * array.size());
+			String imageUrl = array.get(index2).getAsString();
+
 			for (Entry<String, JsonElement> entry : obj.entrySet()) {
 				
 				MessageChannel channel=getMessageChannelById(Long.parseLong(entry.getKey()));
@@ -111,12 +110,28 @@ public class QuoteOfTheDay {
 				if(!entry.getValue().isJsonNull() && (entry.getValue().getAsLong()>=0)) {
 					long messageId = entry.getValue().getAsLong();
 					try {
-						MessageHistory.getHistoryAround(channel, messageId+"").complete().getMessageById(messageId).delete().complete();
-					} catch(Exception e) {
+						MessageHistory.getHistoryAround(channel, messageId + "").complete().getMessageById(messageId).delete().complete();
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
-				long newMsgId = channel.sendMessage(Main.getEmbedMessage("Message of the day:", msg)).complete().getIdLong();
+
+				MessageEmbed msgEmbed = new MessageEmbed(
+						null,
+						"Message of the day:",
+						msg,
+						EmbedType.IMAGE,
+						null,
+						Main.embedColor,
+						null,
+						null,
+						null,
+						null,
+						new MessageEmbed.Footer("Gummi", null, null),
+						new MessageEmbed.ImageInfo(imageUrl, null, -1, -1),
+						null);
+
+				long newMsgId = channel.sendMessage(msgEmbed).complete().getIdLong();
 				entry.setValue(new JsonPrimitive(newMsgId));
 			}
 			QuoteOfTheDay.saveJson(gson.toJson(obj), serverId);

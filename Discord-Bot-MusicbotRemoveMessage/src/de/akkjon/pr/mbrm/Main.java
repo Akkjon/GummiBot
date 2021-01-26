@@ -80,15 +80,16 @@ public class Main extends ListenerAdapter {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public static final int embedColor = new Color(0, 255, 0).getRGB();
 	public static MessageEmbed getEmbedMessage(String title, String message) {
-		MessageEmbed embed = new MessageEmbed(
+		return new MessageEmbed(
 				null,
 				title,
 				message,
 				EmbedType.UNKNOWN,
 				null,
-				new Color(0, 255, 0).getRGB(),
+				embedColor,
 				null,
 				null,
 				null,
@@ -97,7 +98,6 @@ public class Main extends ListenerAdapter {
 				null,
 				new ArrayList<>()
 			);
-		return embed;
 	}
 
 	private static void setIcon() {
