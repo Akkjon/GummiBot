@@ -239,22 +239,10 @@ public class ServerWatcher {
                                     } else
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(6)))).complete();
                                 }
-                                default -> event.getChannel().sendMessage(
-                                        "```Channel-Cleaning:\n" +
-                                                "~addchannel\n" +
-                                                "~removechannel\n" +
-                                                "\n" +
-                                                "Quote of the day\n" +
-                                                "~addqotd\n" +
-                                                "~removeqotd\n" +
-                                                "\n" +
-                                                "Games\n" +
-                                                "~play tod - TruthOrDare\n" +
-                                                "~addtruth\n" +
-                                                "~adddare\n" +
-                                                "\n" +
-                                                "~play ihnn - IchHabNochNie" +
-                                                "```").complete();
+                                default -> {
+                                    String helpMsg = Storage.getInternalFile("help.txt");
+                                    event.getChannel().sendMessage(helpMsg).complete();
+                                }
                             }
                         }
 
