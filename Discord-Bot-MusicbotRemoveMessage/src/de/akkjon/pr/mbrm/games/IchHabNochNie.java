@@ -3,7 +3,6 @@ package de.akkjon.pr.mbrm.games;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -14,7 +13,7 @@ public class IchHabNochNie extends Game {
 
     private List<String> remainingList;
 
-    private static String fileName = "ihnn";
+    private static final String fileName = "ihnn";
 
     public IchHabNochNie(long serverID) {
         super(serverID);

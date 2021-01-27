@@ -22,7 +22,7 @@ public class TruthOrDare extends Game {
     private List<String> remainingListTruth;
     private List<String> remainingListDare;
 
-    private static String fileName = "tod";
+    private static final String fileName = "tod";
 
 
 

@@ -3,6 +3,7 @@ package de.akkjon.pr.mbrm;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,7 @@ public class ServerWatcher {
     private final long serverId;
     private Long[] channels;
     private final String prefix = "~";
+    private final Insult insult;
 
     public ServerWatcher(long serverId) throws AlreadyBoundException {
         for (WeakReference<ServerWatcher> weakReference : serverWatchers) {
@@ -30,6 +32,7 @@ public class ServerWatcher {
             }
         }
         this.serverId = serverId;
+        this.insult = new Insult(serverId);
         initChannels();
         initCommandListeners();
         new QuoteOfTheDay(serverId);
@@ -98,7 +101,7 @@ public class ServerWatcher {
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onRemoveChannelError"))).complete();
                                     }
                                 }
-                                case "addqotd" -> {
+                                case "addqotd", "addmotd" -> {
                                     try {
                                         boolean isAdded = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isAdded) {
@@ -206,12 +209,23 @@ public class ServerWatcher {
                                                 e.printStackTrace();
                                             }
                                         }
+                                        case "insult" -> {
+                                            try {
+                                                boolean isAdded = Insult.addMessage(newElement, serverId);
+                                                if (isAdded) {
+                                                    event.getChannel().sendMessage(Main.getEmbedMessage(succesTitle, succesDescription)).complete();
+                                                } else {
+                                                    event.getChannel().sendMessage(Main.getEmbedMessage(ErrorTitle, ErrorDescription)).complete();
+                                                }
+                                            } catch (IOException e) {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(InternalErrorTitle, InternalErrorDescription)).complete();
+                                                e.printStackTrace();
+                                            }
+                                        }
                                         default -> {
                                             event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Bist du behindert? Das gibt es nicht!")).complete();
                                         }
                                     }
-
-
                                 }
                                 case "play" -> {
                                     if (args.length > 1) {
@@ -238,6 +252,15 @@ public class ServerWatcher {
                                         }
                                     } else
                                         event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(6)))).complete();
+                                }
+                                case "insult" -> {
+                                    long id;
+                                    if (args.length == 1) {
+                                        id = event.getAuthor().getIdLong();
+                                    } else {
+                                        id = event.getMessage().getMentionedMembers().get(0).getIdLong();
+                                    }
+                                    event.getChannel().sendMessage(Main.getEmbedMessage("A", MessageFormat.format(insult.getMessage(), "<@" + id + ">"))).complete();
                                 }
                                 default -> {
                                     String helpMsg = Storage.getInternalFile("help.txt");

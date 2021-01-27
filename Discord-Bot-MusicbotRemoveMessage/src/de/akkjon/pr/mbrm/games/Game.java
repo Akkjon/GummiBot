@@ -25,12 +25,12 @@ public class Game extends ListenerAdapter {
     TextChannel channel;
 
 
-    Game(long serverId) {
+    protected Game(long serverId) {
         this.guildId = serverId;
 
     }
 
-    static String getFromLists(List<String> list) {
+    protected static String getFromLists(List<String> list) {
         int value = (int) (Math.random() * list.size());
 
         String returnVal = list.get(value);
@@ -101,7 +101,7 @@ public class Game extends ListenerAdapter {
         return strGlobal;
     }
 
-    public static boolean shouldReactToMessage(GuildMessageReactionAddEvent event, Message message) {
+    static boolean shouldReactToMessage(GuildMessageReactionAddEvent event, Message message) {
         //skip if message was not from bot or reaction was from bot
         User bot = event.getJDA().getSelfUser();
         if (!message.getAuthor().equals(bot)) {

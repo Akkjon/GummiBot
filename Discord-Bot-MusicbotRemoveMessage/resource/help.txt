@@ -12,4 +12,9 @@ Games
 ~adddare
 
 ~play ihnn - IchHabNochNie
-~play wde - WürdestDuEher```
+~play wde - WürdestDuEher
+
+Random Stuff
+~insult @Spieler
+
+```
