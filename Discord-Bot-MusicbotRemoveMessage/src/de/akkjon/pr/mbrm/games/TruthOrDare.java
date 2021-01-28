@@ -1,5 +1,6 @@
 package de.akkjon.pr.mbrm.games;
 
+import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -28,12 +29,9 @@ public class TruthOrDare extends Game {
 
     public TruthOrDare(long serverID) {
         super(serverID);
-        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel("Truth-or-Dare").complete();
-        Message message = channel.sendMessage(Main.getEmbedMessage("Truth or Dare",
-                "Who wants to play a game?\n" +
-                        "React with 👍 to enter the game.\n" +
-                        "Click ➡ to start the game.\n" +
-                        "Click ❌ to end the current game.")).complete();
+        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(Locales.getString("msg.games.tod.channelName")).complete();
+        Message message = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.tod.title"),
+                Locales.getString("mgs.games.tod.start"))).complete();
         message.addReaction("👍").queue();
         message.addReaction("➡").queue();
         message.addReaction("❌").queue();
@@ -112,12 +110,13 @@ public class TruthOrDare extends Game {
                 if (message.getEmbeds().size() != 0) {
                     String title = message.getEmbeds().get(0).getTitle();
 
-                    if (title.equals("Truth") || title.equals("Dare")) {
+                    if (title.equals(Locales.getString("msg.games.tod.truthTitle"))
+                            || title.equals(Locales.getString("msg.games.tod.dareTitle"))) {
                         if (event.getReactionEmote().getName().equals("➡")) {
                             if (isChoosing) return;
                             sendNextPlayerMessage();
                         }
-                    } else if (title.equals("Truth or Dare")) {
+                    } else if (title.equals(Locales.getString("msg.games.tod.title"))) {
                         if (event.getReactionEmote().getName().equals("👍")) {
                             addPlayer(event.getMember().getIdLong());
                         } else if (event.getReactionEmote().getName().equals("➡")) {
@@ -125,7 +124,8 @@ public class TruthOrDare extends Game {
                         } else if (event.getReactionEmote().getName().equals("❌")) {
                             channel.delete().complete();
                         }
-                    } else if (title.startsWith("Let the games begin...") || title.equals("Next player:")) {
+                    } else if (title.startsWith(Locales.getString("msg.games.tod.gamestartTitlePrefix"))
+                            || title.equals(Locales.getString("msg.games.tod.nextPlayerTitle"))) {
                         if (event.getMember().getIdLong() == (getCurrentPlayer())) {
                             isChoosing = false;
                             if (event.getReactionEmote().getName().equals("1️⃣")) {
@@ -149,7 +149,7 @@ public class TruthOrDare extends Game {
 
                 if (message.getEmbeds().size() != 0) {
                     String title = message.getEmbeds().get(0).getTitle();
-                    if (title.equals("Truth or Dare")) {
+                    if (title.equals(Locales.getString("msg.games.tod.title"))) {
                         if (event.getReactionEmote().getName().equals("👍")) {
                             removePlayer(event.getMember().getIdLong());
                         }
@@ -161,19 +161,18 @@ public class TruthOrDare extends Game {
 
     private void startGame() {
         if (players.size() <= 1) {
-            channel.sendMessage(Main.getEmbedMessage("Nope!", "Get yourself some friends nigga.")).complete();
+            channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.error.noPlayersTitle"),
+                    Locales.getString("msg.games.error.noPlayersMessage"))).complete();
             return;
         }
         if (isStarted) return;
         isStarted = true;
-        isChoosing = true;
-        Message msg = channel.sendMessage(Main.getEmbedMessage("Let the games begin... " + players.size() + " players", "<@" + getNextPlayer() + ">... Truth or Dare?")).complete();
-        msg.addReaction("1️⃣").queue();
-        msg.addReaction("2️⃣").queue();
+        sendNextPlayerMessage();
     }
 
     private void sendNextPlayerMessage() {
-        Message msg = channel.sendMessage(Main.getEmbedMessage("Next player:", "<@" + getNextPlayer() + ">... Truth or Dare?")).complete();
+        Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.tod.nextPlayerTitle"),
+                Locales.getString("msg.games.tod.gameTruthOrDareQuestion", getNextPlayer()))).complete();
         isChoosing = true;
         msg.addReaction("1️⃣").queue();
         msg.addReaction("2️⃣").queue();
@@ -181,7 +180,7 @@ public class TruthOrDare extends Game {
 
     void sendTruth(MessageChannel channel) {
         try {
-            Message msg = channel.sendMessage(Main.getEmbedMessage("Truth", getTruth())).complete();
+            Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.tod.truthTitle"), getTruth())).complete();
             msg.addReaction("➡").queue();
         } catch (IOException e) {
             e.printStackTrace();
@@ -190,7 +189,7 @@ public class TruthOrDare extends Game {
 
     void sendDare(MessageChannel channel) {
         try {
-            Message msg = channel.sendMessage(Main.getEmbedMessage("Dare", getDare())).complete();
+            Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.tod.dareTitle"), getDare())).complete();
             msg.addReaction("➡").queue();
         } catch (IOException e) {
             e.printStackTrace();

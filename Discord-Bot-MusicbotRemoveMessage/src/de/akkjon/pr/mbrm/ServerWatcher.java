@@ -11,7 +11,7 @@ import java.util.List;
 import de.akkjon.pr.mbrm.games.Dice;
 import de.akkjon.pr.mbrm.games.IchHabNochNie;
 import de.akkjon.pr.mbrm.games.TruthOrDare;
-import de.akkjon.pr.mbrm.games.WürdestDuEher;
+import de.akkjon.pr.mbrm.games.WuerdestDuEher;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -199,7 +199,7 @@ public class ServerWatcher {
                                         }
                                         case "wde" -> {
                                             try {
-                                                boolean isAdded = WürdestDuEher.addMessage(newElement, serverId);
+                                                boolean isAdded = WuerdestDuEher.addMessage(newElement, serverId);
                                                 if (isAdded) {
                                                     event.getChannel().sendMessage(Main.getEmbedMessage(succesTitle, succesDescription)).complete();
                                                 } else {
@@ -237,7 +237,7 @@ public class ServerWatcher {
                                             IchHabNochNie ihnn = new IchHabNochNie(serverId);
                                             event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + ihnn.getChannelId() + ">")).complete();
                                         } else if (args[1].equalsIgnoreCase("wde") || args[1].equalsIgnoreCase("würdestDuEher")) {
-                                            WürdestDuEher wde = new WürdestDuEher(serverId);
+                                            WuerdestDuEher wde = new WuerdestDuEher(serverId);
                                             event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + wde.getChannelId() + ">")).complete();
                                         }
                                     } else {

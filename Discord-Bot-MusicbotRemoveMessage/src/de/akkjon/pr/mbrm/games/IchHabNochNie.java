@@ -1,5 +1,6 @@
 package de.akkjon.pr.mbrm.games;
 
+import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -17,11 +18,9 @@ public class IchHabNochNie extends Game {
 
     public IchHabNochNie(long serverID) {
         super(serverID);
-        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel("Ich-hab-noch-nie").complete();
-        Message message = channel.sendMessage(Main.getEmbedMessage("Ich hab noch nie",
-                "Who wants to play a game?\n" +
-                        "Click ➡ to start the game.\n" +
-                        "Click ❌ to end the current game.")).complete();
+        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(Locales.getString("msg.games.ihnn.channelName")).complete();
+        Message message = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.ihnn.title"),
+                Locales.getString("msg.games.ihnn.start"))).complete();
         message.addReaction("➡").queue();
         message.addReaction("❌").queue();
         message.pin().complete();
@@ -59,7 +58,7 @@ public class IchHabNochNie extends Game {
             if (message.getEmbeds().size() != 0) {
                 String title = message.getEmbeds().get(0).getTitle();
 
-                if (title.equals("Ich hab noch nie")) {
+                if (title.equals(Locales.getString("msg.games.ihnn.title"))) {
                     if (event.getReactionEmote().getName().equals("➡")) {
                         sendMessage();
                     } else if (event.getReactionEmote().getName().equals("❌")) {
@@ -73,7 +72,7 @@ public class IchHabNochNie extends Game {
 
     void sendMessage() {
         try {
-            Message msg = channel.sendMessage(Main.getEmbedMessage("Ich hab noch nie", "..." + getMessage())).complete();
+            Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.ihnn.title"), "..." + getMessage())).complete();
             msg.addReaction("➡").queue();
         } catch (IOException e) {
             e.printStackTrace();
