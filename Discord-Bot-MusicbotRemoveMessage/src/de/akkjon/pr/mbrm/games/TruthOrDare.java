@@ -26,7 +26,6 @@ public class TruthOrDare extends Game {
     private static final String fileName = "tod";
 
 
-
     public TruthOrDare(long serverID) {
         super(serverID);
         this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(Locales.getString("msg.games.tod.channelName")).complete();
@@ -47,14 +46,14 @@ public class TruthOrDare extends Game {
     }
 
     public String getTruth() throws IOException {
-        if(this.remainingListTruth.size()==0) {
+        if (this.remainingListTruth.size() == 0) {
             loadRemainingTruth();
         }
         return getFromLists(this.remainingListTruth);
     }
 
     public String getDare() throws IOException {
-        if(this.remainingListDare.size()==0) {
+        if (this.remainingListDare.size() == 0) {
             loadRemainingDare();
         }
         return getFromLists(this.remainingListDare);
@@ -97,13 +96,14 @@ public class TruthOrDare extends Game {
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
                 Message message = null;
                 try {
-                    message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
+                    message = MessageHistory.getHistoryAround(channel,
+                            event.getMessageId()).complete().getMessageById(event.getMessageId());
                 } catch (Exception e) {
                     return;
                 }
 
                 //skip if message was not from bot or reaction was from bot
-                if(!shouldReactToMessage(event, message)) {
+                if (!shouldReactToMessage(event, message)) {
                     return;
                 }
 
@@ -140,7 +140,8 @@ public class TruthOrDare extends Game {
 
             @Override
             public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
+                Message message = MessageHistory.getHistoryAround(channel,
+                        event.getMessageId()).complete().getMessageById(event.getMessageId());
 
                 //skip if message was not from bot
                 if (!message.getAuthor().equals(event.getJDA().getSelfUser())) {
