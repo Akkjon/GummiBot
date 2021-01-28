@@ -18,13 +18,6 @@ public class Locales {
     }
 
     /**
-     * setter for {@link #locale}
-     */
-    public static void setLocale(Locale input) {
-        locale = input;
-    }
-
-    /**
      * gets a string from the {@link ResourceBundle} {@link #messages}
      *
      * @param key {@link String}

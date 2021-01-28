@@ -14,7 +14,7 @@ import java.util.List;
 class Index implements HttpHandler {
 
 	@Override
-	public void handle(HttpExchange exchange) throws IOException {
+	public void handle(HttpExchange exchange) {
 		String response = Storage.getInternalFile("index.html");
 		try {
 			Handler.respond(exchange, response, false);

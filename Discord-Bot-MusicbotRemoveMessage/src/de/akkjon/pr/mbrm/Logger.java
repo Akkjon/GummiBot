@@ -1,12 +1,9 @@
 package de.akkjon.pr.mbrm;
 
-import org.apache.commons.text.StringEscapeUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -27,8 +24,8 @@ public class Logger extends PrintStream {
 		if(!isRunning) {
 			isRunning = true;
 			filePath = getFilePath();
-			System.setOut(new Logger("out", standardOut));
-			System.setErr(new Logger("err", standardErr));
+			System.setOut(new Logger(standardOut));
+			System.setErr(new Logger(standardErr));
 		}
 	}
 	
@@ -43,11 +40,11 @@ public class Logger extends PrintStream {
 	private final PrintStream defaultStream;
 	private boolean printTimePrefix = true;
 	
-	private Logger(String mode, PrintStream defaultStream) {
+	private Logger(PrintStream defaultStream) {
 		super(new OutputStream() {
 			
 			@Override
-			public void write(int b) throws IOException {
+			public void write(int b) {
 				// not used
 			}
 		});

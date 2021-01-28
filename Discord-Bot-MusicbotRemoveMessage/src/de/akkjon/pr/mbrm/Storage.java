@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.Guild;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 public class Storage {
 	
-	public static String jarFolder = null;
+	public static String jarFolder;
 	static {
 		try {
 			jarFolder = (new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath());
@@ -108,9 +107,8 @@ public class Storage {
 		File file = new File(path);
 		if(file.exists()) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-			List<String> lines = reader.lines().collect(Collectors.toList());
 			reader.close();
-			String output = String.join("", lines.toArray(new String[0]));
+			String output = String.join("", reader.lines().toArray(String[]::new));
 			return output;
 		}
 		return defautVal;

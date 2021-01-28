@@ -1,14 +1,13 @@
 package de.akkjon.pr.mbrm;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import java.io.*;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 
 
@@ -90,15 +89,14 @@ public class Updater {
 	private boolean isNewVersionAvail() throws IOException {
 		System.out.println("Checking for updates...");
 		BufferedInputStream in = new BufferedInputStream(new URL(versionUrl).openStream());
-		String content = "";
+		StringBuilder content = new StringBuilder();
 	    byte[] dataBuffer = new byte[1024];
 	    //int bytesRead;
 	    
 	    while ((in.read(dataBuffer, 0, 1024)) != -1) {
-	        content += new String(dataBuffer);
+	        content.append(new String(dataBuffer));
 	    }
-	    content = content.trim();
-	    JsonObject jsonObject = gson.fromJson(content, JsonObject.class);
+	    JsonObject jsonObject = gson.fromJson(content.toString().trim(), JsonObject.class);
 	    newVersion = jsonObject.get("version").getAsDouble();
 	    System.out.println("Update-Check: active version: " + version + "; up-to-date version: " + newVersion);
 	    if(newVersion > version) {
