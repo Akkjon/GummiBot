@@ -70,10 +70,6 @@ public class WuerdestDuEher extends Game{
         return this.lastPlayer;
     }
 
-    long getCurrentPlayer() {
-        return lastPlayer;
-    }
-
     public void initReactionListeners() {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
@@ -90,9 +86,15 @@ public class WuerdestDuEher extends Game{
 
                     if (title.equals(Locales.getString("msg.games.wde.title"))) {
                         if (event.getReactionEmote().getName().equals("➡")) {
-                            sendMessage();
+                            if(isStarted) {
+                                sendMessage();
+                            } else {
+                                startGame();
+                            }
                         } else if (event.getReactionEmote().getName().equals("❌")) {
                             channel.delete().complete();
+                        } else if (event.getReactionEmote().getName().equals("👍")) {
+                            addPlayer(event.getMessageIdLong());
                         }
                     }
                 }
