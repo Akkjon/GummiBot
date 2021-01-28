@@ -167,7 +167,13 @@ public class TruthOrDare extends Game {
         }
         if (isStarted) return;
         isStarted = true;
-        sendNextPlayerMessage();
+
+        Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.tod.gamestartTitlePrefix")
+                        + Locales.getString("msg.games.tod.gamestartTitleSuffix", players.size()),
+                Locales.getString("msg.games.tod.gameTruthOrDareQuestion", getNextPlayer()))).complete();
+        isChoosing = true;
+        msg.addReaction("1️⃣").queue();
+        msg.addReaction("2️⃣").queue();
     }
 
     private void sendNextPlayerMessage() {
