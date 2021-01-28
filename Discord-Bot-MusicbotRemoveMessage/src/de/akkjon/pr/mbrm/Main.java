@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class Main extends ListenerAdapter {
 	private static final String token = "Nzk5MzcxNTE3NzgzMzEwMzM2.YACmvQ.eVLv8VH9MYL7k3UjWaWsEWIcoCo";
+	public static final long STARTUP_TIME = System.currentTimeMillis();
 	public static JDA jda;
 	public static void main(String[] args) {
 		Logger.init();

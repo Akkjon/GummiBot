@@ -32,6 +32,7 @@ public class ServerWatcher {
             }
         }
         this.serverId = serverId;
+        serverWatchers.add(new WeakReference<>(this));
         this.insult = new Insult(serverId);
         initChannels();
         initCommandListeners();
@@ -261,6 +262,35 @@ public class ServerWatcher {
                                         id = event.getMessage().getMentionedMembers().get(0).getIdLong();
                                     }
                                     event.getChannel().sendMessage(Main.getEmbedMessage("A", MessageFormat.format(insult.getMessage(), "<@" + id + ">"))).complete();
+                                }
+                                case "info" -> {
+                                    long uptime = System.currentTimeMillis() - Main.STARTUP_TIME;
+                                    double version = Updater.getVersion();
+
+                                    String strUptime = "";
+                                    uptime /= 1000;
+                                    long sec, min, hour, day;
+                                    if((sec = uptime % 60) > 0) {
+                                        strUptime = sec + "sek" + strUptime;
+                                    }
+                                    uptime /= 60;
+                                    if((min = uptime % 60) > 0) {
+                                        strUptime = min + "min " + strUptime;
+                                    }
+                                    uptime /= 60;
+                                    if((hour = uptime % 60) > 0) {
+                                        strUptime = hour + "h " + strUptime;
+                                    }
+                                    uptime /=24;
+                                    if((day = uptime) > 0) {
+                                        strUptime = day + "d " + strUptime;
+                                    }
+
+                                    String strMsg = "```" +
+                                            "-- System-Info --\n" +
+                                            "Software-Version: " + version + "\n" +
+                                            "Uptime:           " + strUptime + "\n" +
+                                            "```";
                                 }
                                 default -> {
                                     String helpMsg = Storage.getInternalFile("help.txt");

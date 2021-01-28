@@ -28,6 +28,10 @@ public class Updater {
 		}
 	}
 
+	public static double getVersion() {
+		return version;
+	}
+
 	private static Updater updater = null;
 	
 	public static Updater getUpdater() {
