@@ -95,7 +95,7 @@ public class Main extends ListenerAdapter {
 				null,
 				null,
 				null,
-				new MessageEmbed.Footer("Gummi", null, null),
+				new MessageEmbed.Footer(Locales.getString("bot.name"), null, null),
 				null,
 				new ArrayList<>()
 			);
@@ -107,7 +107,7 @@ public class Main extends ListenerAdapter {
 			Image image = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/GummiIcon.png"));
 			
 			try {
-				TrayIcon icon = new TrayIcon(image, "Gummi-Dashboard");
+				TrayIcon icon = new TrayIcon(image, Locales.getString("bot.name") + "-Dashboard");
 				icon.addActionListener(e -> {
 					try {
 						Desktop.getDesktop().browse(new URI("http://localhost:8088"));

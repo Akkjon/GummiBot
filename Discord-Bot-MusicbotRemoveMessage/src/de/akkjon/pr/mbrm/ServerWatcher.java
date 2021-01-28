@@ -7,6 +7,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import de.akkjon.pr.mbrm.games.Dice;
 import de.akkjon.pr.mbrm.games.IchHabNochNie;
@@ -78,40 +79,49 @@ public class ServerWatcher {
                                     if (!isChannelRegistered(channelId)) {
                                         try {
                                             ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onAddChannelSuccess"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.success"),
+                                                    Locales.getString("msg.onAddChannelSuccess"))).complete();
                                         } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error",
+                                                    Locales.getString("error.internalError"))).complete();
                                             e.printStackTrace();
                                         }
 
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddChannelError"))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                Locales.getString("msg.onAddChannelError"))).complete();
                                     }
                                 }
                                 case "removechannel" -> {
                                     if (isChannelRegistered(channelId)) {
                                         try {
                                             ServerWatcher.this.channels = Storage.removeChannel(serverId, channelId);
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onRemoveChannelSuccess"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.success"),
+                                                    Locales.getString("msg.onRemoveChannelSuccess"))).complete();
                                         } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error",
+                                                    Locales.getString("error.internalError"))).complete();
                                             e.printStackTrace();
                                         }
 
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onRemoveChannelError"))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                Locales.getString("msg.onRemoveChannelError"))).complete();
                                     }
                                 }
                                 case "addqotd", "addmotd" -> {
                                     try {
                                         boolean isAdded = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isAdded) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onAddQotdSuccess"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.success"),
+                                                    Locales.getString("msg.onAddQotdSuccess"))).complete();
                                         } else {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddQotdError"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                    Locales.getString("msg.onAddQotdError"))).complete();
                                         }
                                     } catch (Exception e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError2"))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.internalError"),
+                                                Locales.getString("error.internalError2"))).complete();
                                         e.printStackTrace();
                                     }
                                 }
@@ -119,12 +129,15 @@ public class ServerWatcher {
                                     try {
                                         boolean isRemoved = QuoteOfTheDay.removeQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isRemoved) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onRemoveQotdSuccess"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.success"),
+                                                    Locales.getString("msg.onRemoveQotdSuccess"))).complete();
                                         } else {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onRemoveQotdError"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                    Locales.getString("msg.onRemoveQotdError"))).complete();
                                         }
                                     } catch (Exception e) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError3"))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.internalError"),
+                                                Locales.getString("error.internalError3"))).complete();
                                         e.printStackTrace();
                                     }
                                 }
@@ -134,16 +147,20 @@ public class ServerWatcher {
                                         try {
                                             boolean isAdded = TruthOrDare.addTruth(newElement, serverId);
                                             if (isAdded) {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onAddTruthSuccess", newElement))).complete();
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.success"),
+                                                        Locales.getString("msg.onAddTruthSuccess", newElement))).complete();
                                             } else {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddTruthError"))).complete();
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                        Locales.getString("msg.onAddTruthError"))).complete();
                                             }
                                         } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError4"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.internalError"),
+                                                    Locales.getString("error.internalError4"))).complete();
                                             e.printStackTrace();
                                         }
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddTruthNoArgument"))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                Locales.getString("msg.onAddTruthNoArgument"))).complete();
                                     }
                                 }
                                 case "adddare" -> {
@@ -152,36 +169,42 @@ public class ServerWatcher {
                                         try {
                                             boolean isAdded = TruthOrDare.addDare(newElement, serverId);
                                             if (isAdded) {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Success", Locales.getString("msg.onAddTruthSuccess", newElement))).complete();
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.success"),
+                                                        Locales.getString("msg.onAddTruthSuccess", newElement))).complete();
                                             } else {
-                                                event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddDareError"))).complete();
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                        Locales.getString("msg.onAddDareError"))).complete();
                                             }
                                         } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error", Locales.getString("error.internalError5"))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.internalError"),
+                                                    Locales.getString("error.internalError5"))).complete();
                                             e.printStackTrace();
                                         }
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddDareNoArgument"))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                Locales.getString("msg.onAddDareNoArgument"))).complete();
                                     }
                                 }
                                 case "addquestion" -> {
                                     if (args.length == 1) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddQuestionError1"))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                Locales.getString("msg.onAddQuestionError1"))).complete();
                                         return;
                                     }
                                     if(args.length < 3) {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", Locales.getString("msg.onAddQuestionError2"))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                Locales.getString("msg.onAddQuestionError2"))).complete();
                                         return;
                                     }
                                     String gameName = args[1].toLowerCase();
                                     String newElement = String.join(" ", Arrays.asList(args).subList(2, args.length));
 
-                                    String succesTitle          =   "Success";
-                                    String succesDescription    =   "Added \"" + newElement + "\"";
-                                    String ErrorTitle           =   "Error";
-                                    String ErrorDescription     =   "I fucking hate you. It's already registered...";
-                                    String InternalErrorTitle   =   "Internal error";
-                                    String InternalErrorDescription="You are annoying... I made a mistake because of you.";
+                                    String succesTitle          =   Locales.getString("msg.commands.success");
+                                    String succesDescription    =   Locales.getString("msg.commands.addGame.added", newElement);
+                                    String ErrorTitle           =   Locales.getString("msg.commands.error");
+                                    String ErrorDescription     =   Locales.getString("msg.commands.addGame.alreadyExists");
+                                    String InternalErrorTitle   =   Locales.getString("msg.commands.internalError");
+                                    String InternalErrorDescription=Locales.getString("msg.commands.addGame.internalError");
 
                                     switch (gameName) {
                                         case "ihnn" -> {
@@ -224,35 +247,52 @@ public class ServerWatcher {
                                             }
                                         }
                                         default -> {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Bist du behindert? Das gibt es nicht!")).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                    Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
                                         }
                                     }
                                 }
                                 case "play" -> {
                                     if (args.length > 1) {
-                                        if (args[1].equalsIgnoreCase("tod") || args[1].equalsIgnoreCase("truthOrDare")) {
-                                            TruthOrDare tod = new TruthOrDare(serverId);
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + tod.getChannelId() + ">")).complete();
-                                        } else if (args[1].equalsIgnoreCase("ihnn") || args[1].equalsIgnoreCase("ichHabNochNie")) {
-                                            IchHabNochNie ihnn = new IchHabNochNie(serverId);
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + ihnn.getChannelId() + ">")).complete();
-                                        } else if (args[1].equalsIgnoreCase("wde") || args[1].equalsIgnoreCase("würdestDuEher")) {
-                                            WuerdestDuEher wde = new WuerdestDuEher(serverId);
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Fine fucker.. Here's your game.", "<#" + wde.getChannelId() + ">")).complete();
+                                        args[1] = args[1].toLowerCase();
+                                        switch (args[1]) {
+                                            case "tod", "truthordare" -> {
+                                                TruthOrDare tod = new TruthOrDare(serverId);
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
+                                                        "<#" + tod.getChannelId() + ">")).complete();
+                                            }
+                                            case "ihnn", "ichhabnochnie" -> {
+                                                IchHabNochNie ihnn = new IchHabNochNie(serverId);
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
+                                                        "<#" + ihnn.getChannelId() + ">")).complete();
+                                            }
+                                            case "wde", "würdestdueher" -> {
+                                                WuerdestDuEher wde = new WuerdestDuEher(serverId);
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
+                                                        "<#" + wde.getChannelId() + ">")).complete();
+                                            }
+                                            default -> {
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                        Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
+                                            }
                                         }
                                     } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Error", "What u wanna play bitch?")).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                Locales.getString("msg.commands.games.noGame"))).complete();
                                     }
                                 }
                                 case "throwdice" -> {
                                     if (args.length > 1) {
                                         try {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(Integer.parseInt(args[1]))))).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.Dice.name"),
+                                                    String.valueOf(Dice.throwDice(Integer.parseInt(args[1]))))).complete();
                                         } catch (NumberFormatException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Error", "Emilia, was soll der Shit. Was zum Fick ist " + args[1])).complete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                                    Locales.getString("msg.commands.games.Dice.error", args[1]))).complete();
                                         }
                                     } else
-                                        event.getChannel().sendMessage(Main.getEmbedMessage("Dice", String.valueOf(Dice.throwDice(6)))).complete();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.Dice.name"),
+                                                String.valueOf(Dice.throwDice(6)))).complete();
                                 }
                                 case "insult" -> {
                                     long id;

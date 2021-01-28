@@ -118,7 +118,7 @@ public class QuoteOfTheDay {
 
 				MessageEmbed msgEmbed = new MessageEmbed(
 						null,
-						"Message of the day:",
+						Locales.getString("msg.qotd.title"),
 						msg,
 						EmbedType.IMAGE,
 						null,
@@ -127,7 +127,7 @@ public class QuoteOfTheDay {
 						null,
 						null,
 						null,
-						new MessageEmbed.Footer("Gummi", null, null),
+						new MessageEmbed.Footer(Locales.getString("bot.name"), null, null),
 						new MessageEmbed.ImageInfo(imageUrl, null, -1, -1),
 						null);
 
