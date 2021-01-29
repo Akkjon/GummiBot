@@ -22,9 +22,8 @@ jobs:
         java-version: 14
     - name: Build with Maven
       run: mvn -B package --file Discord-Bot-MusicbotRemoveMessage/pom.xml
-
-    - run: mkdir staging && cp target/*.jar staging
+      
     - uses: actions/upload-artifact@v2
       with:
-        name: Package
-        path: staging
+        name: bot
+        path: Discord-Bot-MusicbotRemoveMessage/target/Discord-Bot-MusicbotRemoveMessage-**jar # or path/to/artifact
