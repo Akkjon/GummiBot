@@ -31,4 +31,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: bot
-        path: Discord-Bot-MusicbotRemoveMessage/target/Discord-Bot-MusicbotRemoveMessage-**jar # or path/to/artifact
+        path: target/Gummibot-**jar # or path/to/artifact
