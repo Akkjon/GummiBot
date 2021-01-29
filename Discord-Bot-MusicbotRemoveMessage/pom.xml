@@ -22,6 +22,20 @@
                 <target>14</target>
             </configuration>
         </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+                <archive>
+                    <manifest>
+                        <mainClass>de.akkjon.pr.mbrm.Main</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
 
