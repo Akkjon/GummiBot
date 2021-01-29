@@ -8,6 +8,9 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
+    tags:
+        description: 'Test scenario tags'  
 
 jobs:
   build:
