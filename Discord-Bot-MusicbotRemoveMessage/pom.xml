@@ -35,6 +35,12 @@
                     </manifest>
                 </archive>
             </configuration>
+            <executions>
+                <phase>package</phase>
+                <goals>
+                    <goal>single</goal>
+                </goals>
+            </executions>
         </plugin>
     </plugins>
   </build>
