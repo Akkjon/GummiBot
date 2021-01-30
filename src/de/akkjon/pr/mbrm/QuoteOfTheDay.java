@@ -88,6 +88,7 @@ public class QuoteOfTheDay {
 			if(this.data.size() == 0) {
 				loadData();
 			}
+			if(this.data.size() == 0) return;
 			//List<String> data = Handler.getData();
 			int index = (int)(Math.random() * data.size());
 			this.data.remove(index);
