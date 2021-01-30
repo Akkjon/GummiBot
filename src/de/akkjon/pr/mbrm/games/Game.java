@@ -5,6 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
+import de.akkjon.pr.mbrm.Locales;
+import de.akkjon.pr.mbrm.Main;
 import de.akkjon.pr.mbrm.Storage;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -111,5 +113,18 @@ public class Game extends ListenerAdapter {
             return false;
         }
         return true;
+    }
+
+    void sendStartMessage(String gameName) {
+        String[] emotes = new String[]{"👍", "➡", "❌"};
+        Message message = channel.sendMessage(Main.getEmbedMessage(
+                Locales.getString("msg.games." + gameName + ".title", emotes[0], emotes[1], emotes[2]),
+                Locales.getString("msg.games." + gameName + ".start"))).complete();
+        for(String emote : emotes) {
+            if(message.getContentRaw().contains(emote)) {
+                message.addReaction(emote).queue();
+            }
+        }
+        message.pin().complete();
     }
 }
