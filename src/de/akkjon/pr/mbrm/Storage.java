@@ -107,8 +107,8 @@ public class Storage {
 		File file = new File(path);
 		if(file.exists()) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-			reader.close();
 			String output = String.join("", reader.lines().toArray(String[]::new));
+			reader.close();
 			return output;
 		}
 		return defautVal;
