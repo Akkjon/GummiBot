@@ -21,7 +21,7 @@ public class QuoteOfTheDay {
 		return Storage.rootFolder + serverId + File.separator + "qotd.txt";
 	}
 
-	private List<String> data;
+	private List<String> data = null;
 
 	public static boolean removeQotd(long channelId, long serverId) throws IOException {
 		JsonObject obj = getQotdObject(serverId);
