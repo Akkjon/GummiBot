@@ -331,6 +331,8 @@ public class ServerWatcher {
                                             "Software-Version: " + version + "\n" +
                                             "Uptime:           " + strUptime + "\n" +
                                             "```";
+
+                                    event.getChannel().sendMessage(strMsg).complete();
                                 }
                                 default -> {
                                     String helpMsg = Storage.getInternalFile("help.txt");
