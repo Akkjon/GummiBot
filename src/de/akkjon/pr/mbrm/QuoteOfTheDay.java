@@ -95,7 +95,7 @@ public class QuoteOfTheDay {
 			String msg = data.get(index);
 			JsonObject obj = QuoteOfTheDay.getQotdObject(serverId);
 
-			JsonArray array = gson.fromJson(Storage.getInternalFile("animals.json"), JsonObject.class).get("animals").getAsJsonArray();
+			JsonArray array = gson.fromJson(Storage.getInternalFile("animals.json"), JsonObject.class).get("pictures").getAsJsonArray();
 			int index2 = (int)(Math.random() * array.size());
 			String imageUrl = array.get(index2).getAsString();
 
