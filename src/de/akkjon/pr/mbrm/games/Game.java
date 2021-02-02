@@ -117,11 +117,12 @@ public class Game extends ListenerAdapter {
 
     void sendStartMessage(String gameName) {
         String[] emotes = new String[]{"👍", "➡", "❌"};
+        String text = Locales.getString("msg.games." + gameName + ".start", emotes[0], emotes[1], emotes[2]);
         Message message = channel.sendMessage(Main.getEmbedMessage(
                 Locales.getString("msg.games." + gameName + ".title"),
-                Locales.getString("msg.games." + gameName + ".start", emotes[0], emotes[1], emotes[2]))).complete();
+                text)).complete();
         for (String emote : emotes) {
-            if (message.getContentRaw().contains(emote)) {
+            if (text.contains(emote)) {
                 message.addReaction(emote).queue();
             }
         }
