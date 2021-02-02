@@ -34,8 +34,8 @@ jobs:
       #run: mvn -B package --file Discord-Bot-MusicbotRemoveMessage/pom.xml
       run: mvn -B package
       
-    - uses: actions/upload-artifact@v2
     - name: Upload artifact
+      uses: actions/upload-artifact@v2
       with:
         name: bot
         path: /home/runner/work/GummiBot/GummiBot/target/GummiBot-**-jar-with-dependencies.jar # or path/to/artifact
