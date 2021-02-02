@@ -27,7 +27,7 @@ jobs:
     - name: Replace token
       env:
         TOKEN: ${{ secrets.DISCORD_TOKEN }}
-      run: sed 's/\[token\]/$TOKEN/' src/de/akkjon/pr/mbrm Main.java
+      run: sed 's/\[token\]/$TOKEN/' src/de/akkjon/pr/mbrm/Main.java
     #- name: pwd
     #  run: pwd
     - name: Build with Maven
