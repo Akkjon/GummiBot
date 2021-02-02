@@ -24,6 +24,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 14
+    - name: Replace token
+      env:
+        TOKEN: ${{ secrets.SuperSecret }}
+      run: sed 's/\[token\]/$TOKEN/' src/de/akkjon/pr/mbrm Main.java
     #- name: pwd
     #  run: pwd
     - name: Build with Maven
@@ -31,6 +35,7 @@ jobs:
       run: mvn -B package
       
     - uses: actions/upload-artifact@v2
+    - name: Upload artifact
       with:
         name: bot
         path: /home/runner/work/GummiBot/GummiBot/target/GummiBot-**-jar-with-dependencies.jar # or path/to/artifact
