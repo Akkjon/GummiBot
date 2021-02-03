@@ -442,7 +442,7 @@ public class ServerWatcher {
 
         MessageChannel messageChannel = (MessageChannel) Main.jda.getGuildChannelById(intChannelId);
         if(messageChannel != null) {
-            messageChannel.sendMessage(error).complete();
+            messageChannel.sendMessage("```" + error + "```").complete();
         }
     }
 

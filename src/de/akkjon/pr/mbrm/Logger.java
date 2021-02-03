@@ -21,8 +21,8 @@ public class Logger extends PrintStream {
 		if(!isRunning) {
 			isRunning = true;
 			filePath = getFilePath();
-			System.setOut(new Logger(standardOut, false));
-			System.setErr(new Logger(standardErr, true));
+			System.setOut(new Logger(standardOut, true, "Out"));
+			System.setErr(new Logger(standardErr, true, "Error"));
 		}
 	}
 	
@@ -37,10 +37,11 @@ public class Logger extends PrintStream {
 	private final PrintStream defaultStream;
 	private boolean printTimePrefix = true;
 	private final boolean isLoggingToChannel;
-	private StringBuilder cache = new StringBuilder();
+	private StringBuilder cache ;
 	private long lastCache = 0;
+	private String name;
 
-	private Logger(PrintStream defaultStream, boolean isLoggingToChannel) {
+	private Logger(PrintStream defaultStream, boolean isLoggingToChannel, String name) {
 		super(new OutputStream() {
 			
 			@Override
@@ -51,6 +52,8 @@ public class Logger extends PrintStream {
 		this.defaultStream = defaultStream;
 
 		this.isLoggingToChannel = isLoggingToChannel;
+		this.name = name + "\n";
+		cache = new StringBuilder(this.name);
 	}
 	
 	@Override
@@ -164,7 +167,7 @@ public class Logger extends PrintStream {
 				} catch (InterruptedException err) {return;}
 				if(stamp != Logger.this.lastCache) return;
 				ServerWatcher.logError(cache.toString());
-				cache = new StringBuilder();
+				cache = new StringBuilder(this.name);
 			});
 		}
 
