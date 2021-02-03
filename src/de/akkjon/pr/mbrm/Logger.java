@@ -39,7 +39,7 @@ public class Logger extends PrintStream {
 	private final boolean isLoggingToChannel;
 	private StringBuilder cache ;
 	private long lastCache = 0;
-	private String name;
+	private final String name;
 
 	private Logger(PrintStream defaultStream, boolean isLoggingToChannel, String name) {
 		super(new OutputStream() {
