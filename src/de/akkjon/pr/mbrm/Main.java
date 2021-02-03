@@ -28,6 +28,8 @@ public class Main extends ListenerAdapter {
 	private static final String token = "[token]";
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	public static JDA jda;
+	public static boolean isEnabled = true;
+
 	public static void main(String[] args) {
 		Logger.init();
 		try {

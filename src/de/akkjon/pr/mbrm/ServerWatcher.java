@@ -71,6 +71,14 @@ public class ServerWatcher {
             public void onMessageReceived(MessageReceivedEvent event) {
                 if (event.isFromGuild()) {
                     if (event.getGuild().getIdLong() == serverId) {
+
+                        if(event.getMessage().getContentRaw().equals("~disable")) {
+                            Main.isEnabled = false;
+                        } else if(event.getMessage().getContentRaw().equals("~enable")) {
+                            Main.isEnabled = true;
+                        }
+                        if(!Main.isEnabled) return;
+
                         long channelId = event.getChannel().getIdLong();
                         String content = event.getMessage().getContentRaw();
                         long selfUserId = Main.jda.getSelfUser().getIdLong();
