@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class Main extends ListenerAdapter {
-	private static final String token = "[token]";
+	private static final String token = Test.token;
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	public static JDA jda;
 	public static void main(String[] args) {
