@@ -6,19 +6,61 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
-import java.io.IOException;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class BlackJack extends Game {
 
     private class Player {
-        int number = 0;
+        int number;
 
-        int drawCard() {
-            int card = Dice.throwDice(13);
-            number = number + card;
+        String drawCard() {
+            String card;
+            int value = Dice.throwDice(13);
+            switch (value) {
+                case 11 -> {
+                    card = "Bube";
+                    number = number + 10;
+
+                }
+                case 12 -> {
+                    card = "Dame";
+                    number = number + 10;
+                }
+                case 13 -> {
+                    card = "König";
+                    number = number + 10;
+                }
+                case 1 -> {
+                    card = "Ass";
+                    number = chooseValueOfAce();
+                }
+                default -> {
+                    card = String.valueOf(value);
+                    number = number + value;
+                }
+            }
+
             return card;
+        }
+
+        private int chooseValueOfAce() {
+            final int[] res = new int[1];
+            Message msg = channel.sendMessage("Du hast ein Ass gezogen. Soll es den Wert 1 oder 11 haben?").complete();
+            msg.addReaction("1️⃣").complete();
+            msg.addReaction("2️⃣").complete();
+            Main.jda.addEventListener(new ListenerAdapter() {
+                @Override
+                public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+                    if (msg == MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId())) {
+                        switch (event.getReactionEmote().getName()) {
+                            case "1️⃣" -> res[0] = 1;
+                            case "2️⃣" -> res[0] = 11;
+                        }
+                        channel.deleteMessageById(event.getMessageId());
+                    }
+                }
+            });
+            return res[0];
         }
 
     }
@@ -94,7 +136,7 @@ public class BlackJack extends Game {
 
     private void msgDrawCard() {
         Message msg;
-        int card = player.drawCard();
+        String card = player.drawCard();
         if (player.number >= 22) {
             msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Looser! Du hast " + card + " gezogen und damit " + player.number + " Punkte. Klicke ➡ für ein neues Spiel.")).complete();
             msg.addReaction("➡").complete();
