@@ -74,8 +74,10 @@ public class ServerWatcher {
 
                         if(event.getMessage().getContentRaw().equals("~disable")) {
                             Main.isEnabled = false;
+                            Main.removeStatus();
                         } else if(event.getMessage().getContentRaw().equals("~enable")) {
                             Main.isEnabled = true;
+                            Main.setStatus();
                         }
                         if(!Main.isEnabled) return;
 
