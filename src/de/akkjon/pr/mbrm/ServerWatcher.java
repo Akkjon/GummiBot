@@ -72,10 +72,10 @@ public class ServerWatcher {
                 if (event.isFromGuild()) {
                     if (event.getGuild().getIdLong() == serverId) {
 
-                        if(event.getMessage().getContentRaw().equals("~disable")) {
+                        if(event.getMessage().getContentRaw().equals(prefix + "disable")) {
                             Main.isEnabled = false;
                             Main.removeStatus();
-                        } else if(event.getMessage().getContentRaw().equals("~enable")) {
+                        } else if(event.getMessage().getContentRaw().equals(prefix + "enable")) {
                             Main.isEnabled = true;
                             Main.setStatus();
                         }
@@ -421,6 +421,7 @@ public class ServerWatcher {
     }
 
     private void removeMessages(MessageChannel channel, String messageId) {
+        if(!Main.isEnabled) return;
         new Thread(() -> {
             MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
             List<Message> messages = messageHistory.getRetrievedHistory();
