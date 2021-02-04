@@ -14,6 +14,7 @@ import de.akkjon.pr.mbrm.games.Dice;
 import de.akkjon.pr.mbrm.games.IchHabNochNie;
 import de.akkjon.pr.mbrm.games.TruthOrDare;
 import de.akkjon.pr.mbrm.games.WuerdestDuEher;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -29,6 +30,7 @@ public class ServerWatcher {
     private final Insult insult;
 
     public static void logError(String throwable) {
+        if(Main.jda.getStatus() != JDA.Status.CONNECTED) return;
         for(WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
                 ServerWatcher watcher = serverWatcher.get();
                 if(watcher != null) watcher.logErrorInternal(throwable);
