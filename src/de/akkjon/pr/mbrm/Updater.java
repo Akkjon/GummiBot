@@ -101,7 +101,6 @@ public class Updater {
 	    System.out.println("Update-Check: active version: " + version + "; up-to-date version: " + newVersion);
 	    if(newVersion > version) {
 	    	newDownloadUrl = jsonObject.get("downloadUrl").getAsString();
-	    	
 	    	return true;
 	    }
 	    
@@ -109,7 +108,8 @@ public class Updater {
 	}
 	
 	private void update() throws IOException, InterruptedException {
-		System.out.println("Updating...");
+		System.out.println("Updating... (" + newVersion + ")");
+		ServerWatcher.logError("Updating now... (" + newVersion + ")");
 		shutdownInternals();
 
 		File file = new File(versionFilePath);

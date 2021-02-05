@@ -441,11 +441,12 @@ public class ServerWatcher {
             e.printStackTrace();
             return;
         }
-
-        MessageChannel messageChannel = (MessageChannel) Main.jda.getGuildChannelById(intChannelId);
-        if(messageChannel != null) {
-            messageChannel.sendMessage("```" + error + "```").complete();
-        }
+        try {
+            MessageChannel messageChannel = (MessageChannel) Main.jda.getGuildChannelById(intChannelId);
+            if (messageChannel != null) {
+                messageChannel.sendMessage("```" + error + "```").complete();
+            }
+        } catch (Exception err) {}
     }
 
 }
