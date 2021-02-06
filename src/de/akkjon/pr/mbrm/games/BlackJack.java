@@ -65,7 +65,38 @@ public class BlackJack extends Game {
 
     }
 
-    private class Dealer extends Player {
+    private class Dealer {
+        int number;
+
+        String drawCard() {
+            String card;
+            int value = Dice.throwDice(13);
+            switch (value) {
+                case 11 -> {
+                    card = "Bube";
+                    number = number + 10;
+
+                }
+                case 12 -> {
+                    card = "Dame";
+                    number = number + 10;
+                }
+                case 13 -> {
+                    card = "König";
+                    number = number + 10;
+                }
+                case 1 -> {
+                    card = "Ass";
+                    number = (number >= 11) ? number + 1 : number + 11;
+                }
+                default -> {
+                    card = String.valueOf(value);
+                    number = number + value;
+                }
+            }
+
+            return card;
+        }
     }
 
 
@@ -109,7 +140,7 @@ public class BlackJack extends Game {
     private void msgSkip() {
         do {
             channel.sendMessage("Dealer zieht... eine " + dealer.drawCard()).complete();
-        } while ((player.number >= dealer.number) && (dealer.number <= 16));
+        } while ((player.number >= dealer.number) && (dealer.number <= 14));
 
         String text;
 
@@ -130,7 +161,8 @@ public class BlackJack extends Game {
     private void newGame() {
         dealer.number = 0;
         player.number = 0;
-        Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Start. Ziehe eine Karte mit 🆕")).complete();
+        channel.sendMessage("Start! Der Dealer hat eine " + dealer.drawCard() + " vor sich.").complete();
+        Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Ziehe eine Karte mit 🆕")).complete();
         msg.addReaction("🆕").complete();
     }
 
