@@ -97,6 +97,7 @@ public class Updater {
 				JsonArray jsonArray = gson.fromJson(connection.getResponse(), JsonArray.class);
 				JsonObject lastRelease = jsonArray.get(0).getAsJsonObject();
 				double localNewestVersion = lastRelease.get("tag_name").getAsDouble();
+				System.out.println("Found version " + localNewestVersion);
 
 				JsonArray assets = lastRelease.get("assets").getAsJsonArray();
 				if(assets.size() > 0) {
