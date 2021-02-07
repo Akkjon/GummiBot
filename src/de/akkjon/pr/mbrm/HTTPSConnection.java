@@ -3,16 +3,12 @@ package de.akkjon.pr.mbrm;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
 public class HTTPSConnection {
 
-    private String strUrl;
+    private final String strUrl;
     private HttpsURLConnection conn;
-    private URL url;
     private final String method;
     private int responseCode;
     private String response = "";
@@ -20,13 +16,6 @@ public class HTTPSConnection {
     private int contentLength;
     private boolean isResponseSuccess = true;
 
-    public String getStrUrl() {
-        return strUrl;
-    }
-
-    public String getMethod() {
-        return method;
-    }
 
     public int getResponseCode() {
         return responseCode;
@@ -69,7 +58,7 @@ public class HTTPSConnection {
     }
 
     private void connect() throws IOException {
-        this.url = new URL(this.strUrl);
+        URL url = new URL(this.strUrl);
         this.conn = (HttpsURLConnection) url.openConnection();
 
         this.conn.setRequestMethod(this.method);
@@ -83,6 +72,8 @@ public class HTTPSConnection {
             InputStream in = this.conn.getInputStream();
             this.response = new String(in.readAllBytes());
             in.close();
+        } else {
+            this.isResponseSuccess = false;
         }
     }
 
