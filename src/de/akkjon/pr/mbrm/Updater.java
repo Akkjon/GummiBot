@@ -101,7 +101,6 @@ public class Updater {
 	    System.out.println("Update-Check: active version: " + version + "; up-to-date version: " + newVersion);
 	    if(newVersion > version) {
 	    	newDownloadUrl = jsonObject.get("downloadUrl").getAsString();
-	    	
 	    	return true;
 	    }
 	    
@@ -109,7 +108,13 @@ public class Updater {
 	}
 	
 	private void update() throws IOException, InterruptedException {
-		System.out.println("Updating...");
+		System.out.println("Updating... (" + newVersion + ")");
+		ServerWatcher.logError("Updating now... (" + newVersion + ")");
+		String filePath = Storage.getJarName();
+		if(filePath == null) {
+			System.out.println("Error: file does not end with .jar");
+			return;
+		}
 		shutdownInternals();
 
 		File file = new File(versionFilePath);
@@ -123,7 +128,6 @@ public class Updater {
 		writer.close();
 
 		BufferedInputStream in = new BufferedInputStream(new URL(newDownloadUrl).openStream());
-		String filePath = Storage.getJarName();
 		FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 	    byte[] dataBuffer = new byte[1024];
 	    int bytesRead;

@@ -1,5 +1,7 @@
 package de.akkjon.pr.mbrm;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
@@ -7,12 +9,13 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import de.akkjon.pr.mbrm.games.Dice;
 import de.akkjon.pr.mbrm.games.IchHabNochNie;
 import de.akkjon.pr.mbrm.games.TruthOrDare;
 import de.akkjon.pr.mbrm.games.WuerdestDuEher;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -25,6 +28,14 @@ public class ServerWatcher {
     private Long[] channels;
     private final String prefix = "~";
     private final Insult insult;
+
+    public static void logError(String throwable) {
+        if(Main.jda.getStatus() != JDA.Status.CONNECTED) return;
+        for(WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
+                ServerWatcher watcher = serverWatcher.get();
+                if(watcher != null) watcher.logErrorInternal(throwable);
+        }
+    }
 
     public ServerWatcher(long serverId) throws AlreadyBoundException {
         for (WeakReference<ServerWatcher> weakReference : serverWatchers) {
@@ -334,6 +345,57 @@ public class ServerWatcher {
 
                                     event.getChannel().sendMessage(strMsg).complete();
                                 }
+                                case "setlog" -> {
+                                    if((event.getMember() != null) && (!event.getMember().hasPermission(Permission.ADMINISTRATOR))) return;
+                                    File file = new File(Storage.rootFolder + getGuildId() + File.separator + "logChannel.txt");
+
+                                    try {
+                                        if(!file.exists()) {
+                                            file.getParentFile().mkdirs();
+                                            file.createNewFile();
+                                        }
+                                        FileWriter writer = new FileWriter(file);
+                                        writer.write(event.getChannel().getId());
+                                        writer.close();
+
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(
+                                                Locales.getString("msg.commands.success"),
+                                                Locales.getString("msg.commands.log.added")
+                                        )).complete();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(
+                                                Locales.getString("msg.commands.internalError"),
+                                                Locales.getString("error.internalError6")
+                                        )).complete();
+                                        return;
+                                    }
+                                }
+                                case "removelog" -> {
+                                    if((event.getMember() != null) && (!event.getMember().hasPermission(Permission.ADMINISTRATOR))) return;
+                                    File file = new File(Storage.rootFolder + getGuildId() + File.separator + "logChannel.txt");
+                                    if(file.exists()) {
+                                        try {
+                                            file.delete();
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                                    Locales.getString("msg.commands.success"),
+                                                    Locales.getString("msg.commands.log.removed")
+                                            )).complete();
+                                        } catch (Exception e) {
+                                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                                    Locales.getString("msg.commands.success"),
+                                                    Locales.getString("error.internalError7")
+                                            )).complete();
+                                        }
+
+                                    } else {
+                                        event.getChannel().sendMessage(Main.getEmbedMessage(
+                                                Locales.getString("msg.commands.success"),
+                                                Locales.getString("msg.commands.log.notSet")
+                                        )).complete();
+                                    }
+
+                                }
                                 default -> {
                                     String helpMsg = Storage.getInternalFile("help.txt");
                                     event.getChannel().sendMessage(helpMsg).complete();
@@ -363,5 +425,28 @@ public class ServerWatcher {
         }).start();
     }
 
+    private void logErrorInternal(String error) {
+        String strChannelId;
+        try {
+            strChannelId = Storage.getFileContent(Storage.rootFolder + serverId + File.separator + "logChannel.txt", "-1");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        int intChannelId;
+        try {
+            intChannelId = Integer.parseInt(strChannelId);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return;
+        }
+        try {
+            MessageChannel messageChannel = (MessageChannel) Main.jda.getGuildChannelById(intChannelId);
+            if (messageChannel != null) {
+                messageChannel.sendMessage("```" + error + "```").complete();
+            }
+        } catch (Exception err) {}
+    }
 
 }

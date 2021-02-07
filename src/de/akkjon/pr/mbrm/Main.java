@@ -19,8 +19,10 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.EmbedType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 public class Main extends ListenerAdapter {
 	private static final String token = "[token]";
@@ -39,6 +41,17 @@ public class Main extends ListenerAdapter {
 		new Updater();
 		try {
 			jda = JDABuilder.createDefault(token).build();
+			jda.setAutoReconnect(true);
+			jda.addEventListener(new ListenerAdapter() {
+				@Override
+				public void onShutdown(@NotNull ShutdownEvent event) {
+					try {
+						Updater.shutdownInternals();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			});
 			try {
 				jda.awaitReady();
 			} catch (InterruptedException e) {
