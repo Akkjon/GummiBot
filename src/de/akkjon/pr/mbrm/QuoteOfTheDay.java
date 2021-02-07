@@ -84,6 +84,7 @@ public class QuoteOfTheDay {
 	}
 	
 	private void timerTask() {
+		if(!Main.isEnabled) return;
 		try {
 			if(this.data == null || this.data.size() == 0) {
 				loadData();

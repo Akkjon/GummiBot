@@ -17,6 +17,7 @@ import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.EmbedType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.ShutdownEvent;
@@ -28,6 +29,8 @@ public class Main extends ListenerAdapter {
 	private static final String token = "[token]";
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	public static JDA jda;
+	public static boolean isEnabled = true;
+
 	public static void main(String[] args) {
 		Logger.init();
 		try {
@@ -59,6 +62,7 @@ public class Main extends ListenerAdapter {
 			}
 			new Main();
 			setIcon();
+			setStatus();
 		} catch (LoginException e) {
 			System.err.println(Locales.getString("error.loginException"));
 			e.printStackTrace();
@@ -135,5 +139,13 @@ public class Main extends ListenerAdapter {
 			}
 			
 		}
+	}
+
+	public static void setStatus() {
+		Main.jda.getPresence().setActivity(Activity.watching("Pornhub"));
+	}
+
+	public static void removeStatus() {
+		Main.jda.getPresence().setActivity(null);
 	}
 }

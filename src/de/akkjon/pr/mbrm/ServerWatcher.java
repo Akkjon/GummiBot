@@ -73,6 +73,16 @@ public class ServerWatcher {
             public void onMessageReceived(MessageReceivedEvent event) {
                 if (event.isFromGuild()) {
                     if (event.getGuild().getIdLong() == serverId) {
+
+                        if(event.getMessage().getContentRaw().equals(prefix + "disable")) {
+                            Main.isEnabled = false;
+                            Main.removeStatus();
+                        } else if(event.getMessage().getContentRaw().equals(prefix + "enable")) {
+                            Main.isEnabled = true;
+                            Main.setStatus();
+                        }
+                        if(!Main.isEnabled) return;
+
                         long channelId = event.getChannel().getIdLong();
                         String content = event.getMessage().getContentRaw();
                         long selfUserId = Main.jda.getSelfUser().getIdLong();
@@ -413,6 +423,7 @@ public class ServerWatcher {
     }
 
     private void removeMessages(MessageChannel channel, String messageId) {
+        if(!Main.isEnabled) return;
         new Thread(() -> {
             MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
             List<Message> messages = messageHistory.getRetrievedHistory();

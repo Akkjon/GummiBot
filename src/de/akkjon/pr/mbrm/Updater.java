@@ -67,6 +67,7 @@ public class Updater {
 	}
 	
 	public void updateRoutine() {
+		if(!Main.isEnabled) return;
 		new Thread(() -> {
 			boolean newVersionAvail = false;
 			try {

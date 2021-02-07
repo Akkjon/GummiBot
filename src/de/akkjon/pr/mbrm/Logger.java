@@ -157,7 +157,7 @@ public class Logger extends PrintStream {
 	}
 	
 	private void log(String s) {
-		if(isLoggingToChannel) {
+		if(isLoggingToChannel && Main.isEnabled) {
 			long stamp = System.currentTimeMillis();
 			this.lastCache = stamp;
 			cache.append(s);
