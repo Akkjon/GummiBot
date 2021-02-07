@@ -1,6 +1,7 @@
 package de.akkjon.pr.mbrm;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.*;
@@ -14,7 +15,7 @@ import java.util.TimerTask;
 public class Updater {
 	
 	private static double version = 1;
-	private static final String versionUrl = "https://onedrive.live.com/download?cid=B327A7F518EB2758&resid=B327A7F518EB2758%21371414&authkey=AF_cXCt3Fouz7jo";
+	private static final String versionUrl = "https://api.github.com/repos/Akkjon/Gummibot/releases";
 
 	private static final String versionFilePath = Storage.jarFolder + File.separator + "version.txt";
 
@@ -89,23 +90,33 @@ public class Updater {
 	
 	private boolean isNewVersionAvail() throws IOException {
 		System.out.println("Checking for updates...");
-		BufferedInputStream in = new BufferedInputStream(new URL(versionUrl).openStream());
-		StringBuilder content = new StringBuilder();
-	    byte[] dataBuffer = new byte[1024];
-	    //int bytesRead;
-	    
-	    while ((in.read(dataBuffer, 0, 1024)) != -1) {
-	        content.append(new String(dataBuffer));
-	    }
-	    JsonObject jsonObject = gson.fromJson(content.toString().trim(), JsonObject.class);
-	    newVersion = jsonObject.get("version").getAsDouble();
-	    System.out.println("Update-Check: active version: " + version + "; up-to-date version: " + newVersion);
-	    if(newVersion > version) {
-	    	newDownloadUrl = jsonObject.get("downloadUrl").getAsString();
-	    	return true;
-	    }
-	    
-	    return false;
+
+		HTTPSConnection connection = new HTTPSConnection(versionUrl);
+		if(connection.isConnectionSuccess()) {
+			if(connection.isResponseSuccess()) {
+				JsonArray jsonArray = gson.fromJson(connection.getResponse(), JsonArray.class);
+				JsonObject lastRelease = jsonArray.get(0).getAsJsonObject();
+				double localNewestVersion = lastRelease.get("tag_name").getAsDouble();
+				System.out.println("Found version " + localNewestVersion);
+
+				JsonArray assets = lastRelease.get("assets").getAsJsonArray();
+				if(assets.size() > 0) {
+					this.newVersion = localNewestVersion;
+
+					if(newVersion > version) {
+						this.newDownloadUrl = assets.get(0).getAsJsonObject().get("browser_download_url").getAsString();
+						return true;
+					}
+				} else {
+					System.err.println("Updater: Release " + localNewestVersion + " cannot be analyzed, as there is not asset uploaded.");
+				}
+			} else {
+				System.err.println("Updater: Response by " + versionUrl + " returned an error");
+			}
+		} else {
+			System.err.println("Updater: Connection to " + versionUrl + " returned an error");
+		}
+		return false;
 	}
 	
 	private void update() throws IOException, InterruptedException {
