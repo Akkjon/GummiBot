@@ -13,34 +13,14 @@ public class BlackJack extends Game {
     private class Player {
         int number;
 
-        String drawCard() {
-            String card;
+        int drawCard(boolean isDealer) {
             int value = Dice.throwDice(13);
-            switch (value) {
-                case 11 -> {
-                    card = "Bube";
-                    number = number + 10;
-
-                }
-                case 12 -> {
-                    card = "Dame";
-                    number = number + 10;
-                }
-                case 13 -> {
-                    card = "König";
-                    number = number + 10;
-                }
-                case 1 -> {
-                    card = "Ass";
-                    number = chooseValueOfAce();
-                }
-                default -> {
-                    card = String.valueOf(value);
-                    number = number + value;
-                }
-            }
-
-            return card;
+            number = switch (value) {
+                case 11, 12, 13 -> number + 10;
+                case 1 -> (isDealer) ? ((number >= 11) ? number + 1 : number + 11) : chooseValueOfAce();
+                default -> number + value;
+            };
+            return value;
         }
 
         private int chooseValueOfAce() {
@@ -65,41 +45,6 @@ public class BlackJack extends Game {
 
     }
 
-    private class Dealer {
-        int number;
-
-        String drawCard() {
-            String card;
-            int value = Dice.throwDice(13);
-            switch (value) {
-                case 11 -> {
-                    card = "Bube";
-                    number = number + 10;
-
-                }
-                case 12 -> {
-                    card = "Dame";
-                    number = number + 10;
-                }
-                case 13 -> {
-                    card = "König";
-                    number = number + 10;
-                }
-                case 1 -> {
-                    card = "Ass";
-                    number = (number >= 11) ? number + 1 : number + 11;
-                }
-                default -> {
-                    card = String.valueOf(value);
-                    number = number + value;
-                }
-            }
-
-            return card;
-        }
-    }
-
-
     public BlackJack(long serverID) {
         super(serverID);
         this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(Locales.getString("msg.games.blackJack.channelName")).complete();
@@ -108,7 +53,11 @@ public class BlackJack extends Game {
     }
 
     Player player = new Player();
-    Dealer dealer = new Dealer();
+    Player dealer = new Player();
+
+    private static String getCardString(int card) {
+        return Locales.getString("msg.games.blackJack.cards." + card);
+    }
 
     public void initReactionListeners() {
         Main.jda.addEventListener(new ListenerAdapter() {
@@ -139,7 +88,7 @@ public class BlackJack extends Game {
 
     private void msgSkip() {
         do {
-            channel.sendMessage("Dealer zieht... eine " + dealer.drawCard()).complete();
+            channel.sendMessage("Dealer zieht... " + getCardString(dealer.drawCard(true))).complete();
         } while ((player.number >= dealer.number) && (dealer.number <= 14));
 
         String text;
@@ -161,19 +110,19 @@ public class BlackJack extends Game {
     private void newGame() {
         dealer.number = 0;
         player.number = 0;
-        channel.sendMessage("Start! Der Dealer hat eine " + dealer.drawCard() + " vor sich.").complete();
+        channel.sendMessage("Start! Der Dealer hat " + getCardString(dealer.drawCard(true)) + " vor sich.").complete();
         Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Ziehe eine Karte mit 🆕")).complete();
         msg.addReaction("🆕").complete();
     }
 
     private void msgDrawCard() {
         Message msg;
-        String card = player.drawCard();
+        int card = player.drawCard(false);
         if (player.number >= 22) {
-            msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Looser! Du hast " + card + " gezogen und damit " + player.number + " Punkte. Klicke ➡ für ein neues Spiel.")).complete();
+            msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Looser! Du hast " + getCardString(card) + " gezogen und damit " + player.number + " Punkte. Klicke ➡ für ein neues Spiel.")).complete();
             msg.addReaction("➡").complete();
         } else {
-            msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Du hast " + card + " gezogen. Damit hast du " + player.number + " Punkte.")).complete();
+            msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Du hast " + getCardString(card) + " gezogen. Damit hast du " + player.number + " Punkte.")).complete();
             msg.addReaction("🆕").complete();
             msg.addReaction("⭕").complete();
         }
