@@ -97,6 +97,14 @@ public class ServerWatcher {
                             }
                             switch (args[0].toLowerCase()) {
                                 case "addchannel" -> {
+                                    boolean isAdmin = false;
+                                    for (Role role: event.getMember().getRoles()) {
+                                        if(role.getName().equals("Admin")) {
+                                            isAdmin = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!isAdmin) return;
                                     if (!isChannelRegistered(channelId)) {
                                         try {
                                             ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
