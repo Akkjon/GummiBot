@@ -30,10 +30,10 @@ public class ServerWatcher {
     private final Insult insult;
 
     public static void logError(String throwable) {
-        if(Main.jda.getStatus() != JDA.Status.CONNECTED) return;
-        for(WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
-                ServerWatcher watcher = serverWatcher.get();
-                if(watcher != null) watcher.logErrorInternal(throwable);
+        if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
+        for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
+            ServerWatcher watcher = serverWatcher.get();
+            if (watcher != null) watcher.logErrorInternal(throwable);
         }
     }
 
@@ -74,19 +74,19 @@ public class ServerWatcher {
                 if (event.isFromGuild()) {
                     if (event.getGuild().getIdLong() == serverId) {
 
-                        if(event.getMessage().getContentRaw().equals(prefix + "disable")) {
+                        if (event.getMessage().getContentRaw().equals(prefix + "disable")) {
                             Main.isEnabled = false;
                             Main.removeStatus();
-                        } else if(event.getMessage().getContentRaw().equals(prefix + "enable")) {
+                        } else if (event.getMessage().getContentRaw().equals(prefix + "enable")) {
                             Main.isEnabled = true;
                             Main.setStatus();
                         }
-                        if(!Main.isEnabled) return;
+                        if (!Main.isEnabled) return;
 
                         long channelId = event.getChannel().getIdLong();
                         String content = event.getMessage().getContentRaw();
                         long selfUserId = Main.jda.getSelfUser().getIdLong();
-                        if(event.getMessage().getMentionedMembers().stream().filter(member -> member.getIdLong()==selfUserId).count()>0) {
+                        if (event.getMessage().getMentionedMembers().stream().filter(member -> member.getIdLong() == selfUserId).count() > 0) {
                             event.getChannel().sendMessage(Locales.getString("msg.onMentioned")).complete();
                         }
                         if (content.startsWith(prefix)) {
@@ -95,17 +95,15 @@ public class ServerWatcher {
                             if (args.length == 0) {
                                 return;
                             }
+                            boolean isAdmin = event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
                             switch (args[0].toLowerCase()) {
                                 case "addchannel" -> {
-                                    boolean isAdmin = false;
-                                    for (Role role: event.getMember().getRoles()) {
-                                        if(role.getName().equals("Admin")) {
-                                            isAdmin = true;
-                                            break;
-                                        }
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
                                     }
-                                    if(!isAdmin) return;
-                                    if (!isChannelRegistered(channelId)) {
+                                     else if (!isChannelRegistered(channelId)) {
                                         try {
                                             ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
                                             event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.success"),
@@ -122,6 +120,11 @@ public class ServerWatcher {
                                     }
                                 }
                                 case "removechannel" -> {
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     if (isChannelRegistered(channelId)) {
                                         try {
                                             ServerWatcher.this.channels = Storage.removeChannel(serverId, channelId);
@@ -139,6 +142,11 @@ public class ServerWatcher {
                                     }
                                 }
                                 case "addqotd", "addmotd" -> {
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     try {
                                         boolean isAdded = QuoteOfTheDay.addQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isAdded) {
@@ -155,6 +163,11 @@ public class ServerWatcher {
                                     }
                                 }
                                 case "removeqotd" -> {
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     try {
                                         boolean isRemoved = QuoteOfTheDay.removeQotd(event.getChannel().getIdLong(), event.getGuild().getIdLong());
                                         if (isRemoved) {
@@ -171,6 +184,11 @@ public class ServerWatcher {
                                     }
                                 }
                                 case "addtruth" -> {
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     if (args.length > 1) {
                                         String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
                                         try {
@@ -193,6 +211,11 @@ public class ServerWatcher {
                                     }
                                 }
                                 case "adddare" -> {
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     if (args.length > 1) {
                                         String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
                                         try {
@@ -215,12 +238,17 @@ public class ServerWatcher {
                                     }
                                 }
                                 case "addquestion" -> {
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     if (args.length == 1) {
                                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
                                                 Locales.getString("msg.onAddQuestionError1"))).complete();
                                         return;
                                     }
-                                    if(args.length < 3) {
+                                    if (args.length < 3) {
                                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
                                                 Locales.getString("msg.onAddQuestionError2"))).complete();
                                         return;
@@ -228,12 +256,12 @@ public class ServerWatcher {
                                     String gameName = args[1].toLowerCase();
                                     String newElement = String.join(" ", Arrays.asList(args).subList(2, args.length));
 
-                                    String succesTitle          =   Locales.getString("msg.commands.success");
-                                    String succesDescription    =   Locales.getString("msg.commands.addGame.added", newElement);
-                                    String ErrorTitle           =   Locales.getString("msg.commands.error");
-                                    String ErrorDescription     =   Locales.getString("msg.commands.addGame.alreadyExists");
-                                    String InternalErrorTitle   =   Locales.getString("msg.commands.internalError");
-                                    String InternalErrorDescription=Locales.getString("msg.commands.addGame.internalError");
+                                    String succesTitle = Locales.getString("msg.commands.success");
+                                    String succesDescription = Locales.getString("msg.commands.addGame.added", newElement);
+                                    String ErrorTitle = Locales.getString("msg.commands.error");
+                                    String ErrorDescription = Locales.getString("msg.commands.addGame.alreadyExists");
+                                    String InternalErrorTitle = Locales.getString("msg.commands.internalError");
+                                    String InternalErrorDescription = Locales.getString("msg.commands.addGame.internalError");
 
                                     switch (gameName) {
                                         case "ihnn" -> {
@@ -333,25 +361,30 @@ public class ServerWatcher {
                                     event.getChannel().sendMessage(Main.getEmbedMessage("A", MessageFormat.format(insult.getMessage(), "<@" + id + ">"))).complete();
                                 }
                                 case "info" -> {
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     long uptime = System.currentTimeMillis() - Main.STARTUP_TIME;
                                     double version = Updater.getVersion();
 
                                     String strUptime = "";
                                     uptime /= 1000;
                                     long sec, min, hour, day;
-                                    if((sec = uptime % 60) > 0) {
+                                    if ((sec = uptime % 60) > 0) {
                                         strUptime = sec + "sek" + strUptime;
                                     }
                                     uptime /= 60;
-                                    if((min = uptime % 60) > 0) {
+                                    if ((min = uptime % 60) > 0) {
                                         strUptime = min + "min " + strUptime;
                                     }
                                     uptime /= 60;
-                                    if((hour = uptime % 60) > 0) {
+                                    if ((hour = uptime % 60) > 0) {
                                         strUptime = hour + "h " + strUptime;
                                     }
-                                    uptime /=24;
-                                    if((day = uptime) > 0) {
+                                    uptime /= 24;
+                                    if ((day = uptime) > 0) {
                                         strUptime = day + "d " + strUptime;
                                     }
 
@@ -364,11 +397,15 @@ public class ServerWatcher {
                                     event.getChannel().sendMessage(strMsg).complete();
                                 }
                                 case "setlog" -> {
-                                    if((event.getMember() != null) && (!event.getMember().hasPermission(Permission.ADMINISTRATOR))) return;
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     File file = new File(Storage.rootFolder + getGuildId() + File.separator + "logChannel.txt");
 
                                     try {
-                                        if(!file.exists()) {
+                                        if (!file.exists()) {
                                             file.getParentFile().mkdirs();
                                             file.createNewFile();
                                         }
@@ -390,9 +427,13 @@ public class ServerWatcher {
                                     }
                                 }
                                 case "removelog" -> {
-                                    if((event.getMember() != null) && (!event.getMember().hasPermission(Permission.ADMINISTRATOR))) return;
+                                    if (!isAdmin) {
+                                        event.getChannel().sendMessage(
+                                                Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
+                                        return;
+                                    }
                                     File file = new File(Storage.rootFolder + getGuildId() + File.separator + "logChannel.txt");
-                                    if(file.exists()) {
+                                    if (file.exists()) {
                                         try {
                                             file.delete();
                                             event.getChannel().sendMessage(Main.getEmbedMessage(
@@ -431,7 +472,7 @@ public class ServerWatcher {
     }
 
     private void removeMessages(MessageChannel channel, String messageId) {
-        if(!Main.isEnabled) return;
+        if (!Main.isEnabled) return;
         new Thread(() -> {
             MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
             List<Message> messages = messageHistory.getRetrievedHistory();
@@ -465,7 +506,8 @@ public class ServerWatcher {
             if (messageChannel != null) {
                 messageChannel.sendMessage("```" + error + "```").complete();
             }
-        } catch (Exception err) {}
+        } catch (Exception ignored) {
+        }
     }
 
 }
