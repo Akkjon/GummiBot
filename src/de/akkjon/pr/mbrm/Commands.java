@@ -225,6 +225,11 @@ public class Commands {
                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
                                 "<#" + wde.getChannelId() + ">")).complete();
                     }
+                    case "blackjack" -> {
+                        BlackJack blackJack = new BlackJack(serverId);
+                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
+                                "<#" + blackJack.getChannelId() + ">")).complete();
+                    }
                     default -> event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
                                 Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
                 }
