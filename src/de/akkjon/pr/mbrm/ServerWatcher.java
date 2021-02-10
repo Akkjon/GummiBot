@@ -1,5 +1,16 @@
 package de.akkjon.pr.mbrm;
 
+import de.akkjon.pr.mbrm.games.Dice;
+import de.akkjon.pr.mbrm.games.IchHabNochNie;
+import de.akkjon.pr.mbrm.games.TruthOrDare;
+import de.akkjon.pr.mbrm.games.WuerdestDuEher;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,23 +20,14 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import de.akkjon.pr.mbrm.games.Dice;
-import de.akkjon.pr.mbrm.games.IchHabNochNie;
-import de.akkjon.pr.mbrm.games.TruthOrDare;
-import de.akkjon.pr.mbrm.games.WuerdestDuEher;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import java.util.stream.Collectors;
 
 public class ServerWatcher {
 
     private static final List<WeakReference<ServerWatcher>> serverWatchers = new ArrayList<>();
 
     private final long serverId;
-    private Long[] channels;
+    Long[] channels;
     private final String prefix = "~";
     private final Insult insult;
 
@@ -35,6 +37,10 @@ public class ServerWatcher {
             ServerWatcher watcher = serverWatcher.get();
             if (watcher != null) watcher.logErrorInternal(throwable);
         }
+    }
+
+    public static ServerWatcher getInstance(long serverId) {
+        return serverWatchers.stream().filter(e -> e.get().serverId == serverId).collect(Collectors.toList()).get(0).get();
     }
 
     public ServerWatcher(long serverId) throws AlreadyBoundException {
@@ -60,7 +66,7 @@ public class ServerWatcher {
         this.channels = Storage.getChannels(serverId);
     }
 
-    private boolean isChannelRegistered(long channelId) {
+    static boolean isChannelRegistered(long channelId) {
         for (Long long1 : channels) {
             if (long1 == channelId) return true;
         }
@@ -103,21 +109,7 @@ public class ServerWatcher {
                                                 Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();
                                         return;
                                     }
-                                     else if (!isChannelRegistered(channelId)) {
-                                        try {
-                                            ServerWatcher.this.channels = Storage.addChannel(serverId, channelId);
-                                            event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.success"),
-                                                    Locales.getString("msg.onAddChannelSuccess"))).complete();
-                                        } catch (IOException e) {
-                                            event.getChannel().sendMessage(Main.getEmbedMessage("Internal error",
-                                                    Locales.getString("error.internalError"))).complete();
-                                            e.printStackTrace();
-                                        }
-
-                                    } else {
-                                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
-                                                Locales.getString("msg.onAddChannelError"))).complete();
-                                    }
+                                     else
                                 }
                                 case "removechannel" -> {
                                     if (!isAdmin) {
