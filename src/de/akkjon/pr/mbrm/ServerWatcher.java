@@ -1,9 +1,5 @@
 package de.akkjon.pr.mbrm;
 
-import de.akkjon.pr.mbrm.games.Dice;
-import de.akkjon.pr.mbrm.games.IchHabNochNie;
-import de.akkjon.pr.mbrm.games.TruthOrDare;
-import de.akkjon.pr.mbrm.games.WuerdestDuEher;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -11,17 +7,14 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ServerWatcher {
 
@@ -37,10 +30,6 @@ public class ServerWatcher {
             ServerWatcher watcher = serverWatcher.get();
             if (watcher != null) watcher.logErrorInternal(throwable);
         }
-    }
-
-    public static ServerWatcher getInstance(long serverId) {
-        return serverWatchers.stream().filter(e -> e.get().serverId == serverId).collect(Collectors.toList()).get(0).get();
     }
 
     public ServerWatcher(long serverId) throws AlreadyBoundException {
@@ -80,7 +69,7 @@ public class ServerWatcher {
     private void initCommandListeners() {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
-            public void onMessageReceived(MessageReceivedEvent event) {
+            public void onMessageReceived(@NotNull MessageReceivedEvent event) {
                 if (event.isFromGuild()) {
                     if (event.getGuild().getIdLong() == serverId) {
 
@@ -98,7 +87,7 @@ public class ServerWatcher {
                         long channelId = event.getChannel().getIdLong();
 
                         long selfUserId = Main.jda.getSelfUser().getIdLong();
-                        if (event.getMessage().getMentionedMembers().stream().filter(member -> member.getIdLong() == selfUserId).count() > 0) {
+                        if (event.getMessage().getMentionedMembers().stream().anyMatch(member -> member.getIdLong() == selfUserId)) {
                             event.getChannel().sendMessage(Locales.getString("msg.onMentioned")).complete();
                         }
 
