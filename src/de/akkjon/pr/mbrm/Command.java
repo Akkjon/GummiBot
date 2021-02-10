@@ -25,7 +25,7 @@ public class Command {
         return labels;
     }
 
-    public void run(MessageReceivedEvent event, String[] args) {
+    public void run(MessageReceivedEvent event, String[] args, ServerWatcher serverWatcher) {
         if (isAdminRequired()) {
             boolean isAdmin = event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
             if (!isAdmin) {
@@ -34,6 +34,6 @@ public class Command {
                 return;
             }
         }
-        run.run(event, args);
+        run.run(event, args, serverWatcher);
     }
 }
