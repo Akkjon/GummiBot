@@ -2,11 +2,13 @@ package de.akkjon.pr.mbrm;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.*;
 import java.net.URL;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,7 +40,7 @@ public class Updater {
 		return updater;
 	}
 	
-	private Gson gson;
+	private static Gson gson = new Gson();
 	private String newDownloadUrl = "";
 	private double newVersion = -1;
 
@@ -47,7 +49,6 @@ public class Updater {
 			return;
 		}
 		updater = this;
-		gson = new Gson();
 
 		TimerTask task = new TimerTask() {
 			
@@ -151,7 +152,7 @@ public class Updater {
 	    
 	    try {
 	    	
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", filePath);
+			ProcessBuilder pb = new ProcessBuilder("java", "-jar", filePath, Double.toString(getVersion()));
 			pb.start();
 			System.exit(0);
 		} catch(Exception e) {
@@ -162,6 +163,32 @@ public class Updater {
 	public static void shutdownInternals() throws InterruptedException {
 		Handler.stopWebServer();
 		Main.jda.shutdownNow();
+	}
+
+	public static void sendChangelog() {
+
+		String changelog = Storage.getInternalFile("changelog.json");
+		JsonObject jsonObject = gson.fromJson(changelog, JsonObject.class);
+		boolean print = false;
+		StringBuilder out = new StringBuilder();
+		for(Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+			double version = Double.parseDouble(entry.getKey());
+			if(!print) {
+				if(version > Main.getVersionPrior()) {
+					print = true;
+				}
+			}
+			if(print) {
+				out.append("\n" + version);
+				for(JsonElement change : entry.getValue().getAsJsonArray()) {
+					out.append("\n- " + change.getAsString());
+				}
+			}
+		}
+		if(print) {
+			out.substring(1);
+			ServerWatcher.sendChangelog(out.toString());
+		}
 	}
 	
 }

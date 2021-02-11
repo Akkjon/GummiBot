@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class ServerWatcher {
@@ -28,6 +29,14 @@ public class ServerWatcher {
         for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
             ServerWatcher watcher = serverWatcher.get();
             if (watcher != null) watcher.logErrorInternal(throwable);
+        }
+    }
+
+    public static void sendChangelog(String changelog) {
+        if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
+        for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
+            ServerWatcher watcher = serverWatcher.get();
+            if (watcher != null) watcher.sendChangelogInternal(changelog);
         }
     }
 
@@ -138,6 +147,22 @@ public class ServerWatcher {
                 messageChannel.sendMessage("```" + error + "```").complete();
             }
         } catch (Exception ignored) {
+        }
+    }
+
+    private void sendChangelogInternal(String changelog) {
+        String changelogChannels;
+        try {
+            changelogChannels = Storage.getFileContent(Storage.rootFolder + serverId + File.separator + "changelogChannels.txt", "[]");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        List<String> strArrChangelogChannels = Storage.getStringArrayFromFile(changelogChannels);
+
+        for(String strChangelogChannel : strArrChangelogChannels) {
+            MessageChannel channel = (MessageChannel) Main.jda.getGuildChannelById(strChangelogChannel);
+            channel.sendMessage("```" + changelog + "```").complete();
         }
     }
 }
