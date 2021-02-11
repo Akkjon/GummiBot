@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 public class Main extends ListenerAdapter {
+
 	private static String TOKEN;
 	static {
 		try {
@@ -36,7 +37,7 @@ public class Main extends ListenerAdapter {
 			System.exit(2);
 		}
 	}
-
+  
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	public static JDA jda;
 	public static boolean isEnabled = true;
