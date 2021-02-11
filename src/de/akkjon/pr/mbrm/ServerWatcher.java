@@ -1,5 +1,6 @@
 package de.akkjon.pr.mbrm;
 
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -9,10 +10,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -23,6 +26,7 @@ public class ServerWatcher {
     private final long serverId;
     Long[] channels;
     private final Insult insult;
+    private final String changelogFilePath;
 
     public static void logError(String throwable) {
         if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
@@ -49,6 +53,7 @@ public class ServerWatcher {
         this.serverId = serverId;
         serverWatchers.add(new WeakReference<>(this));
         this.insult = new Insult(serverId);
+        this.changelogFilePath = Storage.rootFolder + serverId + File.separator + "changelogChannels.txt";
         initChannels();
         initCommandListeners();
         new QuoteOfTheDay(serverId);
@@ -151,18 +156,35 @@ public class ServerWatcher {
     }
 
     private void sendChangelogInternal(String changelog) {
-        String changelogChannels;
+        Long[] strArrChangelogChannels;
         try {
-            changelogChannels = Storage.getFileContent(Storage.rootFolder + serverId + File.separator + "changelogChannels.txt", "[]");
+            strArrChangelogChannels = getChangelogChannelsList();
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
-        List<String> strArrChangelogChannels = Storage.getStringArrayFromFile(changelogChannels);
 
-        for(String strChangelogChannel : strArrChangelogChannels) {
+        for(Long strChangelogChannel : strArrChangelogChannels) {
             MessageChannel channel = (MessageChannel) Main.jda.getGuildChannelById(strChangelogChannel);
-            channel.sendMessage("```" + changelog + "```").complete();
+            if(channel != null)
+                channel.sendMessage("```" + changelog + "```").complete();
         }
+    }
+
+    public Long[] getChangelogChannelsList() throws IOException {
+        String changelogChannels = Storage.getFileContent(changelogFilePath, "[]");
+        return Storage.arrayFromString(changelogChannels);
+    }
+
+    public void saveChangelogChannelsList(Long[] channels) throws IOException {
+        File file = new File(changelogFilePath);
+        if(!file.exists()) {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        }
+
+        FileWriter writer = new FileWriter(file);
+        writer.write(Arrays.toString(channels));
+        writer.close();
     }
 }

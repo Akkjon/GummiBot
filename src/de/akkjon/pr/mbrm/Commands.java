@@ -1,9 +1,6 @@
 package de.akkjon.pr.mbrm;
 
-import de.akkjon.pr.mbrm.games.Dice;
-import de.akkjon.pr.mbrm.games.IchHabNochNie;
-import de.akkjon.pr.mbrm.games.TruthOrDare;
-import de.akkjon.pr.mbrm.games.WuerdestDuEher;
+import de.akkjon.pr.mbrm.games.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
@@ -341,6 +338,46 @@ public class Commands {
                         Locales.getString("msg.commands.success"),
                         Locales.getString("msg.commands.log.notSet")
                 )).complete();
+            }
+        }));
+
+        commands.add(new Command(new String[]{"addchangelog"}, true, (event, args, serverWatcher) -> {
+            List<Long> arrChangelog;
+            try {
+                arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            Long channelId = event.getChannel().getIdLong();
+            if(arrChangelog.contains(channelId)) {
+                return;
+            }
+            arrChangelog.add(channelId);
+            try {
+                serverWatcher.saveChangelogChannelsList(arrChangelog.toArray(new Long[0]));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
+
+        commands.add(new Command(new String[]{"removechangelog"}, true, (event, args, serverWatcher) -> {
+            List<Long> arrChangelog;
+            try {
+                arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            Long channelId = event.getChannel().getIdLong();
+            if(!arrChangelog.contains(channelId)) {
+                return;
+            }
+            arrChangelog.remove(channelId);
+            try {
+                serverWatcher.saveChangelogChannelsList(arrChangelog.toArray(new Long[0]));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }));
 
