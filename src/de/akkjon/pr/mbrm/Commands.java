@@ -347,18 +347,36 @@ public class Commands {
                 arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
             } catch (IOException e) {
                 e.printStackTrace();
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.internalError"),
+                        Locales.getString("msg.commands.changelog.error.channelsGetException")
+                )).complete();
                 return;
             }
             Long channelId = event.getChannel().getIdLong();
             if(arrChangelog.contains(channelId)) {
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.error"),
+                        Locales.getString("msg.commands.changelog.error.alreadyExists")
+                )).complete();
                 return;
             }
             arrChangelog.add(channelId);
+
             try {
                 serverWatcher.saveChangelogChannelsList(arrChangelog.toArray(new Long[0]));
             } catch (IOException e) {
                 e.printStackTrace();
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.internalError"),
+                        Locales.getString("msg.commands.changelog.error.cannotSave")
+                )).complete();
+                return;
             }
+            event.getChannel().sendMessage(Main.getEmbedMessage(
+                    Locales.getString("msg.commands.success"),
+                    Locales.getString("msg.commands.changelog.added")
+            )).complete();
         }));
 
         commands.add(new Command(new String[]{"removechangelog"}, true, (event, args, serverWatcher) -> {
@@ -367,18 +385,36 @@ public class Commands {
                 arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
             } catch (IOException e) {
                 e.printStackTrace();
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.internalError"),
+                        Locales.getString("msg.commands.changelog.error.channelsGetException")
+                )).complete();
                 return;
             }
             Long channelId = event.getChannel().getIdLong();
             if(!arrChangelog.contains(channelId)) {
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.error"),
+                        Locales.getString("msg.commands.changelog.error.notExists")
+                )).complete();
                 return;
             }
             arrChangelog.remove(channelId);
+
             try {
                 serverWatcher.saveChangelogChannelsList(arrChangelog.toArray(new Long[0]));
             } catch (IOException e) {
                 e.printStackTrace();
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.internalError"),
+                        Locales.getString("msg.commands.changelog.error.cannotSave")
+                )).complete();
+                return;
             }
+            event.getChannel().sendMessage(Main.getEmbedMessage(
+                    Locales.getString("msg.commands.success"),
+                    Locales.getString("msg.commands.changelog.removed")
+            )).complete();
         }));
 
         helpCommand = (event, args, serverWatcher) -> {

@@ -186,8 +186,7 @@ public class Updater {
 			}
 		}
 		if(print) {
-			out.substring(1);
-			ServerWatcher.sendChangelog(out.toString());
+			ServerWatcher.sendChangelog(out.substring(1));
 		}
 	}
 	
