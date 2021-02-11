@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,7 +27,17 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 public class Main extends ListenerAdapter {
-	private static final String token = Test.token;
+
+	private static String TOKEN;
+	static {
+		try {
+			TOKEN = Storage.getFileContent(Storage.jarFolder + File.separator + "token.txt", "");
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(2);
+		}
+	}
+  
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	public static JDA jda;
 	public static boolean isEnabled = true;
@@ -43,7 +54,7 @@ public class Main extends ListenerAdapter {
 		
 		new Updater();
 		try {
-			jda = JDABuilder.createDefault(token).build();
+			jda = JDABuilder.createDefault(TOKEN).build();
 			jda.setAutoReconnect(true);
 			jda.addEventListener(new ListenerAdapter() {
 				@Override
