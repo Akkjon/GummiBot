@@ -4,23 +4,57 @@ import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+
+interface BlackjackCallback {
+    void run(int number);
+}
 
 public class BlackJack extends Game {
 
     private class Player {
         int number;
 
-        int drawCard(boolean isDealer) {
+        void drawCard(boolean isDealer, BlackjackCallback callback) {
             int value = Dice.throwDice(13);
-            number = switch (value) {
+            if(value == 1 && !isDealer) {
+
+                Message msg = channel.sendMessage("Du hast ein Ass gezogen. Soll es den Wert 1 oder 11 haben?").complete();
+                msg.addReaction("1️⃣").complete();
+                msg.addReaction("2️⃣").complete();
+                Main.jda.addEventListener(new ListenerAdapter() {
+                    @Override
+                    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+                    if (msg == MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId())) {
+
+                        int number = switch (event.getReactionEmote().getName()) {
+                            case "1️⃣" -> 1;
+                            case "2️⃣" -> 11;
+                            default -> 0;
+                        };
+                        channel.deleteMessageById(event.getMessageId());
+                        callback.run(number);
+                    }
+                    }
+                });
+
+                return;
+            }
+            if(value >=11 && value <=13) {
+                number =+10;
+            } else {
+                number+=value;
+            }
+            callback.run(value);
+            /*number = switch (value) {
                 case 11, 12, 13 -> number + 10;
                 case 1 -> (isDealer) ? ((number >= 11) ? number + 1 : number + 11) : chooseValueOfAce();
                 default -> number + value;
             };
-            return value;
+            return value;*/
         }
 
         private int chooseValueOfAce() {
@@ -88,7 +122,13 @@ public class BlackJack extends Game {
 
     private void msgSkip() {
         do {
-            channel.sendMessage("Dealer zieht... " + getCardString(dealer.drawCard(true))).complete();
+            dealer.drawCard(true, new BlackjackCallback() {
+                @Override
+                public void run(int number) {
+                    channel.sendMessage("Dealer zieht..." + getCardString(number)).complete();
+                }
+            });
+            //channel.sendMessage("Dealer zieht... " + getCardString(dealer.drawCard(true))).complete();
         } while ((player.number >= dealer.number) && (dealer.number <= 14));
 
         String text;
@@ -110,21 +150,33 @@ public class BlackJack extends Game {
     private void newGame() {
         dealer.number = 0;
         player.number = 0;
-        channel.sendMessage("Start! Der Dealer hat " + getCardString(dealer.drawCard(true)) + " vor sich.").complete();
-        Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Ziehe eine Karte mit 🆕")).complete();
-        msg.addReaction("🆕").complete();
+        dealer.drawCard(true, new BlackjackCallback() {
+            @Override
+            public void run(int number) {
+                channel.sendMessage("Start! Der Dealer hat " + getCardString(number) + " vor sich.").complete();
+                Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Ziehe eine Karte mit 🆕")).complete();
+                msg.addReaction("🆕").complete();
+            }
+        });
+
     }
 
     private void msgDrawCard() {
-        Message msg;
-        int card = player.drawCard(false);
-        if (player.number >= 22) {
-            msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Looser! Du hast " + getCardString(card) + " gezogen und damit " + player.number + " Punkte. Klicke ➡ für ein neues Spiel.")).complete();
-            msg.addReaction("➡").complete();
-        } else {
-            msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Du hast " + getCardString(card) + " gezogen. Damit hast du " + player.number + " Punkte.")).complete();
-            msg.addReaction("🆕").complete();
-            msg.addReaction("⭕").complete();
-        }
+        player.drawCard(false, new BlackjackCallback() {
+            @Override
+            public void run(int card) {
+                Message msg;
+
+                if (player.number >= 22) {
+                    msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Looser! Du hast " + getCardString(card) + " gezogen und damit " + player.number + " Punkte. Klicke ➡ für ein neues Spiel.")).complete();
+                    msg.addReaction("➡").complete();
+                } else {
+                    msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Du hast " + getCardString(card) + " gezogen. Damit hast du " + player.number + " Punkte.")).complete();
+                    msg.addReaction("🆕").complete();
+                    msg.addReaction("⭕").complete();
+                }
+            }
+        });
+
     }
 }
