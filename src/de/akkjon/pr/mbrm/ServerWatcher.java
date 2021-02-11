@@ -16,6 +16,14 @@ import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import de.akkjon.pr.mbrm.games.*;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
 public class ServerWatcher {
 
     private static final List<WeakReference<ServerWatcher>> serverWatchers = new ArrayList<>();
@@ -91,6 +99,7 @@ public class ServerWatcher {
                             event.getChannel().sendMessage(Locales.getString("msg.onMentioned")).complete();
                         }
 
+
                         Commands.runCommands(event, ServerWatcher.this);
 
                         if (isChannelRegistered(channelId)) {
@@ -140,5 +149,4 @@ public class ServerWatcher {
         } catch (Exception ignored) {
         }
     }
-
 }
