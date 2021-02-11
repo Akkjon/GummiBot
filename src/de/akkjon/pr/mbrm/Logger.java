@@ -1,9 +1,6 @@
 package de.akkjon.pr.mbrm;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -24,8 +21,8 @@ public class Logger extends PrintStream {
 		if(!isRunning) {
 			isRunning = true;
 			filePath = getFilePath();
-			System.setOut(new Logger(standardOut));
-			System.setErr(new Logger(standardErr));
+			System.setOut(new Logger(standardOut, true, "Out"));
+			System.setErr(new Logger(standardErr, true, "Error"));
 		}
 	}
 	
@@ -39,8 +36,12 @@ public class Logger extends PrintStream {
 	
 	private final PrintStream defaultStream;
 	private boolean printTimePrefix = true;
-	
-	private Logger(PrintStream defaultStream) {
+	private final boolean isLoggingToChannel;
+	private StringBuilder cache ;
+	private long lastCache = 0;
+	private final String name;
+
+	private Logger(PrintStream defaultStream, boolean isLoggingToChannel, String name) {
 		super(new OutputStream() {
 			
 			@Override
@@ -49,6 +50,10 @@ public class Logger extends PrintStream {
 			}
 		});
 		this.defaultStream = defaultStream;
+
+		this.isLoggingToChannel = isLoggingToChannel;
+		this.name = name + "\n";
+		cache = new StringBuilder(this.name);
 	}
 	
 	@Override
@@ -152,9 +157,24 @@ public class Logger extends PrintStream {
 	}
 	
 	private void log(String s) {
+		if(isLoggingToChannel && Main.isEnabled) {
+			long stamp = System.currentTimeMillis();
+			this.lastCache = stamp;
+			cache.append(s);
+			new Thread(() -> {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException err) {return;}
+				if(stamp != Logger.this.lastCache) return;
+				ServerWatcher.logError(cache.toString());
+				cache = new StringBuilder(this.name);
+			});
+		}
+
 		s = (printTimePrefix ? getTimePrefix() : "") + s;
 		defaultStream.print(s);
-		
+
+
 		try {
 			writeToLogFile(s);
 		} catch (IOException ignored) {}
