@@ -10,10 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.akkjon.pr.mbrm.games.Dice;
-import de.akkjon.pr.mbrm.games.IchHabNochNie;
-import de.akkjon.pr.mbrm.games.TruthOrDare;
-import de.akkjon.pr.mbrm.games.WuerdestDuEher;
+import de.akkjon.pr.mbrm.games.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -291,6 +288,11 @@ public class ServerWatcher {
                                                 WuerdestDuEher wde = new WuerdestDuEher(serverId);
                                                 event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
                                                         "<#" + wde.getChannelId() + ">")).complete();
+                                            }
+                                            case "blackjack" -> {
+                                                BlackJack blackJack = new BlackJack(serverId);
+                                                event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
+                                                        "<#" + blackJack.getChannelId() + ">")).complete();
                                             }
                                             default -> {
                                                 event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
