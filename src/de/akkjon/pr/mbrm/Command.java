@@ -27,7 +27,7 @@ public class Command {
 
     public void run(MessageReceivedEvent event, String[] args, ServerWatcher serverWatcher) {
         if (isAdminRequired()) {
-            boolean isAdmin = event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
+            boolean isAdmin = Commands.isAdmin(event);
             if (!isAdmin) {
                 event.getChannel().sendMessage(
                         Main.getEmbedMessage("Nö!", "Darfst du nicht!")).complete();

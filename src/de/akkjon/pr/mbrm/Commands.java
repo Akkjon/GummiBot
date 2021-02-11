@@ -374,4 +374,8 @@ public class Commands {
             helpCommand.run(event, args, watcher);
         }
     }
+
+    public static boolean isAdmin(MessageReceivedEvent event) {
+        return event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
+    }
 }

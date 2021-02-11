@@ -73,7 +73,7 @@ public class ServerWatcher {
                 if (event.isFromGuild()) {
                     if (event.getGuild().getIdLong() == serverId) {
 
-                        boolean isPermitted = event.getMember().hasPermission(Permission.ADMINISTRATOR);
+                        boolean isPermitted = Commands.isAdmin(event);
 
                         if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "disable") && isPermitted) {
                             Main.isEnabled = false;
