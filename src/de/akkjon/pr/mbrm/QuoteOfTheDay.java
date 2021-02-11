@@ -1,17 +1,16 @@
 package de.akkjon.pr.mbrm;
 
+import com.google.gson.*;
+import net.dv8tion.jda.api.entities.*;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
-
-import com.google.gson.*;
-
-import net.dv8tion.jda.api.entities.*;
 
 public class QuoteOfTheDay {
 	

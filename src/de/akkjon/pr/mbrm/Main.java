@@ -1,21 +1,5 @@
 package de.akkjon.pr.mbrm;
 
-import java.awt.AWTException;
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Image;
-import java.awt.SystemTray;
-import java.awt.Toolkit;
-import java.awt.TrayIcon;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
-
-import javax.security.auth.login.LoginException;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -25,6 +9,15 @@ import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+
+import javax.security.auth.login.LoginException;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.rmi.AlreadyBoundException;
+import java.util.ArrayList;
 
 public class Main extends ListenerAdapter {
 
