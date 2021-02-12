@@ -16,7 +16,6 @@ public class BlackJack extends Game {
 
     private class Player {
         int number;
-
         void drawCard(boolean isDealer, BlackjackCallback callback) {
             int value = Dice.throwDice(13);
             if (value == 1) {
@@ -39,7 +38,6 @@ public class BlackJack extends Game {
                             }
                         }
                     });
-
                     return;
                 } else {
                     if (number >= 11)
@@ -78,9 +76,7 @@ public class BlackJack extends Game {
                 Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
 
                 //skip if message was not from bot or reaction was from bot
-                if (!shouldReactToMessage(event, message)) {
-                    return;
-                }
+                if (!shouldReactToMessage(event, message)) return;
 
                 if (message.getEmbeds().size() != 0) {
                     String title = message.getEmbeds().get(0).getTitle();
@@ -114,7 +110,6 @@ public class BlackJack extends Game {
         } else {
             text = "Looser! Der Dealer hat " + dealer.number + " Punkte und damit mehr als du.";
         }
-
         Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), text + "Klicke ➡ für ein neues Spiel.")).complete();
         msg.addReaction("➡").complete();
     }
@@ -127,7 +122,6 @@ public class BlackJack extends Game {
             Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.blackJack.title"), "Ziehe eine Karte mit 🆕")).complete();
             msg.addReaction("🆕").complete();
         });
-
     }
 
     private void msgDrawCard() {
@@ -143,6 +137,5 @@ public class BlackJack extends Game {
                 msg.addReaction("⭕").complete();
             }
         });
-
     }
 }

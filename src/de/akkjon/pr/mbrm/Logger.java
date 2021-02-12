@@ -109,10 +109,7 @@ public class Logger extends PrintStream {
 		log(x + "\n");
 		printTimePrefix = true;
 	}
-	
-	
-	
-	
+
 	@Override
 	public void print(boolean b) {
 		print(String.valueOf(b));
@@ -173,17 +170,14 @@ public class Logger extends PrintStream {
 				cache = new StringBuilder(this.name);
 			});
 		}
-
 		s = (printTimePrefix ? getTimePrefix() : "") + s;
 		defaultStream.print(s);
-
 
 		try {
 			writeToLogFile(s);
 		} catch (IOException ignored) {}
 	}
-	
-	
+
 	private boolean isMillisToday(long millis) {	
 		
 		Calendar today = Calendar.getInstance();
