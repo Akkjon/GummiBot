@@ -16,6 +16,7 @@ public class Commands {
     public static List<Command> commands = new ArrayList<>();
     public static CommandRunnable helpCommand;
     public static final String COMMAND_PREFIX = "~";
+
     static {
         commands.add(new Command(new String[]{"addchannel"}, true, (event, args, serverWatcher) -> {
             long channelId = event.getChannel().getIdLong();
@@ -112,7 +113,7 @@ public class Commands {
             }
         }));
 
-        commands.add(new Command(new String[] {"adddare"}, true, (event, args, serverWatcher) -> {
+        commands.add(new Command(new String[]{"adddare"}, true, (event, args, serverWatcher) -> {
             if (args.length > 1) {
                 String newElement = String.join(" ", Arrays.asList(args).subList(1, args.length));
                 try {
@@ -228,7 +229,7 @@ public class Commands {
                                 "<#" + blackJack.getChannelId() + ">")).complete();
                     }
                     default -> event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
-                                Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
+                            Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
                 }
             } else {
                 event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
@@ -354,7 +355,7 @@ public class Commands {
                 return;
             }
             Long channelId = event.getChannel().getIdLong();
-            if(arrChangelog.contains(channelId)) {
+            if (arrChangelog.contains(channelId)) {
                 event.getChannel().sendMessage(Main.getEmbedMessage(
                         Locales.getString("msg.commands.error"),
                         Locales.getString("msg.commands.changelog.error.alreadyExists")
@@ -392,7 +393,7 @@ public class Commands {
                 return;
             }
             Long channelId = event.getChannel().getIdLong();
-            if(!arrChangelog.contains(channelId)) {
+            if (!arrChangelog.contains(channelId)) {
                 event.getChannel().sendMessage(Main.getEmbedMessage(
                         Locales.getString("msg.commands.error"),
                         Locales.getString("msg.commands.changelog.error.notExists")
@@ -437,9 +438,9 @@ public class Commands {
             args[0] = args[0].toLowerCase();
             boolean isAdmin = event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
 
-            for(Command command : commands) {
-                if(command.getLabels().contains(args[0])) {
-                    if(!(command.isAdminRequired() && isAdmin)) break;
+            for (Command command : commands) {
+                if (command.getLabels().contains(args[0])) {
+                    if (!(command.isAdminRequired() && isAdmin)) break;
                     command.run(event, args, watcher);
                     break;
                 }

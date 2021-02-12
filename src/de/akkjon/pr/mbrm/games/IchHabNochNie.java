@@ -30,7 +30,7 @@ public class IchHabNochNie extends Game {
     }
 
     public String getMessage() throws IOException {
-        if(this.remainingList.size()==0) {
+        if (this.remainingList.size() == 0) {
             loadRemainingList();
         }
         return getFromLists(this.remainingList);
@@ -44,24 +44,24 @@ public class IchHabNochNie extends Game {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-            Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
+                Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
 
-            //skip if message was not from bot or reaction was from bot
-            if(!shouldReactToMessage(event, message)) {
-                return;
-            }
+                //skip if message was not from bot or reaction was from bot
+                if (!shouldReactToMessage(event, message)) {
+                    return;
+                }
 
-            if (message.getEmbeds().size() != 0) {
-                String title = message.getEmbeds().get(0).getTitle();
+                if (message.getEmbeds().size() != 0) {
+                    String title = message.getEmbeds().get(0).getTitle();
 
-                if (title.equals(Locales.getString("msg.games.ihnn.title"))) {
-                    if (event.getReactionEmote().getName().equals("➡")) {
-                        sendMessage();
-                    } else if (event.getReactionEmote().getName().equals("❌")) {
-                        channel.delete().complete();
+                    if (title.equals(Locales.getString("msg.games.ihnn.title"))) {
+                        if (event.getReactionEmote().getName().equals("➡")) {
+                            sendMessage();
+                        } else if (event.getReactionEmote().getName().equals("❌")) {
+                            channel.delete().complete();
+                        }
                     }
                 }
-            }
             }
         });
     }

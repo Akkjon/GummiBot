@@ -162,9 +162,9 @@ public class ServerWatcher {
             return;
         }
 
-        for(Long strChangelogChannel : strArrChangelogChannels) {
+        for (Long strChangelogChannel : strArrChangelogChannels) {
             MessageChannel channel = (MessageChannel) Main.jda.getGuildChannelById(strChangelogChannel);
-            if(channel != null)
+            if (channel != null)
                 channel.sendMessage("```" + changelog + "```").complete();
         }
     }
@@ -176,7 +176,7 @@ public class ServerWatcher {
 
     public void saveChangelogChannelsList(Long[] channels) throws IOException {
         File file = new File(changelogFilePath);
-        if(!file.exists()) {
+        if (!file.exists()) {
             file.getParentFile().mkdirs();
             file.createNewFile();
         }

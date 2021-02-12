@@ -94,7 +94,8 @@ public class Game extends ListenerAdapter {
         JsonArray global = getGlobal(mode, fileName + ".json");
         JsonArray server = getServer(mode, guildId, fileName + ".txt");
 
-        Type collectionType = new TypeToken<List<String>>(){}.getType();
+        Type collectionType = new TypeToken<List<String>>() {
+        }.getType();
         List<String> strGlobal = gson.fromJson(global, collectionType);
         List<String> strServer = gson.fromJson(server, collectionType);
 
@@ -109,10 +110,7 @@ public class Game extends ListenerAdapter {
         if (!message.getAuthor().equals(bot)) {
             return false;
         }
-        if (event.getMember().getUser().equals(bot)) {
-            return false;
-        }
-        return true;
+        return !event.getMember().getUser().equals(bot);
     }
 
     void sendStartMessage(String gameName) {

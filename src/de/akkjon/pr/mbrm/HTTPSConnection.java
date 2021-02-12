@@ -67,7 +67,7 @@ public class HTTPSConnection {
 
     private void read() throws IOException {
         this.responseCode = conn.getResponseCode();
-        if(this.responseCode == 200) {
+        if (this.responseCode == 200) {
             this.contentLength = this.conn.getContentLength();
             InputStream in = this.conn.getInputStream();
             this.response = new String(in.readAllBytes());

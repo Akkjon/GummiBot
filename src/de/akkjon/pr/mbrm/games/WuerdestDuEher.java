@@ -12,14 +12,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WuerdestDuEher extends Game{
+public class WuerdestDuEher extends Game {
 
     final ArrayList<Long> players = new ArrayList<>();
     private long lastPlayer;
     private boolean isStarted = false;
 
     private List<String> remainingList;
-    private static String fileName = "wde";
+    private static final String fileName = "wde";
 
     public WuerdestDuEher(long serverId) {
         super(serverId);
@@ -41,14 +41,14 @@ public class WuerdestDuEher extends Game{
     }
 
     public String getMessage() throws IOException {
-        if(this.remainingList.size()==0) {
+        if (this.remainingList.size() == 0) {
             loadRemainingList();
         }
         return getFromLists(this.remainingList);
     }
 
     public static boolean addMessage(String element, long serverId) throws IOException {
-        return add(element, "questions", serverId, fileName+".txt");
+        return add(element, "questions", serverId, fileName + ".txt");
     }
 
     void addPlayer(Long id) {
@@ -78,7 +78,7 @@ public class WuerdestDuEher extends Game{
                 Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
 
                 //skip if message was not from bot or reaction was from bot
-                if(!shouldReactToMessage(event, message)) {
+                if (!shouldReactToMessage(event, message)) {
                     return;
                 }
 
@@ -87,7 +87,7 @@ public class WuerdestDuEher extends Game{
 
                     if (title.equals(Locales.getString("msg.games.wde.title"))) {
                         if (event.getReactionEmote().getName().equals("➡")) {
-                            if(isStarted) {
+                            if (isStarted) {
                                 sendMessage();
                             } else {
                                 startGame();

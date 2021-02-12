@@ -16,6 +16,7 @@ public class BlackJack extends Game {
 
     private class Player {
         int number;
+
         void drawCard(boolean isDealer, BlackjackCallback callback) {
             int value = Dice.throwDice(13);
             if (value == 1) {
