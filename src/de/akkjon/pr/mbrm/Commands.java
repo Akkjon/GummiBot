@@ -1,9 +1,6 @@
 package de.akkjon.pr.mbrm;
 
-import de.akkjon.pr.mbrm.games.Dice;
-import de.akkjon.pr.mbrm.games.IchHabNochNie;
-import de.akkjon.pr.mbrm.games.TruthOrDare;
-import de.akkjon.pr.mbrm.games.WuerdestDuEher;
+import de.akkjon.pr.mbrm.games.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
@@ -342,6 +339,82 @@ public class Commands {
                         Locales.getString("msg.commands.log.notSet")
                 )).complete();
             }
+        }));
+
+        commands.add(new Command(new String[]{"addchangelog"}, true, (event, args, serverWatcher) -> {
+            List<Long> arrChangelog;
+            try {
+                arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
+            } catch (IOException e) {
+                e.printStackTrace();
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.internalError"),
+                        Locales.getString("msg.commands.changelog.error.channelsGetException")
+                )).complete();
+                return;
+            }
+            Long channelId = event.getChannel().getIdLong();
+            if(arrChangelog.contains(channelId)) {
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.error"),
+                        Locales.getString("msg.commands.changelog.error.alreadyExists")
+                )).complete();
+                return;
+            }
+            arrChangelog.add(channelId);
+
+            try {
+                serverWatcher.saveChangelogChannelsList(arrChangelog.toArray(new Long[0]));
+            } catch (IOException e) {
+                e.printStackTrace();
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.internalError"),
+                        Locales.getString("msg.commands.changelog.error.cannotSave")
+                )).complete();
+                return;
+            }
+            event.getChannel().sendMessage(Main.getEmbedMessage(
+                    Locales.getString("msg.commands.success"),
+                    Locales.getString("msg.commands.changelog.added")
+            )).complete();
+        }));
+
+        commands.add(new Command(new String[]{"removechangelog"}, true, (event, args, serverWatcher) -> {
+            List<Long> arrChangelog;
+            try {
+                arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
+            } catch (IOException e) {
+                e.printStackTrace();
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.internalError"),
+                        Locales.getString("msg.commands.changelog.error.channelsGetException")
+                )).complete();
+                return;
+            }
+            Long channelId = event.getChannel().getIdLong();
+            if(!arrChangelog.contains(channelId)) {
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.error"),
+                        Locales.getString("msg.commands.changelog.error.notExists")
+                )).complete();
+                return;
+            }
+            arrChangelog.remove(channelId);
+
+            try {
+                serverWatcher.saveChangelogChannelsList(arrChangelog.toArray(new Long[0]));
+            } catch (IOException e) {
+                e.printStackTrace();
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.internalError"),
+                        Locales.getString("msg.commands.changelog.error.cannotSave")
+                )).complete();
+                return;
+            }
+            event.getChannel().sendMessage(Main.getEmbedMessage(
+                    Locales.getString("msg.commands.success"),
+                    Locales.getString("msg.commands.changelog.removed")
+            )).complete();
         }));
 
         helpCommand = (event, args, serverWatcher) -> {

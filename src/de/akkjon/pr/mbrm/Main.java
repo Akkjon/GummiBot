@@ -30,7 +30,12 @@ public class Main extends ListenerAdapter {
 			System.exit(2);
 		}
 	}
-  
+	private static double VERSION_PRIOR = -1;
+
+	public static double getVersionPrior() {
+		return Main.VERSION_PRIOR;
+	}
+
 	public static final long STARTUP_TIME = System.currentTimeMillis();
 	public static JDA jda;
 	public static boolean isEnabled = true;
@@ -46,6 +51,17 @@ public class Main extends ListenerAdapter {
 		}
 		
 		new Updater();
+		if(args.length>0) {
+			try {
+				double versionPrior = Double.parseDouble(args[0]);
+				Main.VERSION_PRIOR = versionPrior;
+
+				if(versionPrior < Updater.getVersion()) {
+					Updater.sendChangelog();
+				}
+			} catch (Exception err) {}
+		}
+
 		try {
 			jda = JDABuilder.createDefault(TOKEN).build();
 			jda.setAutoReconnect(true);
