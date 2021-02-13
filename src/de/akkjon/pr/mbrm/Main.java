@@ -166,10 +166,10 @@ public class Main extends ListenerAdapter {
     }
 
     public static void setStatus() {
-        Main.jda.getPresence().setActivity(Activity.watching("Pornhub"));
+        //Main.jda.getPresence().setActivity(Activity.watching("Pornhub"));
     }
 
     public static void removeStatus() {
-        Main.jda.getPresence().setActivity(null);
+        //Main.jda.getPresence().setActivity(null);
     }
 }
