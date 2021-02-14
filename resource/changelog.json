@@ -1,0 +1,16 @@
+{
+  "1.0": [
+    "Added truthOrDare - Wahrheit oder Pflicht gibt es schon seit der Beta",
+    "Added Ihnn - Ich hab noch nie",
+    "Added wde - Würdest du eher?",
+    "Added Channel Cleaning - Nachrichten werden gelöscht, wenn neue Nachrichten ankommen.",
+    "Added motd - Tolle Tierbilder und total wichtige Lebensweisheiten.",
+    "Added insult - Beleidigungen sind wichtig in unserer Gesellschaft."
+  ],
+  "1.1": [
+    "Added Blackjack",
+    "Added Command-Role management",
+    "Added this changelog :)",
+    "Bugfixes"
+  ]
+}

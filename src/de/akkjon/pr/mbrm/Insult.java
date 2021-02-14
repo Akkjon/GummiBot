@@ -5,7 +5,7 @@ import de.akkjon.pr.mbrm.games.Game;
 import java.io.IOException;
 import java.util.List;
 
-public class Insult extends Game{
+public class Insult extends Game {
 
     public Insult(long serverID) {
         super(serverID);
@@ -18,10 +18,10 @@ public class Insult extends Game{
 
     private List<String> remainingList;
 
-    private static final String  fileName = "insults";
+    private static final String fileName = "insults";
 
     public String getMessage() {
-        if(this.remainingList.size()==0) {
+        if (this.remainingList.size() == 0) {
             try {
                 loadRemainingList();
             } catch (IOException e) {

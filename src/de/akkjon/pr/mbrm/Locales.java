@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class Locales {
-    private static Locale locale = Locale.getDefault();
+    private static final Locale locale = Locale.getDefault();
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessageBundle", getLocale());
 
     /**
