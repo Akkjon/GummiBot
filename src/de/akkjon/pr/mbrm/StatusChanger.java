@@ -50,6 +50,9 @@ public class StatusChanger {
 
         Activity.ActivityType type = Activity.ActivityType.valueOf(object.get("type").getAsString());
         String message = object.get("message").getAsString();
+
+        message = message.replace("[numberServers]", Main.jda.getGuilds().size()+"");
+
         String url = object.get("url").getAsString();
 
         Main.jda.getPresence().setActivity(Activity.of(type, message, url));
