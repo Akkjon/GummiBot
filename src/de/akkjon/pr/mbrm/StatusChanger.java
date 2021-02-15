@@ -46,6 +46,7 @@ public class StatusChanger {
             timer.cancel();
             timer = null;
         }
+        Main.jda.getPresence().setActivity(null);
     }
 
     private void timerTask() {
@@ -68,6 +69,5 @@ public class StatusChanger {
 
     public static void removeStatus() {
         if(statusChanger != null) statusChanger.stopTimer();
-        Main.jda.getPresence().setActivity(null);
     }
 }
