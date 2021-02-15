@@ -38,11 +38,14 @@ public class StatusChanger {
             }
         };
         timer = new Timer();
-        timer.schedule(task, 0, 5000);
+        timer.schedule(task, 0, 10000);
     }
 
     private void stopTimer() {
-        if(timer != null) timer.cancel();
+        if(timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 
     private void timerTask() {
