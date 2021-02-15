@@ -27,6 +27,7 @@ public class ServerWatcher {
     private final String changelogFilePath;
 
     public static void logError(String throwable) {
+        if(Main.jda == null) return;
         if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
         for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
             ServerWatcher watcher = serverWatcher.get();

@@ -53,40 +53,37 @@ public class Main extends ListenerAdapter {
             System.exit(0);
         }
 
-        if (args.length > 0) {
-            HashMap<String, String> argsMap = new HashMap<>();
-            for (String str : args) {
-                String[] arr = str.split("=", 2);
-                if (!(arr[0] == null || arr[0].isBlank())) {
-                    if (!(arr[1] == null || arr[1].isBlank())) {
-                        argsMap.put(arr[0], arr[1]);
-                    }
-                }
+        HashMap<String, String> argsMap = new HashMap<>();
+        for (String str : args) {
+            String[] arr = str.split("=", 2);
+            if (!(arr[0] == null || arr[0].isBlank())) {
+                if (!(arr[1] == null || arr[1].isBlank())) {
+                    argsMap.put(arr[0], arr[1]);
+                } else argsMap.put(arr[0], "");
             }
-            if (argsMap.containsKey("doUpdates")) {
-                if (!argsMap.get("doUpdates").equals("false")) {
-                    new Updater();
-                }
+        }
+        if (argsMap.getOrDefault("doUpdates", "true").equals("true")) {
+            new Updater();
+        }
+        if (argsMap.containsKey("versionPrior")) {
+            double versionPrior = Double.parseDouble(argsMap.get("versionPrior"));
+            Main.VERSION_PRIOR = versionPrior;
+
+            if (versionPrior < Updater.getVersion()) {
+                Updater.sendChangelog();
             }
-            if (argsMap.containsKey("versionPrior")) {
-                double versionPrior = Double.parseDouble(argsMap.get("versionPrior"));
+        } else {
+            try {
+                double versionPrior = Double.parseDouble(args[0]);
                 Main.VERSION_PRIOR = versionPrior;
 
                 if (versionPrior < Updater.getVersion()) {
                     Updater.sendChangelog();
                 }
-            } else {
-                try {
-                    double versionPrior = Double.parseDouble(args[0]);
-                    Main.VERSION_PRIOR = versionPrior;
-
-                    if (versionPrior < Updater.getVersion()) {
-                        Updater.sendChangelog();
-                    }
-                } catch (Exception ignored) {
-                }
+            } catch (Exception ignored) {
             }
         }
+
 
         try {
             jda = JDABuilder.createDefault(TOKEN).build();
