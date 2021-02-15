@@ -146,9 +146,9 @@ public class ServerWatcher {
             return;
         }
 
-        int intChannelId;
+        long intChannelId;
         try {
-            intChannelId = Integer.parseInt(strChannelId);
+            intChannelId = Long.parseLong(strChannelId);
         } catch (NumberFormatException e) {
             e.printStackTrace();
             return;
