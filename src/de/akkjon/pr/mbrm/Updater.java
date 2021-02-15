@@ -65,6 +65,8 @@ public class Updater {
         }
         cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY), 30, 0);
         timer.schedule(task, cal.getTimeInMillis() - now, 1000 * 60 * 60); // Every hour
+
+        updateRoutine();
     }
 
     public void updateRoutine() {
@@ -129,15 +131,7 @@ public class Updater {
         }
         shutdownInternals();
 
-        File file = new File(versionFilePath);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
-
-        FileWriter writer = new FileWriter(file);
-        writer.write(newVersion + "");
-        writer.close();
+        Storage.saveFile(versionFilePath, newVersion + "");
 
         BufferedInputStream in = new BufferedInputStream(new URL(newDownloadUrl).openStream());
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);

@@ -4,7 +4,6 @@ import de.akkjon.pr.mbrm.games.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -294,16 +293,8 @@ public class Commands {
         }));
 
         commands.add(new Command(new String[]{"setlog"}, true, (event, args, serverWatcher) -> {
-            File file = new File(Storage.rootFolder + serverWatcher.getGuildId() + File.separator + "logChannel.txt");
-
             try {
-                if (!file.exists()) {
-                    file.getParentFile().mkdirs();
-                    file.createNewFile();
-                }
-                FileWriter writer = new FileWriter(file);
-                writer.write(event.getChannel().getId());
-                writer.close();
+                Storage.saveFile(Storage.rootFolder + serverWatcher.getGuildId() + File.separator + "logChannel.txt", event.getChannel().getId());
 
                 event.getChannel().sendMessage(Main.getEmbedMessage(
                         Locales.getString("msg.commands.success"),
@@ -345,7 +336,7 @@ public class Commands {
         commands.add(new Command(new String[]{"addchangelog"}, true, (event, args, serverWatcher) -> {
             List<Long> arrChangelog;
             try {
-                arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
+                arrChangelog = new ArrayList<>(Arrays.asList(serverWatcher.getChangelogChannelsList()));
             } catch (IOException e) {
                 e.printStackTrace();
                 event.getChannel().sendMessage(Main.getEmbedMessage(
