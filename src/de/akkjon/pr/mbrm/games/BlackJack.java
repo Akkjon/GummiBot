@@ -58,7 +58,7 @@ public class BlackJack extends Game {
 
     public BlackJack(long serverID) {
         super(serverID);
-        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(Locales.getString("msg.games.blackJack.channelName")).complete();
+        createTextChannel(Locales.getString("msg.games.blackJack.channelName"));
         sendStartMessage("blackJack");
         initReactionListeners();
     }

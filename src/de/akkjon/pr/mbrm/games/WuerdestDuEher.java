@@ -23,13 +23,7 @@ public class WuerdestDuEher extends Game {
 
     public WuerdestDuEher(long serverId) {
         super(serverId);
-        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(Locales.getString("msg.games.wde.channelName")).complete();
-        /*Message message = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.wde.title"),
-                Locales.getString("mgs.games.wde.start"))).complete();
-        message.addReaction("👍").queue();
-        message.addReaction("➡").queue();
-        message.addReaction("❌").queue();
-        message.pin().complete();*/
+        createTextChannel(Locales.getString("msg.games.wde.channelName"));
         sendStartMessage(fileName);
         try {
             loadRemainingList();

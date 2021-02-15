@@ -431,9 +431,9 @@ public class Commands {
 
             for (Command command : commands) {
                 if (command.getLabels().contains(args[0])) {
-                    if (!(command.isAdminRequired() && isAdmin)) break;
+                    if (command.isAdminRequired() && !isAdmin) break;
                     command.run(event, args, watcher);
-                    break;
+                    return;
                 }
             }
             helpCommand.run(event, args, watcher);
