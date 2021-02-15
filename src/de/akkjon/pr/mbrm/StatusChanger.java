@@ -12,11 +12,13 @@ public class StatusChanger {
 
     private int activeIndex = 0;
     private JsonArray elements;
+    private Timer timer = null;
+    private static StatusChanger statusChanger = null;
 
     public StatusChanger() {
-
+        statusChanger = this;
         loadElements();
-        initTimer();
+        startTimer();
 
     }
 
@@ -27,15 +29,20 @@ public class StatusChanger {
         this.elements = elements.get("status").getAsJsonArray();
     }
 
-    private void initTimer() {
+    private void startTimer() {
+        stopTimer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 timerTask();
             }
         };
-        Timer timer = new Timer();
+        timer = new Timer();
         timer.schedule(task, 0, 5000);
+    }
+
+    private void stopTimer() {
+        if(timer != null) timer.cancel();
     }
 
     private void timerTask() {
@@ -47,5 +54,14 @@ public class StatusChanger {
 
         Main.jda.getPresence().setActivity(Activity.of(type, message, url));
         activeIndex = (activeIndex+1) % elements.size();
+    }
+
+    public static void setStatus() {
+        if(statusChanger != null) statusChanger.startTimer();
+    }
+
+    public static void removeStatus() {
+        if(statusChanger != null) statusChanger.stopTimer();
+        Main.jda.getPresence().setActivity(null);
     }
 }
