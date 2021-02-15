@@ -95,23 +95,26 @@ public class ServerWatcher {
                             Main.isEnabled = true;
                             StatusChanger.setStatus();
                         } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "status") && isPermitted) {
-                            if(Main.isEnabled) event.getChannel().sendMessage(Locales.getString("msg.statusEnabled")).complete();
+                            if (Main.isEnabled)
+                                event.getChannel().sendMessage(Locales.getString("msg.statusEnabled")).complete();
                             else event.getChannel().sendMessage(Locales.getString("msg.statusDisabled")).complete();
-                        }
-                        if (!Main.isEnabled) return;
+                        } else {
 
-                        long channelId = event.getChannel().getIdLong();
+                            if (!Main.isEnabled) return;
 
-                        long selfUserId = Main.jda.getSelfUser().getIdLong();
-                        if (event.getMessage().getMentionedMembers().stream().anyMatch(member -> member.getIdLong() == selfUserId)) {
-                            event.getChannel().sendMessage(Locales.getString("msg.onMentioned")).complete();
-                        }
+                            long channelId = event.getChannel().getIdLong();
+
+                            long selfUserId = Main.jda.getSelfUser().getIdLong();
+                            if (event.getMessage().getMentionedMembers().stream().anyMatch(member -> member.getIdLong() == selfUserId)) {
+                                event.getChannel().sendMessage(Locales.getString("msg.onMentioned")).complete();
+                            }
 
 
-                        Commands.runCommands(event, ServerWatcher.this);
+                            Commands.runCommands(event, ServerWatcher.this);
 
-                        if (isChannelRegistered(channelId)) {
-                            removeMessages(event.getChannel(), event.getMessageId());
+                            if (isChannelRegistered(channelId)) {
+                                removeMessages(event.getChannel(), event.getMessageId());
+                            }
                         }
                     }
                 }
