@@ -53,17 +53,6 @@ public class Main extends ListenerAdapter {
         }
 
         new Updater();
-        if (args.length > 0) {
-            try {
-                double versionPrior = Double.parseDouble(args[0]);
-                Main.VERSION_PRIOR = versionPrior;
-
-                if (versionPrior < Updater.getVersion()) {
-                    Updater.sendChangelog();
-                }
-            } catch (Exception err) {
-            }
-        }
 
         try {
             jda = JDABuilder.createDefault(TOKEN).build();
@@ -85,6 +74,18 @@ public class Main extends ListenerAdapter {
             }
             new Main();
             setIcon();
+
+            if (args.length > 0) {
+                try {
+                    double versionPrior = Double.parseDouble(args[0]);
+                    Main.VERSION_PRIOR = versionPrior;
+
+                    if (versionPrior < Updater.getVersion()) {
+                        Updater.sendChangelog();
+                    }
+                } catch (Exception ignored) {}
+            }
+
             setStatus();
         } catch (LoginException e) {
             System.err.println(Locales.getString("error.loginException"));
@@ -96,7 +97,11 @@ public class Main extends ListenerAdapter {
                 e1.printStackTrace();
             }
             System.exit(0);
+            return;
         }
+
+        long STARTUP_DURATION = System.currentTimeMillis() - STARTUP_TIME;
+        System.out.println("Startup finished in " + STARTUP_DURATION + " ms");
     }
 
     public Main() {

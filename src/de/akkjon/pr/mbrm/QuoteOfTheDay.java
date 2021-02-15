@@ -51,14 +51,7 @@ public class QuoteOfTheDay {
     }
 
     public static void saveJson(String json, long serverId) throws IOException {
-        File f = new File(getQotdPath(serverId));
-        if (!f.exists()) {
-            f.getParentFile().mkdirs();
-            f.createNewFile();
-        }
-        FileWriter writer = new FileWriter(f);
-        writer.write(json);
-        writer.close();
+        Storage.saveFile(getQotdPath(serverId), json);
     }
 
 
