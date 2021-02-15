@@ -88,8 +88,10 @@ public class ServerWatcher {
 
                         if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "disable") && isPermitted) {
                             Main.isEnabled = false;
+                            event.getChannel().sendMessage("Bot is now disabled.").complete();
                             Main.removeStatus();
                         } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "enable") && isPermitted) {
+                            event.getChannel().sendMessage("Bot is now enabled.").complete();
                             Main.isEnabled = true;
                             Main.setStatus();
                         }
