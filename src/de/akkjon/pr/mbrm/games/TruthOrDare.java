@@ -28,7 +28,7 @@ public class TruthOrDare extends Game {
 
     public TruthOrDare(long serverID) {
         super(serverID);
-        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(Locales.getString("msg.games.tod.channelName")).complete();
+        createTextChannel(Locales.getString("msg.games.tod.channelName"));
         sendStartMessage(fileName);
         try {
             loadRemainingDare();

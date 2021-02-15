@@ -18,7 +18,7 @@ public class IchHabNochNie extends Game {
 
     public IchHabNochNie(long serverID) {
         super(serverID);
-        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(Locales.getString("msg.games.ihnn.channelName")).complete();
+        createTextChannel(Locales.getString("msg.games.ihnn.channelName"));
         sendStartMessage(fileName);
         try {
             loadRemainingList();

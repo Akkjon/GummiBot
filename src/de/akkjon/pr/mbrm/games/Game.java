@@ -126,4 +126,9 @@ public class Game extends ListenerAdapter {
         }
         message.pin().complete();
     }
+
+    void createTextChannel(String name) {
+        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(name).complete();
+
+    }
 }
