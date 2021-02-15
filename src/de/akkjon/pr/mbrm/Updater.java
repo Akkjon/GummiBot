@@ -65,6 +65,8 @@ public class Updater {
         }
         cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY), 30, 0);
         timer.schedule(task, cal.getTimeInMillis() - now, 1000 * 60 * 60); // Every hour
+
+        updateRoutine();
     }
 
     public void updateRoutine() {
