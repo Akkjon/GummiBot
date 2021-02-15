@@ -54,8 +54,7 @@ public class Storage {
             return new Long[0];
         }
         try {
-            Long[] arrLong = arrayFromString(fileContent);
-            return arrLong;
+            return arrayFromString(fileContent);
         } catch (Exception e) {
             System.err.println("Error: cannot parse channels for Server " + serverId);
             e.printStackTrace();
@@ -87,15 +86,7 @@ public class Storage {
     }
 
     private static void save(long serverId, Long[] channels) throws IOException {
-        File file = new File(rootFolder + serverId + File.separator + "cleanup.txt");
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
-
-        FileWriter writer = new FileWriter(file);
-        writer.write(Arrays.toString(channels));
-        writer.close();
+        saveFile(rootFolder + serverId + File.separator + "cleanup.txt", Arrays.toString(channels));
     }
 
     public static String getFileContent(String path, String defautVal) throws IOException {
@@ -107,6 +98,18 @@ public class Storage {
             return output;
         }
         return defautVal;
+    }
+
+    public static void saveFile(String path, String value) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        }
+
+        FileWriter writer = new FileWriter(file);
+        writer.write(value);
+        writer.close();
     }
 
     public static List<String> getStringArrayFromFile(String input) {
