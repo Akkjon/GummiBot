@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -51,15 +50,7 @@ public class Game extends ListenerAdapter {
             array.add(element);
             String content = gson.toJson(object);
 
-            File file = new File(path);
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            }
-
-            FileWriter writer = new FileWriter(file);
-            writer.write(content);
-            writer.close();
+            Storage.saveFile(path, content);
 
             return true;
         }

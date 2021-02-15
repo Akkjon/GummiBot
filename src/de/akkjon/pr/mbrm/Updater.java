@@ -131,15 +131,7 @@ public class Updater {
         }
         shutdownInternals();
 
-        File file = new File(versionFilePath);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
-
-        FileWriter writer = new FileWriter(file);
-        writer.write(newVersion + "");
-        writer.close();
+        Storage.saveFile(versionFilePath, newVersion + "");
 
         BufferedInputStream in = new BufferedInputStream(new URL(newDownloadUrl).openStream());
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);

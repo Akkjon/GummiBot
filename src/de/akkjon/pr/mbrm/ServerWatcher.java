@@ -180,14 +180,6 @@ public class ServerWatcher {
     }
 
     public void saveChangelogChannelsList(Long[] channels) throws IOException {
-        File file = new File(changelogFilePath);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
-
-        FileWriter writer = new FileWriter(file);
-        writer.write(Arrays.toString(channels));
-        writer.close();
+        Storage.saveFile(changelogFilePath, Arrays.toString(channels));
     }
 }
