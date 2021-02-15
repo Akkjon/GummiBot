@@ -75,6 +75,7 @@ public class Main extends ListenerAdapter {
             new Main();
             setIcon();
 
+            new StatusChanger();
             if (args.length > 0) {
                 try {
                     double versionPrior = Double.parseDouble(args[0]);
@@ -85,8 +86,7 @@ public class Main extends ListenerAdapter {
                     }
                 } catch (Exception ignored) {}
             }
-
-            setStatus();
+          
         } catch (LoginException e) {
             System.err.println(Locales.getString("error.loginException"));
             e.printStackTrace();
@@ -168,13 +168,5 @@ public class Main extends ListenerAdapter {
             }
 
         }
-    }
-
-    public static void setStatus() {
-        //Main.jda.getPresence().setActivity(Activity.watching("Pornhub"));
-    }
-
-    public static void removeStatus() {
-        //Main.jda.getPresence().setActivity(null);
     }
 }
