@@ -170,7 +170,7 @@ public class Logger extends PrintStream {
                 if (stamp != Logger.this.lastCache) return;
                 ServerWatcher.logError(cache.toString());
                 cache = new StringBuilder(this.name);
-            });
+            }).start();
         }
         s = (printTimePrefix ? getTimePrefix() : "") + s;
         defaultStream.print(s);

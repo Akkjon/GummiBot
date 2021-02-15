@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main extends ListenerAdapter {
 
@@ -52,8 +53,26 @@ public class Main extends ListenerAdapter {
             System.exit(0);
         }
 
-        new Updater();
-        if (args.length > 0) {
+        HashMap<String, String> argsMap = new HashMap<>();
+        for (String str : args) {
+            String[] arr = str.split("=", 2);
+            if (!(arr[0] == null || arr[0].isBlank())) {
+                if (!(arr[1] == null || arr[1].isBlank())) {
+                    argsMap.put(arr[0], arr[1]);
+                } else argsMap.put(arr[0], "");
+            }
+        }
+        if (argsMap.getOrDefault("doUpdates", "true").equals("true")) {
+            new Updater();
+        }
+        if (argsMap.containsKey("versionPrior")) {
+            double versionPrior = Double.parseDouble(argsMap.get("versionPrior"));
+            Main.VERSION_PRIOR = versionPrior;
+
+            if (versionPrior < Updater.getVersion()) {
+                Updater.sendChangelog();
+            }
+        } else {
             try {
                 double versionPrior = Double.parseDouble(args[0]);
                 Main.VERSION_PRIOR = versionPrior;
@@ -61,9 +80,10 @@ public class Main extends ListenerAdapter {
                 if (versionPrior < Updater.getVersion()) {
                     Updater.sendChangelog();
                 }
-            } catch (Exception err) {
+            } catch (Exception ignored) {
             }
         }
+
 
         try {
             jda = JDABuilder.createDefault(TOKEN).build();
@@ -85,7 +105,9 @@ public class Main extends ListenerAdapter {
             }
             new Main();
             setIcon();
-            setStatus();
+
+            new StatusChanger();
+
         } catch (LoginException e) {
             System.err.println(Locales.getString("error.loginException"));
             e.printStackTrace();
@@ -96,7 +118,11 @@ public class Main extends ListenerAdapter {
                 e1.printStackTrace();
             }
             System.exit(0);
+            return;
         }
+
+        long STARTUP_DURATION = System.currentTimeMillis() - STARTUP_TIME;
+        System.out.println("Startup finished in " + STARTUP_DURATION + " ms");
     }
 
     public Main() {
@@ -163,13 +189,5 @@ public class Main extends ListenerAdapter {
             }
 
         }
-    }
-
-    public static void setStatus() {
-        //Main.jda.getPresence().setActivity(Activity.watching("Pornhub"));
-    }
-
-    public static void removeStatus() {
-        //Main.jda.getPresence().setActivity(null);
     }
 }

@@ -27,6 +27,7 @@ public class ServerWatcher {
     private final String changelogFilePath;
 
     public static void logError(String throwable) {
+        if(Main.jda == null) return;
         if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
         for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
             ServerWatcher watcher = serverWatcher.get();
@@ -88,25 +89,33 @@ public class ServerWatcher {
 
                         if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "disable") && isPermitted) {
                             Main.isEnabled = false;
-                            Main.removeStatus();
+                            event.getChannel().sendMessage(Locales.getString("msg.onDisable")).complete();
+                            StatusChanger.removeStatus();
                         } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "enable") && isPermitted) {
+                            event.getChannel().sendMessage(Locales.getString("msg.onDisable")).complete();
                             Main.isEnabled = true;
-                            Main.setStatus();
-                        }
-                        if (!Main.isEnabled) return;
+                            StatusChanger.setStatus();
+                        } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "status") && isPermitted) {
+                            if (Main.isEnabled)
+                                event.getChannel().sendMessage(Locales.getString("msg.statusEnabled")).complete();
+                            else event.getChannel().sendMessage(Locales.getString("msg.statusDisabled")).complete();
+                        } else {
 
-                        long channelId = event.getChannel().getIdLong();
+                            if (!Main.isEnabled) return;
 
-                        long selfUserId = Main.jda.getSelfUser().getIdLong();
-                        if (event.getMessage().getMentionedMembers().stream().anyMatch(member -> member.getIdLong() == selfUserId)) {
-                            event.getChannel().sendMessage(Locales.getString("msg.onMentioned")).complete();
-                        }
+                            long channelId = event.getChannel().getIdLong();
+
+                            long selfUserId = Main.jda.getSelfUser().getIdLong();
+                            if (event.getMessage().getMentionedMembers().stream().anyMatch(member -> member.getIdLong() == selfUserId)) {
+                                event.getChannel().sendMessage(Locales.getString("msg.onMentioned")).complete();
+                            }
 
 
-                        Commands.runCommands(event, ServerWatcher.this);
+                            Commands.runCommands(event, ServerWatcher.this);
 
-                        if (isChannelRegistered(channelId)) {
-                            removeMessages(event.getChannel(), event.getMessageId());
+                            if (isChannelRegistered(channelId)) {
+                                removeMessages(event.getChannel(), event.getMessageId());
+                            }
                         }
                     }
                 }
@@ -119,7 +128,7 @@ public class ServerWatcher {
         new Thread(() -> {
             MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
             List<Message> messages = messageHistory.getRetrievedHistory();
-            for (int i = 0; i < messages.size() - 1; i++) {
+            for (int i = 0; i < messages.size() - 2; i++) {
                 try {
                     messages.get(i).delete().complete();
                 } catch (Exception ignored) {
@@ -175,14 +184,6 @@ public class ServerWatcher {
     }
 
     public void saveChangelogChannelsList(Long[] channels) throws IOException {
-        File file = new File(changelogFilePath);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
-
-        FileWriter writer = new FileWriter(file);
-        writer.write(Arrays.toString(channels));
-        writer.close();
+        Storage.saveFile(changelogFilePath, Arrays.toString(channels));
     }
 }

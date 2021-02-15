@@ -12,5 +12,10 @@
     "Added Command-Role management",
     "Added this changelog :)",
     "Bugfixes"
+  ],
+  "1.2": [
+    "Fixed major bugs",
+    "Added changing activities",
+    "Last 2 Messages are kept"
   ]
 }
