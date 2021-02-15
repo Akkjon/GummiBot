@@ -88,10 +88,15 @@ public class ServerWatcher {
 
                         if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "disable") && isPermitted) {
                             Main.isEnabled = false;
-                            Main.removeStatus();
+                            event.getChannel().sendMessage(Locales.getString("msg.onDisable")).complete();
+                            StatusChanger.removeStatus();
                         } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "enable") && isPermitted) {
+                            event.getChannel().sendMessage(Locales.getString("msg.onDisable")).complete();
                             Main.isEnabled = true;
-                            Main.setStatus();
+                            StatusChanger.setStatus();
+                        } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "status") && isPermitted) {
+                            if(Main.isEnabled) event.getChannel().sendMessage(Locales.getString("msg.statusEnabled")).complete();
+                            else event.getChannel().sendMessage(Locales.getString("msg.statusDisabled")).complete();
                         }
                         if (!Main.isEnabled) return;
 
