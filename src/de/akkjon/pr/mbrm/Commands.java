@@ -345,7 +345,7 @@ public class Commands {
         commands.add(new Command(new String[]{"addchangelog"}, true, (event, args, serverWatcher) -> {
             List<Long> arrChangelog;
             try {
-                arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
+                arrChangelog = new ArrayList<>(Arrays.asList(serverWatcher.getChangelogChannelsList()));
             } catch (IOException e) {
                 e.printStackTrace();
                 event.getChannel().sendMessage(Main.getEmbedMessage(
