@@ -2,6 +2,7 @@ package de.akkjon.pr.mbrm;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.entities.Activity;
 
@@ -57,7 +58,11 @@ public class StatusChanger {
 
         message = message.replace("[numberServers]", Main.jda.getGuilds().size()+"");
 
-        String url = object.get("url").getAsString();
+        String url = null;
+        JsonElement urlElement = object.get("url");
+        if(!urlElement.isJsonNull()) {
+            url = urlElement.getAsString();
+        }
 
         Main.jda.getPresence().setActivity(Activity.of(type, message, url));
         activeIndex = (activeIndex+1) % elements.size();
