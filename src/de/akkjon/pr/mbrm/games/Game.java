@@ -8,9 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import de.akkjon.pr.mbrm.Storage;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -18,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 
 public class Game extends ListenerAdapter {
 
@@ -119,7 +118,17 @@ public class Game extends ListenerAdapter {
     }
 
     void createTextChannel(String name) {
-        this.channel = Main.jda.getCategoryById(802719239723024414L).createTextChannel(name).complete();
+        try {
+            Category cat = null;
+            String id = Storage.getFileContent(
+                    Storage.rootFolder + guildId + File.separator + "gameCategory.txt", null);
+            if(id != null && !id.isBlank()) cat = Main.jda.getCategoryById(id);
 
+            if(cat == null) cat = Objects.requireNonNull(Main.jda.getGuildById(guildId)).createCategory("Tolle Spielchen").complete();
+            Storage.saveFile(Storage.rootFolder + guildId + File.separator + "gameCategory.txt", cat.getId());
+            this.channel = cat.createTextChannel(name).complete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
