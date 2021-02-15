@@ -85,7 +85,7 @@ public class Main extends ListenerAdapter {
             }
             new Main();
             setIcon();
-            setStatus();
+            new StatusChanger();
         } catch (LoginException e) {
             System.err.println(Locales.getString("error.loginException"));
             e.printStackTrace();
@@ -163,13 +163,5 @@ public class Main extends ListenerAdapter {
             }
 
         }
-    }
-
-    public static void setStatus() {
-        //Main.jda.getPresence().setActivity(Activity.watching("Pornhub"));
-    }
-
-    public static void removeStatus() {
-        //Main.jda.getPresence().setActivity(null);
     }
 }
