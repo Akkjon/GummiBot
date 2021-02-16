@@ -262,7 +262,7 @@ public class Commands {
 
         commands.add(new Command(new String[]{"info"}, true, (event, args, serverWatcher) -> {
             long uptime = System.currentTimeMillis() - Main.STARTUP_TIME;
-            double version = Updater.getVersion();
+            String version = Updater.getVersion();
 
             String strUptime = "";
             uptime /= 1000;
