@@ -2,7 +2,6 @@ package de.akkjon.pr.mbrm;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.EmbedType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.ShutdownEvent;
@@ -33,9 +32,9 @@ public class Main extends ListenerAdapter {
         }
     }
 
-    private static double VERSION_PRIOR = -1;
+    private static String VERSION_PRIOR = "";
 
-    public static double getVersionPrior() {
+    public static String getVersionPrior() {
         return Main.VERSION_PRIOR;
     }
 
@@ -66,18 +65,18 @@ public class Main extends ListenerAdapter {
             new Updater();
         }
         if (argsMap.containsKey("versionPrior")) {
-            double versionPrior = Double.parseDouble(argsMap.get("versionPrior"));
+            String versionPrior = argsMap.get("versionPrior");
             Main.VERSION_PRIOR = versionPrior;
 
-            if (versionPrior < Updater.getVersion()) {
+            if (!versionPrior.equals(Updater.getVersion())) {
                 Updater.sendChangelog();
             }
         } else {
             try {
-                double versionPrior = Double.parseDouble(args[0]);
+                String versionPrior = args[0];
                 Main.VERSION_PRIOR = versionPrior;
 
-                if (versionPrior < Updater.getVersion()) {
+                if (!versionPrior.equals(Updater.getVersion())) {
                     Updater.sendChangelog();
                 }
             } catch (Exception ignored) {
