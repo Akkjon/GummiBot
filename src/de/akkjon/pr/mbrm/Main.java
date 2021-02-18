@@ -82,7 +82,7 @@ public class Main extends ListenerAdapter {
         if (versionPrior != null) {
             Main.VERSION_PRIOR = versionPrior;
             if (!versionPrior.equals(Updater.getVersion())) {
-                Updater.sendChangelog();
+                Updater.sendChangelog(false);
             }
         }
 

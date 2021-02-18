@@ -146,7 +146,7 @@ public class Updater {
 
         try {
 
-            ProcessBuilder pb = new ProcessBuilder("java", "-jar", filePath, getVersion());
+            ProcessBuilder pb = new ProcessBuilder("java", "-jar", filePath, "versionPrior=" + getVersion());
             pb.start();
             System.exit(0);
         } catch (Exception e) {
@@ -159,7 +159,7 @@ public class Updater {
         Main.jda.shutdownNow();
     }
 
-    public static void sendChangelog() {
+    public static void sendChangelog(boolean startFromBeginning) {
 
         String changelog = Storage.getInternalFile("changelog.json");
         JsonObject jsonObject = gson.fromJson(changelog, JsonObject.class);
@@ -167,7 +167,9 @@ public class Updater {
         boolean print = false;
         boolean breaker = false;
         StringBuilder out = new StringBuilder();
-        String newVer = Main.getVersionPrior();
+        String versionPrior;
+        if (startFromBeginning) versionPrior = "beginning";
+        else versionPrior = Main.getVersionPrior();
         while (!breaker) {
             for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 String version = entry.getKey();
@@ -178,13 +180,13 @@ public class Updater {
                     }
                     ServerWatcher.sendChangelog(out.substring(1));
                     breaker = true;
-                } else if (version.equals(newVer)) {
+                } else if (version.equals(versionPrior)) {
                     print = true;
                 }
             }
             if (!print) {
-                if (newVer.contains(".")) {
-                    newVer = newVer.substring(0, newVer.lastIndexOf("."));
+                if (versionPrior.contains(".")) {
+                    versionPrior = versionPrior.substring(0, versionPrior.lastIndexOf("."));
                 } else {
                     breaker = true;
                 }
