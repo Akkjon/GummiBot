@@ -178,12 +178,12 @@ public class Updater {
                     for (JsonElement change : entry.getValue().getAsJsonArray()) {
                         out.append("\n- ").append(change.getAsString());
                     }
-                    ServerWatcher.sendChangelog(out.substring(1));
                     breaker = true;
                 } else if (version.equals(versionPrior)) {
                     print = true;
                 }
             }
+            ServerWatcher.sendChangelog(out.substring(1));
             if (!print) {
                 if (versionPrior.contains(".")) {
                     versionPrior = versionPrior.substring(0, versionPrior.lastIndexOf("."));
