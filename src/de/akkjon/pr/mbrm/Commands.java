@@ -369,6 +369,7 @@ public class Commands {
                     Locales.getString("msg.commands.success"),
                     Locales.getString("msg.commands.changelog.added")
             )).complete();
+            Updater.sendChangelog(true);
         }));
 
         commands.add(new Command(new String[]{"removechangelog"}, true, (event, args, serverWatcher) -> {
