@@ -65,28 +65,6 @@ public class Main extends ListenerAdapter {
             new Updater();
         }
 
-        //set prior version with key-value pair
-        String versionPrior = argsMap.getOrDefault("versionPrior", null);
-
-        //set prior version without key
-        if (versionPrior == null) {
-            for (String arg : args) {
-                if (arg.matches("^([0-9]|\\.)*$")) {
-                    versionPrior = arg;
-                    break;
-                }
-            }
-        }
-
-        //send changelog if prior version was given in some way and is not the same as new version
-        if (versionPrior != null) {
-            Main.VERSION_PRIOR = versionPrior;
-            if (!versionPrior.equals(Updater.getVersion())) {
-                Updater.sendChangelog(false);
-            }
-        }
-
-
         try {
             jda = JDABuilder.createDefault(TOKEN).build();
             jda.setAutoReconnect(true);
@@ -121,6 +99,27 @@ public class Main extends ListenerAdapter {
             }
             System.exit(0);
             return;
+        }
+
+        //set prior version with key-value pair
+        String versionPrior = argsMap.getOrDefault("versionPrior", null);
+
+        //set prior version without key
+        if (versionPrior == null) {
+            for (String arg : args) {
+                if (arg.matches("^([0-9]|\\.)*$")) {
+                    versionPrior = arg;
+                    break;
+                }
+            }
+        }
+
+        //send changelog if prior version was given in some way and is not the same as new version
+        if (versionPrior != null) {
+            Main.VERSION_PRIOR = versionPrior;
+            if (!versionPrior.equals(Updater.getVersion())) {
+                Updater.sendChangelog(false);
+            }
         }
 
         long STARTUP_DURATION = System.currentTimeMillis() - STARTUP_TIME;
