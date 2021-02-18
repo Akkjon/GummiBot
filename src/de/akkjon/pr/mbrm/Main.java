@@ -64,22 +64,25 @@ public class Main extends ListenerAdapter {
         if (argsMap.getOrDefault("doUpdates", "true").equals("true")) {
             new Updater();
         }
-        if (argsMap.containsKey("versionPrior")) {
-            String versionPrior = argsMap.get("versionPrior");
-            Main.VERSION_PRIOR = versionPrior;
 
+        //set prior version with key-value pair
+        String versionPrior = argsMap.getOrDefault("versionPrior", null);
+
+        //set prior version without key
+        if (versionPrior == null) {
+            for (String arg : args) {
+                if (arg.matches("^([0-9]|\\.)*$")) {
+                    versionPrior = arg;
+                    break;
+                }
+            }
+        }
+
+        //send changelog if prior version was given in some way and is not the same as new version
+        if (versionPrior != null) {
+            Main.VERSION_PRIOR = versionPrior;
             if (!versionPrior.equals(Updater.getVersion())) {
                 Updater.sendChangelog();
-            }
-        } else {
-            try {
-                String versionPrior = args[0];
-                Main.VERSION_PRIOR = versionPrior;
-
-                if (!versionPrior.equals(Updater.getVersion())) {
-                    Updater.sendChangelog();
-                }
-            } catch (Exception ignored) {
             }
         }
 
