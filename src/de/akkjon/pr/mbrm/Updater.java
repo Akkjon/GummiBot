@@ -132,7 +132,7 @@ public class Updater {
         }
         shutdownInternals();
 
-        Storage.saveFile(versionFilePath, newVersion + "");
+        Storage.saveFile(versionFilePath, newVersion);
 
         BufferedInputStream in = new BufferedInputStream(new URL(newDownloadUrl).openStream());
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);
