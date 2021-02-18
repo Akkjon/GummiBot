@@ -183,10 +183,10 @@ public class Updater {
                     print = true;
                 }
             }
-            ServerWatcher.sendChangelog(out.substring(1));
+            ServerWatcher.sendChangelog(out.toString());
             if (!print) {
                 if (versionPrior.contains(".")) {
-                    versionPrior = versionPrior.substring(0, versionPrior.lastIndexOf("."));
+                    versionPrior = versionPrior.substring(0, versionPrior.lastIndexOf(".") - 1);
                 } else {
                     breaker = true;
                 }
