@@ -69,47 +69,35 @@ public class WuerdestDuEher extends Game {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
+                Message message = checkMessage(event);
+                if (message == null) return;
 
-                //skip if message was not from bot or reaction was from bot
-                if (!shouldReactToMessage(event, message)) {
-                    return;
-                }
+                String title = message.getEmbeds().get(0).getTitle();
 
-                if (message.getEmbeds().size() != 0) {
-                    String title = message.getEmbeds().get(0).getTitle();
-
-                    if (title.equals(Locales.getString("msg.games.wde.title"))) {
-                        if (event.getReactionEmote().getName().equals("➡")) {
-                            if (isStarted) {
-                                sendMessage();
-                            } else {
-                                startGame();
-                            }
-                        } else if (event.getReactionEmote().getName().equals("❌")) {
-                            channel.delete().complete();
-                        } else if (event.getReactionEmote().getName().equals("👍")) {
-                            addPlayer(event.getMessageIdLong());
+                if (title.equals(Locales.getString("msg.games.wde.title"))) {
+                    if (event.getReactionEmote().getName().equals("➡")) {
+                        if (isStarted) {
+                            sendMessage();
+                        } else {
+                            startGame();
                         }
+                    } else if (event.getReactionEmote().getName().equals("❌")) {
+                        channel.delete().complete();
+                    } else if (event.getReactionEmote().getName().equals("👍")) {
+                        addPlayer(event.getMessageIdLong());
                     }
                 }
             }
 
             @Override
             public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
+                Message message = checkMessage(event);
+                if (message == null) return;
 
-                //skip if message was not from bot
-                if (!message.getAuthor().equals(event.getJDA().getSelfUser())) {
-                    return;
-                }
-
-                if (message.getEmbeds().size() != 0) {
-                    String title = message.getEmbeds().get(0).getTitle();
-                    if (title.equals(Locales.getString("msg.games.wde.title"))) {
-                        if (event.getReactionEmote().getName().equals("👍")) {
-                            removePlayer(event.getMember().getIdLong());
-                        }
+                String title = message.getEmbeds().get(0).getTitle();
+                if (title.equals(Locales.getString("msg.games.wde.title"))) {
+                    if (event.getReactionEmote().getName().equals("👍")) {
+                        removePlayer(event.getMember().getIdLong());
                     }
                 }
             }
