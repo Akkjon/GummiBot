@@ -4,10 +4,7 @@
 name: Build Pipeline
 
 on:
-  workflow_dispatch:
-    inputs:
-      tags:
-        description: 'None'  
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -20,10 +17,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 14
-    - name: Replace token
-      env:
-        TOKEN: ${{ secrets.DISCORD_TOKEN }}
-      run: sed -i "s/\[token\]/$TOKEN/" src/de/akkjon/pr/mbrm/Main.java
+#    - name: Replace token
+#      env:
+#        TOKEN: ${{ secrets.DISCORD_TOKEN }}
+#      run: sed -i "s/\[token\]/$TOKEN/" src/de/akkjon/pr/mbrm/Main.java
     - name: Build with Maven
       run: mvn -B package
       
@@ -31,4 +28,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bot
-        path: /home/runner/work/GummiBot/GummiBot/target/GummiBot-**-jar-with-dependencies.jar # or path/to/artifact
+        path: /home/runner/work/GummiBot/GummiBot/target/GummiBot-**-jar-with-dependencies.jar
