@@ -7,7 +7,42 @@ import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class Werwolf extends Game {
+public class Werwolf extends MultiPlayerGame {
+
+    private int night;
+
+    private interface Player {
+        void nightAction();
+
+        void dayAction();
+    }
+
+    private class Dorfbewohner implements Player {
+
+        @Override
+        public void nightAction() {
+
+        }
+
+        @Override
+        public void dayAction() {
+
+        }
+    }
+
+    private class Amor extends Dorfbewohner implements Player {
+
+        @Override
+        public void nightAction() {
+
+        }
+
+        @Override
+        public void dayAction() {
+
+        }
+    }
+
 
     private static final String fileName = "ww";
 
@@ -22,12 +57,8 @@ public class Werwolf extends Game {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
-
-                //skip if message was not from bot or reaction was from bot
-                if (!shouldReactToMessage(event, message)) {
-                    return;
-                }
+                Message message = checkMessage(event);
+                if (message == null) return;
             }
         });
     }
