@@ -4,21 +4,19 @@ import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class TruthOrDare extends Game {
+public class TruthOrDare extends MultiPlayerGame {
 
-    final ArrayList<Long> players = new ArrayList<>();
-    private long lastPlayer;
+
     private boolean isStarted = false;
     private boolean isChoosing;
+    private long lastPlayer;
 
     private List<String> remainingListTruth;
     private List<String> remainingListDare;
@@ -62,10 +60,6 @@ public class TruthOrDare extends Game {
         return add(element, "dare", serverId, fileName + ".txt");
     }
 
-    void addPlayer(Long id) {
-        if (!players.contains(id)) players.add(id);
-    }
-
     void removePlayer(long id) {
         if (players.size() <= 1) {
             channel.delete().complete();
@@ -89,45 +83,33 @@ public class TruthOrDare extends Game {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-                Message message = null;
-                try {
-                    message = MessageHistory.getHistoryAround(channel,
-                            event.getMessageId()).complete().getMessageById(event.getMessageId());
-                } catch (Exception e) {
-                    return;
-                }
+                Message message = checkMessage(event);
+                if (message == null) return;
 
-                //skip if message was not from bot or reaction was from bot
-                if (!shouldReactToMessage(event, message)) {
-                    return;
-                }
+                String title = message.getEmbeds().get(0).getTitle();
 
-                if (message.getEmbeds().size() != 0) {
-                    String title = message.getEmbeds().get(0).getTitle();
-
-                    if (title.equals(Locales.getString("msg.games.tod.truthTitle"))
-                            || title.equals(Locales.getString("msg.games.tod.dareTitle"))) {
-                        if (event.getReactionEmote().getName().equals("➡")) {
-                            if (isChoosing) return;
-                            sendNextPlayerMessage();
-                        }
-                    } else if (title.equals(Locales.getString("msg.games.tod.title"))) {
-                        if (event.getReactionEmote().getName().equals("👍")) {
-                            addPlayer(event.getMember().getIdLong());
-                        } else if (event.getReactionEmote().getName().equals("➡")) {
-                            startGame();
-                        } else if (event.getReactionEmote().getName().equals("❌")) {
-                            channel.delete().complete();
-                        }
-                    } else if (title.startsWith(Locales.getString("msg.games.tod.gamestartTitlePrefix"))
-                            || title.equals(Locales.getString("msg.games.tod.nextPlayerTitle"))) {
-                        if (event.getMember().getIdLong() == (getCurrentPlayer())) {
-                            isChoosing = false;
-                            if (event.getReactionEmote().getName().equals("1️⃣")) {
-                                sendTruth(channel);
-                            } else if (event.getReactionEmote().getName().equals("2️⃣")) {
-                                sendDare(channel);
-                            }
+                if (title.equals(Locales.getString("msg.games.tod.truthTitle"))
+                        || title.equals(Locales.getString("msg.games.tod.dareTitle"))) {
+                    if (event.getReactionEmote().getName().equals("➡")) {
+                        if (isChoosing) return;
+                        sendNextPlayerMessage();
+                    }
+                } else if (title.equals(Locales.getString("msg.games.tod.title"))) {
+                    if (event.getReactionEmote().getName().equals("👍")) {
+                        addPlayer(event.getMember().getIdLong());
+                    } else if (event.getReactionEmote().getName().equals("➡")) {
+                        startGame();
+                    } else if (event.getReactionEmote().getName().equals("❌")) {
+                        channel.delete().complete();
+                    }
+                } else if (title.startsWith(Locales.getString("msg.games.tod.gamestartTitlePrefix"))
+                        || title.equals(Locales.getString("msg.games.tod.nextPlayerTitle"))) {
+                    if (event.getMember().getIdLong() == (getCurrentPlayer())) {
+                        isChoosing = false;
+                        if (event.getReactionEmote().getName().equals("1️⃣")) {
+                            sendTruth(channel);
+                        } else if (event.getReactionEmote().getName().equals("2️⃣")) {
+                            sendDare(channel);
                         }
                     }
                 }
@@ -135,20 +117,13 @@ public class TruthOrDare extends Game {
 
             @Override
             public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel,
-                        event.getMessageId()).complete().getMessageById(event.getMessageId());
+                Message message = checkMessage(event);
+                if (message == null) return;
 
-                //skip if message was not from bot
-                if (!message.getAuthor().equals(event.getJDA().getSelfUser())) {
-                    return;
-                }
-
-                if (message.getEmbeds().size() != 0) {
-                    String title = message.getEmbeds().get(0).getTitle();
-                    if (title.equals(Locales.getString("msg.games.tod.title"))) {
-                        if (event.getReactionEmote().getName().equals("👍")) {
-                            removePlayer(event.getMember().getIdLong());
-                        }
+                String title = message.getEmbeds().get(0).getTitle();
+                if (title.equals(Locales.getString("msg.games.tod.title"))) {
+                    if (event.getReactionEmote().getName().equals("👍")) {
+                        removePlayer(event.getMember().getIdLong());
                     }
                 }
             }
