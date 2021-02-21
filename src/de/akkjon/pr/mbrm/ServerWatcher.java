@@ -1,5 +1,6 @@
 package de.akkjon.pr.mbrm;
 
+import de.akkjon.pr.mbrm.audio.AudioManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -25,6 +26,7 @@ public class ServerWatcher {
     Long[] channels;
     private final Insult insult;
     private final String changelogFilePath;
+    private AudioManager audioManager;
 
     public static void logError(String throwable) {
         if(Main.jda == null) return;
@@ -56,6 +58,7 @@ public class ServerWatcher {
         initChannels();
         initCommandListeners();
         new QuoteOfTheDay(serverId);
+        audioManager = new AudioManager(serverId);
     }
 
 
