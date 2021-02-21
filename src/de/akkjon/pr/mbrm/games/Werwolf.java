@@ -3,15 +3,17 @@ package de.akkjon.pr.mbrm.games;
 import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class Werwolf extends MultiPlayerGame {
 
-    private int night;
+    private int progress;
+    private Player[] players;
 
     private interface Player {
+        long id = 0;
+
         void nightAction();
 
         void dayAction();
@@ -59,6 +61,12 @@ public class Werwolf extends MultiPlayerGame {
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
                 Message message = checkMessage(event);
                 if (message == null) return;
+
+                if (event.getReactionEmote().getName().equals("➡")) {
+                    startGame();
+                } else if (event.getReactionEmote().getName().equals("❌")) {
+                    channel.delete().complete();
+                }
             }
         });
     }
