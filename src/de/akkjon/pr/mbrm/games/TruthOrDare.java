@@ -89,7 +89,7 @@ public class TruthOrDare extends Game {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-                Message message = null;
+                Message message;
                 try {
                     message = MessageHistory.getHistoryAround(channel,
                             event.getMessageId()).complete().getMessageById(event.getMessageId());
@@ -135,8 +135,13 @@ public class TruthOrDare extends Game {
 
             @Override
             public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel,
-                        event.getMessageId()).complete().getMessageById(event.getMessageId());
+                Message message;
+                try {
+                    message = MessageHistory.getHistoryAround(channel,
+                            event.getMessageId()).complete().getMessageById(event.getMessageId());
+                } catch (Exception e) {
+                    return;
+                }
 
                 //skip if message was not from bot
                 if (!message.getAuthor().equals(event.getJDA().getSelfUser())) {
