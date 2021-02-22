@@ -83,6 +83,7 @@ public class TruthOrDare extends MultiPlayerGame {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+
                 Message message = checkMessage(event);
                 if (message == null) return;
 
