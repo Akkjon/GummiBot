@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
@@ -92,7 +91,7 @@ public class ServerWatcher {
                             event.getChannel().sendMessage(Locales.getString("msg.onDisable")).complete();
                             StatusChanger.removeStatus();
                         } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "enable") && isPermitted) {
-                            event.getChannel().sendMessage(Locales.getString("msg.onDisable")).complete();
+                            event.getChannel().sendMessage(Locales.getString("msg.onEnable")).complete();
                             Main.isEnabled = true;
                             StatusChanger.setStatus();
                         } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "status") && isPermitted) {

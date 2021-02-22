@@ -3,22 +3,18 @@ package de.akkjon.pr.mbrm.games;
 import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class WuerdestDuEher extends Game {
-
-    final ArrayList<Long> players = new ArrayList<>();
-    private long lastPlayer;
-    private boolean isStarted = false;
+public class WuerdestDuEher extends SuccessiveMultiPlayerGame {
 
     private List<String> remainingList;
+
     private static final String fileName = "wde";
 
     public WuerdestDuEher(long serverId) {
@@ -45,30 +41,10 @@ public class WuerdestDuEher extends Game {
         return add(element, "questions", serverId, fileName + ".txt");
     }
 
-    void addPlayer(Long id) {
-        if (!players.contains(id)) players.add(id);
-    }
-
-    void removePlayer(long id) {
-        if (players.size() <= 1) {
-            channel.delete().complete();
-            return;
-        }
-        if (this.lastPlayer == id) sendMessage();
-        players.remove(id);
-    }
-
-    long getNextPlayer() {
-        int indexOflastPlayer = players.indexOf(lastPlayer);
-        if (++indexOflastPlayer >= players.size()) indexOflastPlayer = 0;
-        this.lastPlayer = players.get(indexOflastPlayer);
-        return this.lastPlayer;
-    }
-
     public void initReactionListeners() {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
-            public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+            public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
                 Message message = checkMessage(event);
                 if (message == null) return;
 
@@ -90,7 +66,7 @@ public class WuerdestDuEher extends Game {
             }
 
             @Override
-            public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
+            public void onGuildMessageReactionRemove(@NotNull GuildMessageReactionRemoveEvent event) {
                 Message message = checkMessage(event);
                 if (message == null) return;
 
@@ -104,17 +80,22 @@ public class WuerdestDuEher extends Game {
         });
     }
 
-    private void startGame() {
+    @Override
+    void startGame() {
+        if (isStarted) {
+            sendMessage();
+            return;
+        }
         if (players.size() <= 1) {
             channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.error.noPlayersTitle"),
                     Locales.getString("msg.games.error.noPlayersMessage"))).complete();
             return;
         }
-        if (isStarted) return;
         isStarted = true;
         sendMessage();
     }
 
+    @Override
     void sendMessage() {
         try {
             Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.wde.title"),

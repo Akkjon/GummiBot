@@ -10,7 +10,9 @@ import de.akkjon.pr.mbrm.Main;
 import de.akkjon.pr.mbrm.Storage;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GenericGuildMessageReactionEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -28,8 +30,28 @@ public class Game extends ListenerAdapter {
 
     protected Game(long serverId) {
         this.guildId = serverId;
-
+        initGameReactionListeners();
     }
+
+    void initGameReactionListeners() {
+        Main.jda.addEventListener(new ListenerAdapter() {
+            @Override
+            public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+                Message message = checkMessage(event);
+                if (message == null) return;
+
+                if (event.getReactionEmote().getName().equals("➡")) {
+                    startGame();
+                } else if (event.getReactionEmote().getName().equals("❌")) {
+                    channel.delete().complete();
+                }
+            }
+        });
+    }
+
+    void startGame() {
+    }
+
 
     protected static String getFromLists(List<String> list) {
         int value = (int) (Math.random() * list.size());
@@ -135,8 +157,15 @@ public class Game extends ListenerAdapter {
     }
 
     @Nullable Message checkMessage(GenericGuildMessageReactionEvent event) {
-        Message message = MessageHistory.getHistoryAround(channel,
-                event.getMessageId()).complete().getMessageById(event.getMessageId());
+        Message message;
+        try {
+            message = MessageHistory.getHistoryAround(channel,
+                    event.getMessageId()).complete().getMessageById(event.getMessageId());
+        } catch (Exception e) {
+            return null;
+        }
+
+        if(message == null) return null;
 
         //skip if message was not from bot or reaction was from bot
         if (!shouldReactToMessage(event, message)) return null;
