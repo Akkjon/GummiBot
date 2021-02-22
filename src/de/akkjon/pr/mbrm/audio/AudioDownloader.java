@@ -46,8 +46,13 @@ public class AudioDownloader {
         if(mediaExtensions.contains(attachment.getFileExtension().toLowerCase())) {
             String name = attachment.getFileName().substring(0, attachment.getFileName().lastIndexOf("."));
             File folder = new File(Song.SONGS_FOLDER);
-            boolean isSet = Arrays.stream(folder.listFiles())
-                    .anyMatch(file->file.getName().matches(Pattern.quote(name) + "\\..*"));
+            boolean isSet = false;
+            if(!folder.exists()) {
+                folder.getParentFile().mkdirs();
+            } else{
+                isSet = Arrays.stream(folder.listFiles())
+                        .anyMatch(file -> file.getName().matches(Pattern.quote(name) + "\\..*"));
+            }
             if(!isSet) {
                 String path = Song.SONGS_FOLDER + attachment.getFileName();
                 attachment.downloadToFile(path).thenAccept(file ->

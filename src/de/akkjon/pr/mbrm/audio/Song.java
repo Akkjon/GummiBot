@@ -30,6 +30,7 @@ public class Song {
 
     public static List<Song> getList() {
         List<Song> list = new ArrayList<>();
+        if(!new File(SONGS_FOLDER).exists()) return list;
         for(File file : new File(SONGS_FOLDER).listFiles()) {
             try {
                 Song song = new Song(file.getAbsolutePath());
