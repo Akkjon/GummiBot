@@ -127,7 +127,7 @@ public class ServerWatcher {
         new Thread(() -> {
             MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
             List<Message> messages = messageHistory.getRetrievedHistory();
-            for (int i = 0; i < messages.size() - 2; i++) {
+            for (int i = 1; i < messages.size() - 1; i++) {
                 try {
                     messages.get(i).delete().complete();
                 } catch (Exception ignored) {
