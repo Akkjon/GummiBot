@@ -27,7 +27,6 @@ public class WuerdestDuEher extends SuccessiveMultiPlayerGame {
             e.printStackTrace();
             this.channel.delete();
         }
-        initReactionListeners();
     }
 
     public String getMessage() throws IOException {
@@ -39,45 +38,6 @@ public class WuerdestDuEher extends SuccessiveMultiPlayerGame {
 
     public static boolean addMessage(String element, long serverId) throws IOException {
         return add(element, "questions", serverId, fileName + ".txt");
-    }
-
-    public void initReactionListeners() {
-        Main.jda.addEventListener(new ListenerAdapter() {
-            @Override
-            public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
-                Message message = checkMessage(event);
-                if (message == null) return;
-
-                String title = message.getEmbeds().get(0).getTitle();
-
-                if (title.equals(Locales.getString("msg.games.wde.title"))) {
-                    if (event.getReactionEmote().getName().equals("➡")) {
-                        if (isStarted) {
-                            sendMessage();
-                        } else {
-                            startGame();
-                        }
-                    } else if (event.getReactionEmote().getName().equals("❌")) {
-                        channel.delete().complete();
-                    } else if (event.getReactionEmote().getName().equals("👍")) {
-                        addPlayer(event.getMessageIdLong());
-                    }
-                }
-            }
-
-            @Override
-            public void onGuildMessageReactionRemove(@NotNull GuildMessageReactionRemoveEvent event) {
-                Message message = checkMessage(event);
-                if (message == null) return;
-
-                String title = message.getEmbeds().get(0).getTitle();
-                if (title.equals(Locales.getString("msg.games.wde.title"))) {
-                    if (event.getReactionEmote().getName().equals("👍")) {
-                        removePlayer(event.getMember().getIdLong());
-                    }
-                }
-            }
-        });
     }
 
     @Override
