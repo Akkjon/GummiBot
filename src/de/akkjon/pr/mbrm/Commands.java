@@ -1,14 +1,22 @@
 package de.akkjon.pr.mbrm;
 
+import de.akkjon.pr.mbrm.audio.AudioManager;
+import de.akkjon.pr.mbrm.audio.Playlist;
+import de.akkjon.pr.mbrm.audio.Song;
 import de.akkjon.pr.mbrm.games.*;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import javax.annotation.Nullable;
+import javax.naming.NameNotFoundException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Commands {
 
@@ -410,6 +418,214 @@ public class Commands {
             )).complete();
         }));
 
+        commands.add(new Command(new String[]{"songs", "songlist"}, false, (event, args, serverWatcher) -> {
+            List<Song> songs = Song.getList();
+            StringBuilder out = new StringBuilder("Songs:");
+            for(Song song : songs) {
+                out.append("\n").append(song.getName());
+            }
+            event.getChannel().sendMessage("````" + out.toString() + "```").complete();
+        }));
+
+        commands.add(new Command(new String[]{"musicplaylist", "musikplaylist"}, false, (event, args, serverWatcher) -> {
+            if(event.getMember()==null) return;
+            GuildVoiceState voiceState = event.getMember().getVoiceState();
+            if(isBotVoicePermitted(voiceState, serverWatcher)) {
+                String name = event.getMessage().getContentRaw().substring(args[0].length() + 1 + 1).trim();
+                List<Playlist> playlists = Playlist.fromName(event.getGuild().getIdLong(), name);
+                List<Playlist> playlistsEquals = playlists.stream().filter(playlist->playlist.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
+
+                if (playlists.size() == 1 || playlistsEquals.size()==1) {
+
+                    Playlist playlist;
+                    if(playlists.size() == 1) playlist = playlists.get(0);
+                    else playlist = playlistsEquals.get(0);
+
+                    serverWatcher.getAudioManager().addPlaylist(playlist, voiceState.getChannel(), event.getChannel());
+                } else {
+                    event.getChannel().sendMessage(Main.getEmbedMessage(
+                            Locales.getString("msg.commands.error"),
+                            Locales.getString("msg.music.playlist.noResult", name))).complete();
+                }
+            }
+        }));
+
+        commands.add(new Command(new String[]{"music", "musik"}, false, (event, args, serverWatcher) -> {
+
+            if(event.getMember()==null) return;
+            GuildVoiceState voiceState = event.getMember().getVoiceState();
+            if(isBotVoicePermitted(voiceState, serverWatcher)) {
+
+                String name = event.getMessage().getContentRaw().substring(args[0].length() + 1 + 1).trim();
+                List<Song> songs = Song.fromName(name);
+                List<Song> songsEquals = songs.stream().filter(song->song.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
+
+                if (songs.size() == 1 || songsEquals.size()==1) {
+
+                    Song song;
+                    if(songs.size() == 1) song = songs.get(0);
+                    else song = songsEquals.get(0);
+
+                    serverWatcher.getAudioManager().addSong(song, voiceState.getChannel(), event.getChannel());
+
+                } else {
+                    event.getChannel().sendMessage(Main.getEmbedMessage(
+                            Locales.getString("msg.commands.error"),
+                            Locales.getString("msg.music.song.noResult", name))).complete();
+                }
+
+            } else {
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.error"),
+                        Locales.getString("msg.music.error.notInVoiceOrBotChannel"))).complete();
+            }
+        }));
+
+        commands.add(new Command(new String[]{"queue"}, false, (event, args, serverWatcher) ->
+            serverWatcher.getAudioManager().getPlaylist().sendToChannel(event.getChannel())
+        ));
+
+        commands.add(new Command(new String[]{"playlist"}, false, ((event, args, serverWatcher) -> {
+            if(event.getMember()==null) return;
+            GuildVoiceState voiceState = event.getMember().getVoiceState();
+            if(isBotVoicePermitted(voiceState, serverWatcher)) {
+                switch (args[1].toLowerCase()) {
+                    case "list" -> serverWatcher.getAudioManager().getPlaylist().sendToChannel(event.getChannel());
+                    case "setname" -> {
+                        String name = String.join(" ", Arrays.asList(args).subList(2, args.length - 1).toArray(String[]::new));
+                        serverWatcher.getAudioManager().getPlaylist().setName(name);
+                        event.getChannel().sendMessage(AudioManager.getMusicEmbed(
+                                Locales.getString("msg.music.playlist.rename", name))).complete();
+                    }
+                    case "save" -> {
+                        try {
+                            boolean saved = serverWatcher.getAudioManager().getPlaylist().save(event.getMember().getIdLong());
+                            if(saved) {
+                                event.getChannel().sendMessage(AudioManager.getMusicEmbed(
+                                        Locales.getString("msg.music.playlist.save.success"))).complete();
+                            } else  {
+                                event.getChannel().sendMessage(Main.getEmbedMessage(
+                                        Locales.getString("msg.commands.internalError"),
+                                        Locales.getString("msg.music.playlist.save.error.internalError"))).complete();
+                            }
+
+                        } catch (NameNotFoundException e) {
+                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                    Locales.getString("msg.commands.error"),
+                                    Locales.getString("msg.music.playlist.save.error.noName"))).complete();
+
+                        } catch (IllegalAccessException e) {
+                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                    Locales.getString("msg.commands.error"),
+                                    Locales.getString("msg.music.playlist.save.error.notPermitted"))).complete();
+                        }
+                    }
+                    case "delete" -> {
+                        try {
+                            boolean removed = serverWatcher.getAudioManager().getPlaylist().remove(event.getMember().getIdLong());
+                            if(removed) {
+                                event.getChannel().sendMessage(AudioManager.getMusicEmbed(
+                                        Locales.getString("msg.music.playlist.delete.success"))).complete();
+                            } else  {
+                                event.getChannel().sendMessage(Main.getEmbedMessage(
+                                        Locales.getString("msg.commands.internalError"),
+                                        Locales.getString("msg.music.playlist.delete.error.internalError"))).complete();
+                            }
+                        } catch (FileNotFoundException e) {
+                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                    Locales.getString("msg.commands.error"),
+                                    Locales.getString("msg.music.playlist.delete.error.notSaved"))).complete();
+                        } catch (IllegalAccessException e) {
+                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                    Locales.getString("msg.commands.error"),
+                                    Locales.getString("msg.music.playlist.delete.error.notPermitted"))).complete();
+                        }
+                    }
+                    case "clear" -> {
+                        serverWatcher.getAudioManager().resetPlaylist();
+                        event.getChannel().sendMessage(AudioManager.getMusicEmbed(
+                                Locales.getString("msg.music.playlist.cleared"))).complete();
+                    }
+                    case "jump" -> {
+                        if(args.length < 3) {
+                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                    Locales.getString("msg.commands.error"),
+                                    Locales.getString("msg.music.jump.noNumber"))).complete();
+                        }
+                        try {
+                            int index = Integer.parseInt(args[2]);
+                            serverWatcher.getAudioManager().jumpToSong(index);
+                            Song song = serverWatcher.getAudioManager().getPlaylist().getSong(index);
+                            event.getChannel().sendMessage(AudioManager.getMusicEmbed(
+                                    Locales.getString("msg.music.jump.success", song.getName()))).complete();
+                        } catch (IllegalArgumentException e) {
+                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                    Locales.getString("msg.commands.error"),
+                                    Locales.getString("msg.music.jump.invalidNumber", args[2]))).complete();
+                        }
+                    }
+                    case "remove" -> {
+                        int index = serverWatcher.getAudioManager().getPlaylist().getNowPlayingIndex();
+                        if(args.length >= 3) {
+                            try {
+                                index = Integer.parseInt(args[2]);
+                            } catch (NumberFormatException ignored) {}
+                        }
+                        if(index < 0 || index>=serverWatcher.getAudioManager().getPlaylist().getSize()) {
+                            event.getChannel().sendMessage(Main.getEmbedMessage(
+                                    Locales.getString("msg.commands.error"),
+                                    Locales.getString("msg.music.playlist.remove.invalidNumber"))).complete();
+                            return;
+                        }
+                        Song song = serverWatcher.getAudioManager().getPlaylist().getSong(index);
+                        serverWatcher.getAudioManager().removeSong(index);
+                        event.getChannel().sendMessage(AudioManager.getMusicEmbed(
+                                Locales.getString("msg.music.playlist.remove.success", song.getName()))).complete();
+                    }
+                }
+            }
+        })));
+
+        commands.add(new Command(new String[]{"loop"}, false, (event, args, serverWatcher) -> {
+            if(event.getMember()==null) return;
+            GuildVoiceState voiceState = event.getMember().getVoiceState();
+            if(isBotVoicePermitted(voiceState, serverWatcher)) {
+                if(serverWatcher.getAudioManager().isConnected()) {
+                    serverWatcher.getAudioManager().getPlaylist().toggleLooping();
+                    String key = serverWatcher.getAudioManager().getPlaylist().isLooping() ? "msg.primitive.true.on" : "msg.primitive.false.off";
+                    AudioManager.getMusicEmbed(Locales.getString("msg.music.looping", Locales.getString(key)));
+                } else {
+                    event.getChannel().sendMessage(Main.getEmbedMessage(
+                            Locales.getString("msg.commands.error"),
+                            Locales.getString("msg.music.error.notConnected"))).complete();
+                }
+            } else {
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.error"),
+                        Locales.getString("msg.music.error.notInVoiceOrBotChannel"))).complete();
+            }
+        }));
+
+        commands.add(new Command(new String[]{"shuffle"}, false, (event, args, serverWatcher) -> {
+            if(event.getMember()==null) return;
+            GuildVoiceState voiceState = event.getMember().getVoiceState();
+            if(isBotVoicePermitted(voiceState, serverWatcher)) {
+                if(serverWatcher.getAudioManager().isConnected()) {
+                    serverWatcher.getAudioManager().getPlaylist().toggleShuffling();
+                    String key = serverWatcher.getAudioManager().getPlaylist().isShuffling() ? "msg.primitive.true.on" : "msg.primitive.true.off";
+                    AudioManager.getMusicEmbed(Locales.getString("msg.music.shuffling", Locales.getString(key)));
+                } else {
+                    event.getChannel().sendMessage(Main.getEmbedMessage(
+                            Locales.getString("msg.commands.error"),
+                            Locales.getString("msg.music.error.notConnected"))).complete();
+                }
+            } else {
+                event.getChannel().sendMessage(Main.getEmbedMessage(
+                        Locales.getString("msg.commands.error"),
+                        Locales.getString("msg.music.error.notInVoiceOrBotChannel"))).complete();
+            }
+        }));
+
         helpCommand = (event, args, serverWatcher) -> {
             String helpMsg = Storage.getInternalFile("help.txt");
             event.getChannel().sendMessage(helpMsg).complete();
@@ -428,6 +644,7 @@ public class Commands {
             }
 
             args[0] = args[0].toLowerCase();
+            if(event.getMember()==null) return;
             boolean isAdmin = event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
 
             for (Command command : commands) {
@@ -442,6 +659,16 @@ public class Commands {
     }
 
     public static boolean isAdmin(MessageReceivedEvent event) {
+        if(event.getMember()==null) return false;
         return event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
+    }
+
+    public static boolean isBotVoicePermitted(@Nullable GuildVoiceState voiceState, ServerWatcher serverWatcher) {
+        if(voiceState==null || voiceState.getChannel()==null) return false;
+        if(voiceState.inVoiceChannel()) {
+            return (!serverWatcher.getAudioManager().isConnected()
+                    || voiceState.getChannel().equals(serverWatcher.getAudioManager().getChannel()));
+        }
+        return false;
     }
 }

@@ -64,6 +64,10 @@ public class AudioSender implements AudioSendHandler {
         onSongEnd.run();
     }
 
+    boolean isPlaying() {
+        return playing;
+    }
+
 
 
     @Override

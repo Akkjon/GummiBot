@@ -1,5 +1,7 @@
 package de.akkjon.pr.mbrm;
 
+import de.akkjon.pr.mbrm.audio.AudioDownloader;
+import de.akkjon.pr.mbrm.audio.AudioManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.EmbedType;
@@ -127,6 +129,7 @@ public class Main extends ListenerAdapter {
     }
 
     public Main() {
+        AudioDownloader.init();
         for (long server : Storage.getServers()) {
             try {
                 new ServerWatcher(server);

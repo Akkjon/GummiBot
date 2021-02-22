@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
@@ -26,7 +25,7 @@ public class ServerWatcher {
     Long[] channels;
     private final Insult insult;
     private final String changelogFilePath;
-    private AudioManager audioManager;
+    private AudioManager audioManager = null;
 
     public static void logError(String throwable) {
         if(Main.jda == null) return;
@@ -47,7 +46,9 @@ public class ServerWatcher {
 
     public ServerWatcher(long serverId) throws AlreadyBoundException {
         for (WeakReference<ServerWatcher> weakReference : serverWatchers) {
-            if (weakReference.get().getGuildId() == serverId) {
+            ServerWatcher watcher = weakReference.get();
+            if(watcher==null) continue;
+            if (watcher.getGuildId() == serverId) {
                 throw new AlreadyBoundException("Server Watcher already exists");
             }
         }
@@ -188,5 +189,9 @@ public class ServerWatcher {
 
     public void saveChangelogChannelsList(Long[] channels) throws IOException {
         Storage.saveFile(changelogFilePath, Arrays.toString(channels));
+    }
+
+    public AudioManager getAudioManager() {
+        return audioManager;
     }
 }
