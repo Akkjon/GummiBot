@@ -227,6 +227,11 @@ public class Commands {
                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
                                 "<#" + blackJack.getChannelId() + ">")).complete();
                     }
+                    case "werwolf" -> {
+                        Werwolf ww = new Werwolf(serverId);
+                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
+                                "<#" + ww.getChannelId() + ">")).complete();
+                    }
                     default -> event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
                             Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
                 }
@@ -262,7 +267,7 @@ public class Commands {
 
         commands.add(new Command(new String[]{"info"}, true, (event, args, serverWatcher) -> {
             long uptime = System.currentTimeMillis() - Main.STARTUP_TIME;
-            double version = Updater.getVersion();
+            String version = Updater.getVersion();
 
             String strUptime = "";
             uptime /= 1000;
@@ -369,12 +374,13 @@ public class Commands {
                     Locales.getString("msg.commands.success"),
                     Locales.getString("msg.commands.changelog.added")
             )).complete();
+            Updater.sendChangelog(true);
         }));
 
         commands.add(new Command(new String[]{"removechangelog"}, true, (event, args, serverWatcher) -> {
             List<Long> arrChangelog;
             try {
-                arrChangelog = Arrays.asList(serverWatcher.getChangelogChannelsList());
+                arrChangelog = new ArrayList<>(Arrays.asList(serverWatcher.getChangelogChannelsList()));
             } catch (IOException e) {
                 e.printStackTrace();
                 event.getChannel().sendMessage(Main.getEmbedMessage(
