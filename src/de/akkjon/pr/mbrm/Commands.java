@@ -227,11 +227,6 @@ public class Commands {
                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
                                 "<#" + blackJack.getChannelId() + ">")).complete();
                     }
-                    case "werwolf" -> {
-                        Werwolf ww = new Werwolf(serverId);
-                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
-                                "<#" + ww.getChannelId() + ">")).complete();
-                    }
                     default -> event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
                             Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
                 }
