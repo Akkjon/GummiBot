@@ -189,7 +189,7 @@ public class Playlist {
         songsRemaining.remove(nextSong);
         nowPlayingIndex = songs.indexOf(nextSong);
 
-        return getCurrent();
+        return nextSong;
     }
 
     public int getSize() {

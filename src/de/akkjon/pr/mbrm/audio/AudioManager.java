@@ -23,10 +23,12 @@ public class AudioManager {
         Guild guild = Main.jda.getGuildById(guildId);
         if(guild!=null) audioManager = guild.getAudioManager();
         else new Exception("Audio manager guild returned null for guild " + guildId).printStackTrace(System.err);
-        resetPlaylist();
         initOnSongEnd();
-
         audioSender = new AudioSender(onSongEnd);
+        resetPlaylist();
+
+
+
     }
 
     private void initOnSongEnd() {
@@ -106,7 +108,6 @@ public class AudioManager {
             connect(channel);
         }
         if(!isStarted()) {
-            start();
             playSong(playlist.getNext());
         } else {
             this.messageChannel.sendMessage(
@@ -116,6 +117,7 @@ public class AudioManager {
 
     private void playSong(Song song) {
         audioSender.playSong(song);
+        start();
         if(nowPlayingMessage != null) nowPlayingMessage.delete().complete();
         messageChannel.sendMessage(
                 AudioManager.getMusicEmbed(Locales.getString("msg.music.nowPlaying", song.getName()))).complete();

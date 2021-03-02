@@ -24,6 +24,7 @@ public class AudioSender implements AudioSendHandler {
     }
 
     void playSong(Song song) {
+        if(song==null) return;
         nowPlayingMeta = song.getMeta();
         stream = nowPlayingMeta.getAudioInputStream();
         preparePackages();

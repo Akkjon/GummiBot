@@ -1,7 +1,5 @@
 package de.akkjon.pr.mbrm;
 
-import de.akkjon.pr.mbrm.audio.AudioDownloader;
-import de.akkjon.pr.mbrm.audio.AudioManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.EmbedType;
@@ -9,6 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 
 import javax.security.auth.login.LoginException;
@@ -68,7 +67,7 @@ public class Main extends ListenerAdapter {
         }
 
         try {
-            jda = JDABuilder.createDefault(TOKEN).build();
+            jda = JDABuilder.createDefault(TOKEN).enableCache(CacheFlag.VOICE_STATE).build();
             jda.setAutoReconnect(true);
             jda.addEventListener(new ListenerAdapter() {
                 @Override
@@ -129,7 +128,7 @@ public class Main extends ListenerAdapter {
     }
 
     public Main() {
-        AudioDownloader.init();
+        //AudioDownloader.init();
         for (long server : Storage.getServers()) {
             try {
                 new ServerWatcher(server);

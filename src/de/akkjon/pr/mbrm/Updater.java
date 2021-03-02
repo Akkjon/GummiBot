@@ -156,7 +156,9 @@ public class Updater {
 
     public static void shutdownInternals() throws InterruptedException {
         Handler.stopWebServer();
-        Main.jda.shutdownNow();
+        try {
+            Main.jda.shutdownNow();
+        } catch (Exception e) {}
     }
 
     public static void sendChangelog(boolean startFromBeginning) {

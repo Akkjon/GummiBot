@@ -16,21 +16,18 @@ import java.util.regex.Pattern;
 
 public class AudioDownloader {
 
-    public static List<String> mediaExtensions = Arrays.asList("mp3", "wav", "ogg");
+    public static List<String> mediaExtensions = Arrays.asList("mp3", "wav");
 
     public static void init() {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onPrivateMessageReceived(@NotNull PrivateMessageReceivedEvent event) {
+                //TODO Usercheck
                 List<Message.Attachment> attachments = event.getMessage().getAttachments();
                 if(attachments.size()>0) {
                     for(Message.Attachment attachment: attachments) {
                         String fileName = attachment.getFileName();
-                        if(addSong(attachment, event.getChannel())) {
-                            event.getChannel().sendMessage(Main.getEmbedMessage(
-                                    Locales.getString("msg.commands.success"),
-                                    Locales.getString("msg.private.downloading", fileName))).complete();
-                        } else {
+                        if(!addSong(attachment, event.getChannel())) {
                             event.getChannel().sendMessage(Main.getEmbedMessage(
                                     Locales.getString("msg.commands.error"),
                                     Locales.getString("msg.private.notValid", fileName))).complete();
@@ -48,7 +45,7 @@ public class AudioDownloader {
             File folder = new File(Song.SONGS_FOLDER);
             boolean isSet = false;
             if(!folder.exists()) {
-                folder.getParentFile().mkdirs();
+                folder.mkdirs();
             } else{
                 isSet = Arrays.stream(folder.listFiles())
                         .anyMatch(file -> file.getName().matches(Pattern.quote(name) + "\\..*"));
