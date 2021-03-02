@@ -26,24 +26,21 @@ public class TalkChannels {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
-                System.out.println("join");
                 if (amountOfEmptyChannels() == 0) {
-                    System.out.println("new Channel");
                     createNewChannel("Test1");
                 }
             }
 
             @Override
             public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
-                System.out.println("move");
-                if (amountOfEmptyChannels() == 0) category.createVoiceChannel("Test1").queue();
+                if (amountOfEmptyChannels() == 0)
+                    createNewChannel("Test1");
                 else removeUnnecessaryChannels();
 
             }
 
             @Override
             public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
-                System.out.println("leave");
                 removeUnnecessaryChannels();
             }
         });
