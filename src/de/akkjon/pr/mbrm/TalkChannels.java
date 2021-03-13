@@ -91,7 +91,7 @@ public class TalkChannels {
                 boolean perm = false;
                 for (PermissionOverride p : c.getPermissionOverrides()) {
                     if (p.isRoleOverride()) {
-                        if (p.getRole().getName().equals("Perm")) {
+                        if (Objects.requireNonNull(p.getRole()).getName().equals("Perm")) {
                             perm = true;
                         }
                     }
