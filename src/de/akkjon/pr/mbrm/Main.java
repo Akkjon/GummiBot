@@ -130,6 +130,7 @@ public class Main extends ListenerAdapter {
         for (long server : Storage.getServers()) {
             try {
                 new ServerWatcher(server);
+                new TalkChannels(server);
             } catch (AlreadyBoundException e) {
                 System.err.println(Locales.getString("error.startWatcher", server));
                 e.printStackTrace();
