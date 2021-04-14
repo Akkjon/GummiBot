@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+
 interface BlackjackCallback {
     void run(int number);
 }
@@ -29,11 +31,14 @@ public class BlackJack extends Game {
                         public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
                             if (msg == MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId())) {
 
-                                int number = switch (event.getReactionEmote().getName()) {
-                                    case "1️⃣" -> 1;
-                                    case "2️⃣" -> 11;
-                                    default -> 0;
-                                };
+                                int number = 1;
+                                switch (event.getReactionEmote().getName()) {
+                                    case "1️⃣":
+                                        number = 1;
+                                        break;
+                                    case "2️⃣":
+                                        number = 11;
+                                }
                                 channel.deleteMessageById(event.getMessageId());
                                 callback.run(number);
                             }
@@ -81,10 +86,18 @@ public class BlackJack extends Game {
 
                 if (title.equals(Locales.getString("msg.games.blackJack.title"))) {
                     switch (event.getReactionEmote().getName()) {
-                        case "➡" -> newGame();
-                        case "❌" -> channel.delete().complete();
-                        case "🆕" -> msgDrawCard();
-                        case "⭕" -> msgSkip();
+                        case "➡":
+                            newGame();
+                            break;
+                        case "❌":
+                            channel.delete().complete();
+                            break;
+                        case "🆕":
+                            msgDrawCard();
+                            break;
+                        case "⭕":
+                            msgSkip();
+                            break;
                     }
                 }
             }
