@@ -158,7 +158,7 @@ public class Commands {
 
             long serverId = serverWatcher.getGuildId();
             switch (gameName) {
-                case "ihnn" -> {
+                case "ihnn":
                     try {
                         boolean isAdded = IchHabNochNie.addMessage(newElement, serverId);
                         if (isAdded) {
@@ -170,8 +170,8 @@ public class Commands {
                         event.getChannel().sendMessage(Main.getEmbedMessage(InternalErrorTitle, InternalErrorDescription)).complete();
                         e.printStackTrace();
                     }
-                }
-                case "wde" -> {
+                    break;
+                case "wde":
                     try {
                         boolean isAdded = WuerdestDuEher.addMessage(newElement, serverId);
                         if (isAdded) {
@@ -183,8 +183,8 @@ public class Commands {
                         event.getChannel().sendMessage(Main.getEmbedMessage(InternalErrorTitle, InternalErrorDescription)).complete();
                         e.printStackTrace();
                     }
-                }
-                case "insult" -> {
+                    break;
+                case "insult":
                     try {
                         boolean isAdded = Insult.addMessage(newElement, serverId);
                         if (isAdded) {
@@ -196,9 +196,10 @@ public class Commands {
                         event.getChannel().sendMessage(Main.getEmbedMessage(InternalErrorTitle, InternalErrorDescription)).complete();
                         e.printStackTrace();
                     }
-                }
-                default -> event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
-                        Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
+                    break;
+                default:
+                    event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                            Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
             }
         }));
 
@@ -207,28 +208,32 @@ public class Commands {
                 args[1] = args[1].toLowerCase();
                 long serverId = serverWatcher.getGuildId();
                 switch (args[1]) {
-                    case "tod", "truthordare" -> {
+                    case "tod":
+                    case "truthordare":
                         TruthOrDare tod = new TruthOrDare(serverId);
                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
                                 "<#" + tod.getChannelId() + ">")).complete();
-                    }
-                    case "ihnn", "ichhabnochnie" -> {
+                        break;
+                    case "ihnn":
+                    case "ichhabnochnie":
                         IchHabNochNie ihnn = new IchHabNochNie(serverId);
                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
                                 "<#" + ihnn.getChannelId() + ">")).complete();
-                    }
-                    case "wde", "würdestdueher" -> {
+                        break;
+                    case "wde":
+                    case "würdestdueher":
                         WuerdestDuEher wde = new WuerdestDuEher(serverId);
                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
                                 "<#" + wde.getChannelId() + ">")).complete();
-                    }
-                    case "blackjack" -> {
+                        break;
+                    case "blackjack":
                         BlackJack blackJack = new BlackJack(serverId);
                         event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.games.start"),
                                 "<#" + blackJack.getChannelId() + ">")).complete();
-                    }
-                    default -> event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
-                            Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
+                        break;
+                    default:
+                        event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
+                                Locales.getString("msg.commands.addGame.gameNotExists"))).complete();
                 }
             } else {
                 event.getChannel().sendMessage(Main.getEmbedMessage(Locales.getString("msg.commands.error"),
