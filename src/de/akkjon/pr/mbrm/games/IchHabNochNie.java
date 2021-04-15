@@ -3,7 +3,6 @@ package de.akkjon.pr.mbrm.games;
 import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -44,26 +43,19 @@ public class IchHabNochNie extends Game {
         Main.jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-                Message message = MessageHistory.getHistoryAround(channel, event.getMessageId()).complete().getMessageById(event.getMessageId());
+                Message message = checkMessage(event);
+                if (message == null) return;
 
-                //skip if message was not from bot or reaction was from bot
-                if (!shouldReactToMessage(event, message)) {
-                    return;
-                }
-
-                if (message.getEmbeds().size() != 0) {
-                    String title = message.getEmbeds().get(0).getTitle();
-
-                    if (title.equals(Locales.getString("msg.games.ihnn.title"))) {
-                        if (event.getReactionEmote().getName().equals("➡")) {
-                            sendMessage();
-                        } else if (event.getReactionEmote().getName().equals("❌")) {
-                            channel.delete().complete();
-                        }
-                    }
+                if (event.getReactionEmote().getName().equals("➡")) {
+                    sendMessage();
                 }
             }
         });
+    }
+
+    @Override
+    void startGame() {
+        sendMessage();
     }
 
     void sendMessage() {

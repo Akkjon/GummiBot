@@ -2,7 +2,6 @@ package de.akkjon.pr.mbrm;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.EmbedType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.ShutdownEvent;
@@ -33,9 +32,9 @@ public class Main extends ListenerAdapter {
         }
     }
 
-    private static double VERSION_PRIOR = -1;
+    private static String VERSION_PRIOR = "";
 
-    public static double getVersionPrior() {
+    public static String getVersionPrior() {
         return Main.VERSION_PRIOR;
     }
 
@@ -65,25 +64,6 @@ public class Main extends ListenerAdapter {
         if (argsMap.getOrDefault("doUpdates", "true").equals("true")) {
             new Updater();
         }
-        if (argsMap.containsKey("versionPrior")) {
-            double versionPrior = Double.parseDouble(argsMap.get("versionPrior"));
-            Main.VERSION_PRIOR = versionPrior;
-
-            if (versionPrior < Updater.getVersion()) {
-                Updater.sendChangelog();
-            }
-        } else {
-            try {
-                double versionPrior = Double.parseDouble(args[0]);
-                Main.VERSION_PRIOR = versionPrior;
-
-                if (versionPrior < Updater.getVersion()) {
-                    Updater.sendChangelog();
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
 
         try {
             jda = JDABuilder.createDefault(TOKEN).build();
@@ -121,6 +101,27 @@ public class Main extends ListenerAdapter {
             return;
         }
 
+        //set prior version with key-value pair
+        String versionPrior = argsMap.getOrDefault("versionPrior", null);
+
+        //set prior version without key
+        if (versionPrior == null) {
+            for (String arg : args) {
+                if (arg.matches("^([0-9]|\\.)*$")) {
+                    versionPrior = arg;
+                    break;
+                }
+            }
+        }
+
+        //send changelog if prior version was given in some way and is not the same as new version
+        if (versionPrior != null) {
+            Main.VERSION_PRIOR = versionPrior;
+            if (!versionPrior.equals(Updater.getVersion())) {
+                Updater.sendChangelog(false);
+            }
+        }
+
         long STARTUP_DURATION = System.currentTimeMillis() - STARTUP_TIME;
         System.out.println("Startup finished in " + STARTUP_DURATION + " ms");
     }
@@ -129,6 +130,7 @@ public class Main extends ListenerAdapter {
         for (long server : Storage.getServers()) {
             try {
                 new ServerWatcher(server);
+                new TalkChannels(server);
             } catch (AlreadyBoundException e) {
                 System.err.println(Locales.getString("error.startWatcher", server));
                 e.printStackTrace();

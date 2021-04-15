@@ -5,7 +5,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Map;
@@ -15,21 +18,20 @@ import java.util.TimerTask;
 
 public class Updater {
 
-    private static double version = 1;
+    private static String version = "";
     private static final String versionUrl = "https://api.github.com/repos/Akkjon/Gummibot/releases";
 
     private static final String versionFilePath = Storage.jarFolder + File.separator + "version.txt";
 
     static {
         try {
-            String versionFile = Storage.getFileContent(versionFilePath, version + "");
-            version = Double.parseDouble(versionFile);
+            version = Storage.getFileContent(versionFilePath, version + "");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static double getVersion() {
+    public static String getVersion() {
         return version;
     }
 
@@ -41,7 +43,7 @@ public class Updater {
 
     private static final Gson gson = new Gson();
     private String newDownloadUrl = "";
-    private double newVersion = -1;
+    private String newVersion = "";
 
     public Updater() {
         if (updater != null) {
@@ -98,19 +100,21 @@ public class Updater {
             if (connection.isResponseSuccess()) {
                 JsonArray jsonArray = gson.fromJson(connection.getResponse(), JsonArray.class);
                 JsonObject lastRelease = jsonArray.get(0).getAsJsonObject();
-                double localNewestVersion = lastRelease.get("tag_name").getAsDouble();
+                String localNewestVersion = lastRelease.get("tag_name").getAsString();
                 System.out.println("Found version " + localNewestVersion);
 
                 JsonArray assets = lastRelease.get("assets").getAsJsonArray();
                 if (assets.size() > 0) {
                     this.newVersion = localNewestVersion;
 
-                    if (newVersion > version) {
+                    if (!newVersion.equals(version)) {
                         this.newDownloadUrl = assets.get(0).getAsJsonObject().get("browser_download_url").getAsString();
                         return true;
+                    } else {
+                        System.out.println("No update required. You are up to date.");
                     }
                 } else {
-                    System.err.println("Updater: Release " + localNewestVersion + " cannot be analyzed, as there is not asset uploaded.");
+                    System.err.println("Updater: Release " + localNewestVersion + " cannot be analyzed, as there is no asset uploaded.");
                 }
             } else {
                 System.err.println("Updater: Response by " + versionUrl + " returned an error");
@@ -131,7 +135,7 @@ public class Updater {
         }
         shutdownInternals();
 
-        Storage.saveFile(versionFilePath, newVersion + "");
+        Storage.saveFile(versionFilePath, newVersion);
 
         BufferedInputStream in = new BufferedInputStream(new URL(newDownloadUrl).openStream());
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);
@@ -145,7 +149,7 @@ public class Updater {
 
         try {
 
-            ProcessBuilder pb = new ProcessBuilder("java", "-jar", filePath, Double.toString(getVersion()));
+            ProcessBuilder pb = new ProcessBuilder("java", "-jar", filePath, "versionPrior=" + getVersion());
             pb.start();
             System.exit(0);
         } catch (Exception e) {
@@ -158,28 +162,38 @@ public class Updater {
         Main.jda.shutdownNow();
     }
 
-    public static void sendChangelog() {
+    public static void sendChangelog(boolean startFromBeginning) {
 
         String changelog = Storage.getInternalFile("changelog.json");
         JsonObject jsonObject = gson.fromJson(changelog, JsonObject.class);
+
         boolean print = false;
+        boolean breaker = false;
         StringBuilder out = new StringBuilder();
-        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-            double version = Double.parseDouble(entry.getKey());
-            if (!print) {
-                if (version > Main.getVersionPrior()) {
+        String versionPrior;
+        if (startFromBeginning) versionPrior = "beginning";
+        else versionPrior = Main.getVersionPrior();
+        while (!breaker) {
+            for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                String version = entry.getKey();
+                if (print) {
+                    out.append("\n").append(version);
+                    for (JsonElement change : entry.getValue().getAsJsonArray()) {
+                        out.append("\n- ").append(change.getAsString());
+                    }
+                    breaker = true;
+                } else if (version.equals(versionPrior)) {
                     print = true;
                 }
             }
-            if (print) {
-                out.append("\n" + version);
-                for (JsonElement change : entry.getValue().getAsJsonArray()) {
-                    out.append("\n- " + change.getAsString());
+            ServerWatcher.sendChangelog(out.toString());
+            if (!print) {
+                if (versionPrior.contains(".")) {
+                    versionPrior = versionPrior.substring(0, versionPrior.lastIndexOf(".") - 1);
+                } else {
+                    breaker = true;
                 }
             }
-        }
-        if (print) {
-            ServerWatcher.sendChangelog(out.substring(1));
         }
     }
 

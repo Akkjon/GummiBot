@@ -1,6 +1,7 @@
 package de.akkjon.pr.mbrm;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -9,13 +10,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ServerWatcher {
 
@@ -92,7 +93,7 @@ public class ServerWatcher {
                             event.getChannel().sendMessage(Locales.getString("msg.onDisable")).complete();
                             StatusChanger.removeStatus();
                         } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "enable") && isPermitted) {
-                            event.getChannel().sendMessage(Locales.getString("msg.onDisable")).complete();
+                            event.getChannel().sendMessage(Locales.getString("msg.onEnable")).complete();
                             Main.isEnabled = true;
                             StatusChanger.setStatus();
                         } else if (event.getMessage().getContentRaw().equals(Commands.COMMAND_PREFIX + "status") && isPermitted) {
@@ -128,7 +129,7 @@ public class ServerWatcher {
         new Thread(() -> {
             MessageHistory messageHistory = MessageHistory.getHistoryBefore(channel, messageId).complete();
             List<Message> messages = messageHistory.getRetrievedHistory();
-            for (int i = 0; i < messages.size() - 2; i++) {
+            for (int i = 1; i < messages.size() - 1; i++) {
                 try {
                     messages.get(i).delete().complete();
                 } catch (Exception ignored) {

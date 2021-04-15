@@ -4,7 +4,6 @@ import com.google.gson.*;
 import net.dv8tion.jda.api.entities.*;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;

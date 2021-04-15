@@ -9,8 +9,11 @@ import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import de.akkjon.pr.mbrm.Storage;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.guild.react.GenericGuildMessageReactionEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +30,28 @@ public class Game extends ListenerAdapter {
 
     protected Game(long serverId) {
         this.guildId = serverId;
-
+        initGameReactionListeners();
     }
+
+    void initGameReactionListeners() {
+        Main.jda.addEventListener(new ListenerAdapter() {
+            @Override
+            public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+                Message message = checkMessage(event);
+                if (message == null) return;
+
+                if (event.getReactionEmote().getName().equals("➡")) {
+                    startGame();
+                } else if (event.getReactionEmote().getName().equals("❌")) {
+                    channel.delete().complete();
+                }
+            }
+        });
+    }
+
+    void startGame() {
+    }
+
 
     protected static String getFromLists(List<String> list) {
         int value = (int) (Math.random() * list.size());
@@ -94,7 +117,7 @@ public class Game extends ListenerAdapter {
         return strGlobal;
     }
 
-    static boolean shouldReactToMessage(GuildMessageReactionAddEvent event, Message message) {
+    static boolean shouldReactToMessage(GenericGuildMessageReactionEvent event, Message message) {
         //skip if message was not from bot or reaction was from bot
         User bot = event.getJDA().getSelfUser();
         if (!message.getAuthor().equals(bot)) {
@@ -122,13 +145,34 @@ public class Game extends ListenerAdapter {
             Category cat = null;
             String id = Storage.getFileContent(
                     Storage.rootFolder + guildId + File.separator + "gameCategory.txt", null);
-            if(id != null && !id.isBlank()) cat = Main.jda.getCategoryById(id);
+            if (id != null && !id.isBlank()) cat = Main.jda.getCategoryById(id);
 
-            if(cat == null) cat = Objects.requireNonNull(Main.jda.getGuildById(guildId)).createCategory("Tolle Spielchen").complete();
+            if (cat == null)
+                cat = Objects.requireNonNull(Main.jda.getGuildById(guildId)).createCategory("Tolle Spielchen").complete();
             Storage.saveFile(Storage.rootFolder + guildId + File.separator + "gameCategory.txt", cat.getId());
             this.channel = cat.createTextChannel(name).complete();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Nullable Message checkMessage(GenericGuildMessageReactionEvent event) {
+        Message message;
+        try {
+            message = MessageHistory.getHistoryAround(channel,
+                    event.getMessageId()).complete().getMessageById(event.getMessageId());
+        } catch (Exception e) {
+            return null;
+        }
+
+        if(message == null) return null;
+
+        //skip if message was not from bot or reaction was from bot
+        if (!shouldReactToMessage(event, message)) return null;
+
+        //skip if message has no embeds
+        if (message.getEmbeds().size() == 0) return null;
+
+        return message;
     }
 }
