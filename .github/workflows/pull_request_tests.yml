@@ -46,6 +46,11 @@ jobs:
 
             exit 1
           fi
+      - name: maven clean verify
+        run: |
+          if ! [[ $GITHUB_HEAD_REF =~ .*_no_version ]]; then
+            mvn clean verify
+          fi
       - name: publish to webhook
         run: |
           DATA="{
