@@ -1,0 +1,64 @@
+name: Merge test
+
+on:
+  pull_request:
+
+jobs:
+  mergetest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: get pom version
+        run: |
+          REGEX=".*<version>\(\([0-9]\|\.\)*\)<\/version>"
+          VERSION=$(less pom.xml | grep "<version>" | head -1 |sed "s/$REGEX/\1/")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: prepare variables
+        run: |
+          PULL_ID=$(echo $GITHUB_REF | awk '{split($0,a,"/"); print a[3]}')
+          echo "PULL_ID=$PULL_ID" >> $GITHUB_ENV
+      - name: check pom-branch name match
+        run: |
+          if [[ $GITHUB_HEAD_REF =~ .*_no_version ]]; then
+            echo "not checking for version"
+            exit 0
+          fi
+          if ! [[ "$GITHUB_HEAD_REF" == "$VERSION" ]]; then
+            echo "Branch name $GITHUB_HEAD_REF and version $VERSION don't match"
+
+            DATA="{
+              \"embeds\": [
+                {
+                  \"title\": \"ERROR\",
+                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet, da ist aber was schief gelaufen\",
+                  \"color\": 16711680
+                }, {
+                  \"title\":\"Anschauen\",
+                  \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
+                  \"color\": 16711680
+                }
+              ]
+            }"
+            curl -X POST -d "$DATA" -H "Content-Type: application/json" https://discord.com/api/webhooks/${{ secrets.DISCORD_SERVER }}/${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+
+            exit 1
+          fi
+      - name: publish to webhook
+        run: |
+          DATA="{
+            \"embeds\": [
+              {
+                \"title\": \"Review required\",
+                \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
+                \"color\": 16776960
+              }, {
+                \"title\":\"Anschauen\",
+                \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
+                \"color\": 16776960
+              }
+            ]
+          }"
+          curl -X POST -d "$DATA" -H "Content-Type: application/json" https://discord.com/api/webhooks/${{ secrets.DISCORD_SERVER }}/${{ secrets.DISCORD_WEBHOOK_GITHUB }}
