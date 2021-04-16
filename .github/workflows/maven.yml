@@ -68,3 +68,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         milestone_name: v${{ env.VERSION }}
+    - name: send discord message
+      run: |
+        DATA="{
+          \"embeds\": [
+            {
+              \"title\": \"Neue Version\",
+              \"description\": \"Version ${{ env.VERSION }} ist released\",
+              \"color\": 65280
+            }
+          ]
+        }"
+        curl -X POST -d "$DATA" -H "Content-Type: application/json" https://discord.com/api/webhooks/${{ secrets.DISCORD_SERVER }}/${{ secrets.DISCORD_WEBHOOK_GITHUB }}
