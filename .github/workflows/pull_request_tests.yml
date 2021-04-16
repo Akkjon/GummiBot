@@ -1,0 +1,48 @@
+name: Merge test
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  mergetest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: get pom version
+#        env:
+#          VERSION: -1
+        run: |
+          REGEX=".*<version>\(\([0-9]\|\.\)*\)<\/version>"
+          export VERSION=$(less pom.xml | grep "<version>" | head -1 |sed "s/$REGEX/\1/")
+          #echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: check pom-branch name match
+        run: |
+          if ! [[ $GITHUB_HEAD_REF =~ .*_no_version]]; then
+            echo "not checking for version"
+            exit 0
+          fi
+          if ! [[ $GITHUB_HEAD_REF -eq $VERSION ]]; then
+            echo "Branch name $GITHUB_HEAD_REF and version $VERSION doesn't match"
+            exit 1
+          fi
+      - name: publish to webhook
+        run: |
+          PULL_ID=$(echo $GITHUB_REF | awk '{split($0,a,"/"); print a[3]}')
+          DATA='{\
+            "embeds": [\
+              {\
+                "title": "Review required",\
+                "description": "\"$GITHUB_ACTOR\" hat einen MR geöffnet und möchte den branch $GITHUB_HEAD_REF mergen. Will den jemand anschauen?"\
+              }, {\
+                "title":"Anschauen",\
+                "url":"https://github.com/Akkjon/GummiBot/pull/$PULL_ID"\
+              }\
+            ]\
+          }'
