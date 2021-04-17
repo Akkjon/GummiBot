@@ -375,6 +375,10 @@ public class Commands {
             )).complete();
         }));
 
+        commands.add(new Command(new String[]{"update"}, true, ((event, args, serverWatcher) -> {
+            Updater.getUpdater().updateRoutine();
+        })));
+
         helpCommand = (event, args, serverWatcher) -> {
             String helpMsg = Storage.getInternalFile("help.txt");
             event.getChannel().sendMessage(helpMsg).complete();
