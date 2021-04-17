@@ -339,29 +339,10 @@ public class Commands {
         }));
 
         commands.add(new Command(new String[]{"addchangelog"}, true, (event, args, serverWatcher) -> {
-            List<Long> arrChangelog;
-            try {
-                arrChangelog = new ArrayList<>(Arrays.asList(serverWatcher.getChangelogChannelsList()));
-            } catch (IOException e) {
-                e.printStackTrace();
-                event.getChannel().sendMessage(Main.getEmbedMessage(
-                        Locales.getString("msg.commands.internalError"),
-                        Locales.getString("msg.commands.changelog.error.channelsGetException")
-                )).complete();
-                return;
-            }
-            Long channelId = event.getChannel().getIdLong();
-            if (arrChangelog.contains(channelId)) {
-                event.getChannel().sendMessage(Main.getEmbedMessage(
-                        Locales.getString("msg.commands.error"),
-                        Locales.getString("msg.commands.changelog.error.alreadyExists")
-                )).complete();
-                return;
-            }
-            arrChangelog.add(channelId);
+            String channelId = event.getChannel().getId();
 
             try {
-                serverWatcher.saveChangelogChannelsList(arrChangelog.toArray(new Long[0]));
+                serverWatcher.setChangelogChannel(channelId);
             } catch (IOException e) {
                 e.printStackTrace();
                 event.getChannel().sendMessage(Main.getEmbedMessage(
@@ -374,33 +355,12 @@ public class Commands {
                     Locales.getString("msg.commands.success"),
                     Locales.getString("msg.commands.changelog.added")
             )).complete();
-            Updater.sendChangelog(true);
+            ServerWatcher.sendChangelog();
         }));
 
         commands.add(new Command(new String[]{"removechangelog"}, true, (event, args, serverWatcher) -> {
-            List<Long> arrChangelog;
             try {
-                arrChangelog = new ArrayList<>(Arrays.asList(serverWatcher.getChangelogChannelsList()));
-            } catch (IOException e) {
-                e.printStackTrace();
-                event.getChannel().sendMessage(Main.getEmbedMessage(
-                        Locales.getString("msg.commands.internalError"),
-                        Locales.getString("msg.commands.changelog.error.channelsGetException")
-                )).complete();
-                return;
-            }
-            Long channelId = event.getChannel().getIdLong();
-            if (!arrChangelog.contains(channelId)) {
-                event.getChannel().sendMessage(Main.getEmbedMessage(
-                        Locales.getString("msg.commands.error"),
-                        Locales.getString("msg.commands.changelog.error.notExists")
-                )).complete();
-                return;
-            }
-            arrChangelog.remove(channelId);
-
-            try {
-                serverWatcher.saveChangelogChannelsList(arrChangelog.toArray(new Long[0]));
+                serverWatcher.setChangelogChannel("");
             } catch (IOException e) {
                 e.printStackTrace();
                 event.getChannel().sendMessage(Main.getEmbedMessage(

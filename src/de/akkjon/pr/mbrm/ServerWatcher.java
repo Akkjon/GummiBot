@@ -153,7 +153,7 @@ public class ServerWatcher {
         }
     }
 
-    public static void sendChangelog(String changelog) {
+    public static void sendChangelog() {
         if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
         for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
             ServerWatcher watcher = serverWatcher.get();
@@ -166,15 +166,32 @@ public class ServerWatcher {
     private void sendChangelogInternal() {
         MessageChannel channel = getChangelogChannel();
         if (channel != null) {
-            String[] arr = channel.getHistory().getMessageById(channel.getLatestMessageId())
-                    .getContentStripped()
-                    .replace("```", "").lines()
-                    .filter(e -> !e.startsWith("-") && e.length() > 0)
-                    .toArray(String[]::new);
-            String version = arr[arr.length - 1];
+            Message latestMessage = channel.getHistory().getMessageById(channel.getLatestMessageId());
+            String version = null;
+            if (latestMessage != null) {
+                String[] arr = latestMessage.getContentStripped()
+                        .replace("```", "").lines()
+                        .filter(e -> !e.startsWith("-") && e.length() > 0)
+                        .toArray(String[]::new);
+                version = arr[arr.length - 1];
+            }
+
             JsonObject jsonObject = Main.gson.fromJson(Storage.getInternalFile("changelog.json"), JsonObject.class);
 
-            channel.sendMessage("```" + changelog + "```").complete();
+            StringBuilder changeLogBuilder = new StringBuilder();
+            boolean print = (version == null);
+            for(Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                if(print) {
+                    changeLogBuilder.append("\n").append(entry.getKey());
+                    for(JsonElement el : entry.getValue().getAsJsonArray()) {
+                        changeLogBuilder.append("\n").append("-").append(el.getAsString());
+                    }
+                } else {
+                    if(entry.getKey().equals(version)) print = true;
+                }
+            }
+            if(changeLogBuilder.length()>0)
+                channel.sendMessage("```" + changeLogBuilder.toString() + "```").complete();
         }
     }
 
@@ -190,7 +207,7 @@ public class ServerWatcher {
     }
 
 
-    public void saveChangelogChannelsList(Long[] channels) throws IOException {
-        Storage.saveFile(changelogFilePath, Arrays.toString(channels));
+    public void setChangelogChannel(String channelId) throws IOException {
+        Storage.saveFile(changelogFilePath, channelId);
     }
 }
