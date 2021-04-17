@@ -39,7 +39,12 @@ jobs:
                 {
                   \"title\": \"ERROR\",
                   \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet, da ist aber was schief gelaufen\",
-                  \"color\": 16711680
+                  \"color\": 16711680,
+                  \"author\": {
+                    \"name\": \"Github-Status\",
+                    \"url\": \"https://github.com/Akkjon/GummiBot\",
+                    \"icon_url\": \"https://cdn.afterdawn.fi/v3/news/original/github-logo.png\"
+                  }
                 }, {
                   \"title\":\"Anschauen\",
                   \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
@@ -64,7 +69,12 @@ jobs:
                 {
                   \"title\": \"Review required\",
                   \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
-                  \"color\": 16776960
+                  \"color\": 16776960,
+                  \"author\": {
+                    \"name\": \"Github-Status\",
+                    \"url\": \"https://github.com/Akkjon/GummiBot\",
+                    \"icon_url\": \"https://cdn.afterdawn.fi/v3/news/original/github-logo.png\"
+                  }
                 }, {
                   \"title\":\"Anschauen\",
                   \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
@@ -78,7 +88,12 @@ jobs:
                 {
                   \"title\": \"Review required\",
                   \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
-                  \"color\": 16744192
+                  \"color\": 16744192,
+                  \"author\": {
+                    \"name\": \"Github-Status\",
+                    \"url\": \"https://github.com/Akkjon/GummiBot\",
+                    \"icon_url\": \"https://cdn.afterdawn.fi/v3/news/original/github-logo.png\"
+                  }
                 }, {
                   \"title\": \"ACHTUNG\",
                   \"description\": \"RELEASE PIPELINE DEAKTIVIEREN!!\",
