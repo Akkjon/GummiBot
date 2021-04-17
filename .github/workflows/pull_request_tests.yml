@@ -24,13 +24,14 @@ jobs:
           PULL_ID=$(echo $GITHUB_REF | awk '{split($0,a,"/"); print a[3]}')
           echo "PULL_ID=$PULL_ID" >> $GITHUB_ENV
       - name: check pom-branch name match
-        env:
-          checkVersion: true
         run: |
           if [[ $GITHUB_HEAD_REF =~ .*_no_version ]]; then
             echo "not checking for version"
             echo "checkVersion=false" >> $GITHUB_ENV
             exit 0
+          else
+            echo "checking for version compatibility"
+            echo "checkVersion=true" >> $GITHUB_ENV
           fi
           if ! [[ "$GITHUB_HEAD_REF" == "$VERSION" ]]; then
             echo "Branch name $GITHUB_HEAD_REF and version $VERSION don't match"
@@ -64,7 +65,7 @@ jobs:
           fi
       - name: publish to webhook
         run: |
-          if [ ${{ env.checkVersion }} == true ]]; then
+          if [[ "${{ env.checkVersion }}" == "true" ]]; then
             DATA="{
               \"embeds\": [
                 {
