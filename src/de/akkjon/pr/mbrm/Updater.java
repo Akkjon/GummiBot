@@ -41,7 +41,6 @@ public class Updater {
         return updater;
     }
 
-    private static final Gson gson = new Gson();
     private String newDownloadUrl = "";
     private String newVersion = "";
 
@@ -94,7 +93,7 @@ public class Updater {
         HTTPSConnection connection = new HTTPSConnection(versionUrl);
         if (connection.isConnectionSuccess()) {
             if (connection.isResponseSuccess()) {
-                JsonArray jsonArray = gson.fromJson(connection.getResponse(), JsonArray.class);
+                JsonArray jsonArray = Main.gson.fromJson(connection.getResponse(), JsonArray.class);
                 JsonObject lastRelease = jsonArray.get(0).getAsJsonObject();
                 String localNewestVersion = lastRelease.get("tag_name").getAsString();
                 JsonArray assets = lastRelease.get("assets").getAsJsonArray();
@@ -157,7 +156,7 @@ public class Updater {
     public static void sendChangelog(boolean startFromBeginning) {
 
         String changelog = Storage.getInternalFile("changelog.json");
-        JsonObject jsonObject = gson.fromJson(changelog, JsonObject.class);
+        JsonObject jsonObject = Main.gson.fromJson(changelog, JsonObject.class);
 
         boolean print = false;
         boolean breaker = false;
