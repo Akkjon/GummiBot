@@ -26,6 +26,7 @@ public class Command {
     }
 
     public void run(MessageReceivedEvent event, String[] args, ServerWatcher serverWatcher) {
+        if(event.getMember() == null) return;
         if (isAdminRequired()) {
             boolean isAdmin = Commands.isAdmin(event);
             if (!isAdmin) {
