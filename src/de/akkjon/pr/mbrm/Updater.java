@@ -62,10 +62,7 @@ public class Updater {
         Timer timer = new Timer("Update-Check", true);
         Calendar cal = Calendar.getInstance();
         long now = System.currentTimeMillis();
-        if (cal.get(Calendar.MINUTE) >= 30) {
-            cal.add(Calendar.MINUTE, 30);
-        }
-        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY), 30, 0);
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY) + 1, 0, 0);
         timer.schedule(task, cal.getTimeInMillis() - now, 1000 * 60 * 60); // Every hour
 
         updateRoutine();
@@ -93,7 +90,6 @@ public class Updater {
     }
 
     private boolean isNewVersionAvail() throws IOException {
-        System.out.println("Checking for updates...");
 
         HTTPSConnection connection = new HTTPSConnection(versionUrl);
         if (connection.isConnectionSuccess()) {
@@ -101,8 +97,6 @@ public class Updater {
                 JsonArray jsonArray = gson.fromJson(connection.getResponse(), JsonArray.class);
                 JsonObject lastRelease = jsonArray.get(0).getAsJsonObject();
                 String localNewestVersion = lastRelease.get("tag_name").getAsString();
-                System.out.println("Found version " + localNewestVersion);
-
                 JsonArray assets = lastRelease.get("assets").getAsJsonArray();
                 if (assets.size() > 0) {
                     this.newVersion = localNewestVersion;
@@ -110,8 +104,6 @@ public class Updater {
                     if (!newVersion.equals(version)) {
                         this.newDownloadUrl = assets.get(0).getAsJsonObject().get("browser_download_url").getAsString();
                         return true;
-                    } else {
-                        System.out.println("No update required. You are up to date.");
                     }
                 } else {
                     System.err.println("Updater: Release " + localNewestVersion + " cannot be analyzed, as there is no asset uploaded.");

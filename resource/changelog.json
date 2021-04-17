@@ -21,5 +21,8 @@
   ],
   "1.201": [
     "Hot Fix"
+  ],
+  "1.3": [
+    "Dynamically create Talk Channels when there is no empty channel"
   ]
 }
