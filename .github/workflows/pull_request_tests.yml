@@ -2,6 +2,9 @@ name: Merge test
 
 on:
   pull_request:
+    branches:
+      - main
+    types: [ready_for_review, review_requested]
 
 jobs:
   mergetest:
@@ -21,9 +24,12 @@ jobs:
           PULL_ID=$(echo $GITHUB_REF | awk '{split($0,a,"/"); print a[3]}')
           echo "PULL_ID=$PULL_ID" >> $GITHUB_ENV
       - name: check pom-branch name match
+        env:
+          checkVersion: true
         run: |
           if [[ $GITHUB_HEAD_REF =~ .*_no_version ]]; then
             echo "not checking for version"
+            echo "checkVersion=false" >> $GITHUB_ENV
             exit 0
           fi
           if ! [[ "$GITHUB_HEAD_REF" == "$VERSION" ]]; then
@@ -34,7 +40,12 @@ jobs:
                 {
                   \"title\": \"ERROR\",
                   \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet, da ist aber was schief gelaufen\",
-                  \"color\": 16711680
+                  \"color\": 16711680,
+                  \"author\": {
+                    \"name\": \"Github-Status\",
+                    \"url\": \"https://github.com/Akkjon/GummiBot\",
+                    \"icon_url\": \"https://cdn.afterdawn.fi/v3/news/original/github-logo.png\"
+                  }
                 }, {
                   \"title\":\"Anschauen\",
                   \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
@@ -53,17 +64,48 @@ jobs:
           fi
       - name: publish to webhook
         run: |
-          DATA="{
-            \"embeds\": [
-              {
-                \"title\": \"Review required\",
-                \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
-                \"color\": 16776960
-              }, {
-                \"title\":\"Anschauen\",
-                \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
-                \"color\": 16776960
-              }
-            ]
-          }"
+          if [ ${{ env.checkVersion }} == true ]]; then
+            DATA="{
+              \"embeds\": [
+                {
+                  \"title\": \"Review required\",
+                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
+                  \"color\": 16776960,
+                  \"author\": {
+                    \"name\": \"Github-Status\",
+                    \"url\": \"https://github.com/Akkjon/GummiBot\",
+                    \"icon_url\": \"https://cdn.afterdawn.fi/v3/news/original/github-logo.png\"
+                  }
+                }, {
+                  \"title\":\"Anschauen\",
+                  \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
+                  \"color\": 16776960
+                }
+              ]
+            }"
+          else
+            DATA="{
+              \"embeds\": [
+                {
+                  \"title\": \"Review required\",
+                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
+                  \"color\": 16744192,
+                  \"author\": {
+                    \"name\": \"Github-Status\",
+                    \"url\": \"https://github.com/Akkjon/GummiBot\",
+                    \"icon_url\": \"https://cdn.afterdawn.fi/v3/news/original/github-logo.png\"
+                  }
+                }, {
+                  \"title\": \"ACHTUNG\",
+                  \"description\": \"RELEASE PIPELINE DEAKTIVIEREN!!\",
+                  \"url\": \"https://github.com/Akkjon/GummiBot/actions/workflows/maven.yml\",
+                  \"color\": 16744192
+                }, {
+                  \"title\":\"Anschauen\",
+                  \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
+                  \"color\": 16744192
+                }
+              ]
+            }"
+          fi
           curl -X POST -d "$DATA" -H "Content-Type: application/json" https://discord.com/api/webhooks/${{ secrets.DISCORD_SERVER }}/${{ secrets.DISCORD_WEBHOOK_GITHUB }}
