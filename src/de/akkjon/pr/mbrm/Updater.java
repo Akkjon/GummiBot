@@ -1,8 +1,6 @@
 package de.akkjon.pr.mbrm;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.BufferedInputStream;
@@ -11,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,7 +38,6 @@ public class Updater {
         return updater;
     }
 
-    private static final Gson gson = new Gson();
     private String newDownloadUrl = "";
     private String newVersion = "";
 
@@ -94,7 +90,7 @@ public class Updater {
         HTTPSConnection connection = new HTTPSConnection(versionUrl);
         if (connection.isConnectionSuccess()) {
             if (connection.isResponseSuccess()) {
-                JsonArray jsonArray = gson.fromJson(connection.getResponse(), JsonArray.class);
+                JsonArray jsonArray = Main.gson.fromJson(connection.getResponse(), JsonArray.class);
                 JsonObject lastRelease = jsonArray.get(0).getAsJsonObject();
                 String localNewestVersion = lastRelease.get("tag_name").getAsString();
                 JsonArray assets = lastRelease.get("assets").getAsJsonArray();
@@ -152,41 +148,6 @@ public class Updater {
     public static void shutdownInternals() throws InterruptedException {
         Handler.stopWebServer();
         Main.jda.shutdownNow();
-    }
-
-    public static void sendChangelog(boolean startFromBeginning) {
-
-        String changelog = Storage.getInternalFile("changelog.json");
-        JsonObject jsonObject = gson.fromJson(changelog, JsonObject.class);
-
-        boolean print = false;
-        boolean breaker = false;
-        StringBuilder out = new StringBuilder();
-        String versionPrior;
-        if (startFromBeginning) versionPrior = "beginning";
-        else versionPrior = Main.getVersionPrior();
-        while (!breaker) {
-            for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-                String version = entry.getKey();
-                if (print) {
-                    out.append("\n").append(version);
-                    for (JsonElement change : entry.getValue().getAsJsonArray()) {
-                        out.append("\n- ").append(change.getAsString());
-                    }
-                    breaker = true;
-                } else if (version.equals(versionPrior)) {
-                    print = true;
-                }
-            }
-            ServerWatcher.sendChangelog(out.toString());
-            if (!print) {
-                if (versionPrior.contains(".")) {
-                    versionPrior = versionPrior.substring(0, versionPrior.lastIndexOf(".") - 1);
-                } else {
-                    breaker = true;
-                }
-            }
-        }
     }
 
 }

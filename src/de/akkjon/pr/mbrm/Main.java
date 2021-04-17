@@ -1,5 +1,6 @@
 package de.akkjon.pr.mbrm;
 
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.EmbedType;
@@ -41,6 +42,7 @@ public class Main extends ListenerAdapter {
     public static final long STARTUP_TIME = System.currentTimeMillis();
     public static JDA jda;
     public static boolean isEnabled = true;
+    public static final Gson gson = new Gson();
 
     public static void main(String[] args) {
         Logger.init();
@@ -118,7 +120,7 @@ public class Main extends ListenerAdapter {
         if (versionPrior != null) {
             Main.VERSION_PRIOR = versionPrior;
             if (!versionPrior.equals(Updater.getVersion())) {
-                Updater.sendChangelog(false);
+                ServerWatcher.sendChangelog();
             }
         }
 

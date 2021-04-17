@@ -1,7 +1,8 @@
 package de.akkjon.pr.mbrm;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -13,10 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ServerWatcher {
 
@@ -28,19 +26,11 @@ public class ServerWatcher {
     private final String changelogFilePath;
 
     public static void logError(String throwable) {
-        if(Main.jda == null) return;
+        if (Main.jda == null) return;
         if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
         for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
             ServerWatcher watcher = serverWatcher.get();
             if (watcher != null) watcher.logErrorInternal(throwable);
-        }
-    }
-
-    public static void sendChangelog(String changelog) {
-        if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
-        for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
-            ServerWatcher watcher = serverWatcher.get();
-            if (watcher != null) watcher.sendChangelogInternal(changelog);
         }
     }
 
@@ -163,28 +153,61 @@ public class ServerWatcher {
         }
     }
 
-    private void sendChangelogInternal(String changelog) {
-        Long[] strArrChangelogChannels;
+    public static void sendChangelog() {
+        if (Main.jda.getStatus() != JDA.Status.CONNECTED) return;
+        for (WeakReference<ServerWatcher> serverWatcher : serverWatchers) {
+            ServerWatcher watcher = serverWatcher.get();
+            if (watcher != null) {
+                watcher.sendChangelogInternal();
+            }
+        }
+    }
+
+    private void sendChangelogInternal() {
+        MessageChannel channel = getChangelogChannel();
+        if (channel != null) {
+            Message latestMessage = channel.getHistory().getMessageById(channel.getLatestMessageId());
+            String version = null;
+            if (latestMessage != null) {
+                String[] arr = latestMessage.getContentStripped()
+                        .replace("```", "").lines()
+                        .filter(e -> !e.startsWith("-") && e.length() > 0)
+                        .toArray(String[]::new);
+                version = arr[arr.length - 1];
+            }
+
+            JsonObject jsonObject = Main.gson.fromJson(Storage.getInternalFile("changelog.json"), JsonObject.class);
+
+            StringBuilder changeLogBuilder = new StringBuilder();
+            boolean print = (version == null);
+            for(Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                if(print) {
+                    changeLogBuilder.append("\n").append(entry.getKey());
+                    for(JsonElement el : entry.getValue().getAsJsonArray()) {
+                        changeLogBuilder.append("\n").append("-").append(el.getAsString());
+                    }
+                } else {
+                    if(entry.getKey().equals(version)) print = true;
+                }
+            }
+            if(changeLogBuilder.length()>0)
+                channel.sendMessage("```" + changeLogBuilder.toString() + "```").complete();
+        }
+    }
+
+    public MessageChannel getChangelogChannel() {
+        String strChangelogChannel;
         try {
-            strArrChangelogChannels = getChangelogChannelsList();
+            strChangelogChannel = Storage.getFileContent(changelogFilePath, "");
         } catch (IOException e) {
             e.printStackTrace();
-            return;
+            return null;
         }
-
-        for (Long strChangelogChannel : strArrChangelogChannels) {
-            MessageChannel channel = (MessageChannel) Main.jda.getGuildChannelById(strChangelogChannel);
-            if (channel != null)
-                channel.sendMessage("```" + changelog + "```").complete();
-        }
+        return (MessageChannel) Main.jda.getGuildChannelById(strChangelogChannel);
     }
 
-    public Long[] getChangelogChannelsList() throws IOException {
-        String changelogChannels = Storage.getFileContent(changelogFilePath, "[]");
-        return Storage.arrayFromString(changelogChannels);
-    }
 
-    public void saveChangelogChannelsList(Long[] channels) throws IOException {
-        Storage.saveFile(changelogFilePath, Arrays.toString(channels));
+    public void setChangelogChannel(String channelId) throws IOException {
+        Storage.saveFile(changelogFilePath, channelId);
     }
 }
