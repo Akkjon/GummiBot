@@ -2,6 +2,8 @@ name: Merge test
 
 on:
   pull_request:
+    branches:
+      - main
 
 jobs:
   mergetest:
@@ -21,9 +23,12 @@ jobs:
           PULL_ID=$(echo $GITHUB_REF | awk '{split($0,a,"/"); print a[3]}')
           echo "PULL_ID=$PULL_ID" >> $GITHUB_ENV
       - name: check pom-branch name match
+        env:
+          checkVersion: true
         run: |
           if [[ $GITHUB_HEAD_REF =~ .*_no_version ]]; then
             echo "not checking for version"
+            echo "checkVersion=false" >> $GITHUB_ENV
             exit 0
           fi
           if ! [[ "$GITHUB_HEAD_REF" == "$VERSION" ]]; then
@@ -53,17 +58,38 @@ jobs:
           fi
       - name: publish to webhook
         run: |
-          DATA="{
-            \"embeds\": [
-              {
-                \"title\": \"Review required\",
-                \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
-                \"color\": 16776960
-              }, {
-                \"title\":\"Anschauen\",
-                \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
-                \"color\": 16776960
-              }
-            ]
-          }"
+          if [ ${{ env.checkVersion }} == true ]]; then
+            DATA="{
+              \"embeds\": [
+                {
+                  \"title\": \"Review required\",
+                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
+                  \"color\": 16776960
+                }, {
+                  \"title\":\"Anschauen\",
+                  \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
+                  \"color\": 16776960
+                }
+              ]
+            }"
+          else
+            DATA="{
+              \"embeds\": [
+                {
+                  \"title\": \"Review required\",
+                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
+                  \"color\": 16744192
+                }, {
+                  \"title\": \"ACHTUNG\",
+                  \"description\": \"RELEASE PIPELINE DEAKTIVIEREN!!\",
+                  \"url\": \"https://github.com/Akkjon/GummiBot/actions/workflows/maven.yml\",
+                  \"color\": 16744192
+                }, {
+                  \"title\":\"Anschauen\",
+                  \"url\":\"https://github.com/Akkjon/GummiBot/pull/${{ env.PULL_ID }}\",
+                  \"color\": 16744192
+                }
+              ]
+            }"
+          fi
           curl -X POST -d "$DATA" -H "Content-Type: application/json" https://discord.com/api/webhooks/${{ secrets.DISCORD_SERVER }}/${{ secrets.DISCORD_WEBHOOK_GITHUB }}
