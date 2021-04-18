@@ -119,7 +119,7 @@ public class TruthOrDare extends SuccessiveMultiPlayerGame {
     @Override
     void sendMessage() {
         Message msg = channel.sendMessage(Main.getEmbedMessage(Locales.getString("msg.games.tod.nextPlayerTitle"),
-                Locales.getString("msg.games.tod.gameTruthOrDareQuestion", getNextPlayer()))).complete();
+                Locales.getString("msg.games.tod.gameTruthOrDareQuestion", Long.toString(getNextPlayer())))).complete();
         isChoosing = true;
         msg.addReaction("1️⃣").queue();
         msg.addReaction("2️⃣").queue();
