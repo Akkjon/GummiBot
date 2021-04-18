@@ -25,7 +25,6 @@ public class IchHabNochNie extends Game {
             e.printStackTrace();
             this.channel.delete();
         }
-        initReactionListeners();
     }
 
     public String getMessage() throws IOException {
@@ -37,20 +36,6 @@ public class IchHabNochNie extends Game {
 
     public static boolean addMessage(String element, long serverId) throws IOException {
         return add(element, "message", serverId, fileName + ".txt");
-    }
-
-    public void initReactionListeners() {
-        Main.jda.addEventListener(new ListenerAdapter() {
-            @Override
-            public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-                Message message = checkMessage(event);
-                if (message == null) return;
-
-                if (event.getReactionEmote().getName().equals("➡")) {
-                    sendMessage();
-                }
-            }
-        });
     }
 
     @Override
