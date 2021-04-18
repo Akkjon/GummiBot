@@ -376,7 +376,13 @@ public class Commands {
         }));
 
         commands.add(new Command(new String[]{"update"}, true, ((event, args, serverWatcher) -> {
+            String strMsg = "```" +
+                    "-- System-Info --\n" +
+                    "Trying to update..." +
+                    "```";
+            event.getChannel().sendMessage(strMsg).complete();
             Updater.getUpdater().updateRoutine();
+
         })));
 
         helpCommand = (event, args, serverWatcher) -> {
