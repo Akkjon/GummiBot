@@ -3,10 +3,6 @@ package de.akkjon.pr.mbrm.games;
 import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
