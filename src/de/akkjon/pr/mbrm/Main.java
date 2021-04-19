@@ -34,10 +34,12 @@ public class Main extends ListenerAdapter {
     }
 
     private static String VERSION_PRIOR = "";
+    private static String START_SCRIPT = "";
 
     public static String getVersionPrior() {
         return Main.VERSION_PRIOR;
     }
+    public static String getStartScript() { return Main.START_SCRIPT; }
 
     public static final long STARTUP_TIME = System.currentTimeMillis();
     public static JDA jda;
@@ -123,6 +125,8 @@ public class Main extends ListenerAdapter {
                 ServerWatcher.sendChangelog();
             }
         }
+
+        Main.START_SCRIPT = argsMap.getOrDefault("startScript", null);
 
         long STARTUP_DURATION = System.currentTimeMillis() - STARTUP_TIME;
         System.out.println("Startup finished in " + STARTUP_DURATION + " ms");

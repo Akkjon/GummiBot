@@ -8,9 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 
 public class Updater {
@@ -136,8 +134,16 @@ public class Updater {
         fileOutputStream.close();
 
         try {
+            List<String> args = new ArrayList<>();
+            if(Main.getStartScript()!=null) {
+                args.add(Main.getStartScript());
+                args.add("startScript=" + Main.getStartScript());
+            } else {
+                args.addAll(Arrays.asList("java", "-jar", filePath));
+            }
+            args.add("versionPrior=" + getVersion());
 
-            ProcessBuilder pb = new ProcessBuilder("java", "-jar", filePath, "versionPrior=" + getVersion());
+            ProcessBuilder pb = new ProcessBuilder(args);
             pb.start();
             System.exit(0);
         } catch (Exception e) {

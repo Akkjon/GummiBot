@@ -3,8 +3,6 @@ package de.akkjon.pr.mbrm.games;
 import de.akkjon.pr.mbrm.Locales;
 import de.akkjon.pr.mbrm.Main;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +23,6 @@ public class IchHabNochNie extends Game {
             e.printStackTrace();
             this.channel.delete();
         }
-        initReactionListeners();
     }
 
     public String getMessage() throws IOException {
@@ -37,20 +34,6 @@ public class IchHabNochNie extends Game {
 
     public static boolean addMessage(String element, long serverId) throws IOException {
         return add(element, "message", serverId, fileName + ".txt");
-    }
-
-    public void initReactionListeners() {
-        Main.jda.addEventListener(new ListenerAdapter() {
-            @Override
-            public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-                Message message = checkMessage(event);
-                if (message == null) return;
-
-                if (event.getReactionEmote().getName().equals("➡")) {
-                    sendMessage();
-                }
-            }
-        });
     }
 
     @Override
