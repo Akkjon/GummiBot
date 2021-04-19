@@ -70,7 +70,7 @@ jobs:
               \"embeds\": [
                 {
                   \"title\": \"Review required\",
-                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
+                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den Branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
                   \"color\": 16776960,
                   \"author\": {
                     \"name\": \"Github-Status\",
@@ -89,7 +89,7 @@ jobs:
               \"embeds\": [
                 {
                   \"title\": \"Review required\",
-                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
+                  \"description\": \"\\\"$GITHUB_ACTOR\\\" hat einen MR geöffnet und möchte den Branch \\\"$GITHUB_HEAD_REF\\\" mergen. Will den jemand anschauen?\",
                   \"color\": 16744192,
                   \"author\": {
                     \"name\": \"Github-Status\",
