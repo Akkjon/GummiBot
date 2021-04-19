@@ -376,7 +376,13 @@ public class Commands {
         }));
 
         commands.add(new Command(new String[]{"update"}, true, ((event, args, serverWatcher) -> {
+            String strMsg = "```" +
+                    "-- System-Info --\n" +
+                    "Trying to update..." +
+                    "```";
+            event.getChannel().sendMessage(strMsg).complete();
             Updater.getUpdater().updateRoutine();
+
         })));
 
         helpCommand = (event, args, serverWatcher) -> {
@@ -397,11 +403,10 @@ public class Commands {
             }
 
             args[0] = args[0].toLowerCase();
-            boolean isAdmin = event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
 
             for (Command command : commands) {
                 if (command.getLabels().contains(args[0])) {
-                    if (command.isAdminRequired() && !isAdmin) break;
+                    if (command.isAdminRequired() && !isAdmin(event)) break;
                     command.run(event, args, watcher);
                     return;
                 }
@@ -411,6 +416,7 @@ public class Commands {
     }
 
     public static boolean isAdmin(MessageReceivedEvent event) {
+        if(event.getMember() == null) return false;
         return event.getMember().getRoles().contains(event.getGuild().getRolesByName("admin", true).get(0));
     }
 }
