@@ -385,6 +385,10 @@ public class Commands {
 
         })));
 
+        commands.add(new Command(new String[]{"poll"}, false, ((event, args, serverWatcher) -> {
+            new Poll(event.getAuthor(), args, serverWatcher);
+        })));
+
         helpCommand = (event, args, serverWatcher) -> {
             String helpMsg = Storage.getInternalFile("help.txt");
             event.getChannel().sendMessage(helpMsg).complete();
